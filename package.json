@@ -1,0 +1,23 @@
+{
+  "name"         : "ab",
+  "description"  : "Fast client-side asset builder, built on top of npm",
+  "private"      : true,
+  "version"      : "0.0.1",
+  "author"       : "Jo Liss",
+  "main"         : "index.js",
+
+  "dependencies" : {
+    "rsvp": "latest",
+    "underscore": "latest",
+    "graceful-fs": "latest"
+  },
+
+  "devDependencies": {
+    "tap": "latest",
+    "pipette": "latest"
+  },
+
+  "scripts": {
+    "test": "tap ./test"
+  }
+}
