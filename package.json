@@ -14,7 +14,8 @@
 
   "devDependencies": {
     "tap": "latest",
-    "pipette": "latest"
+    "through": "latest",
+    "concat-stream": "latest"
   },
 
   "scripts": {
