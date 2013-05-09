@@ -15,10 +15,11 @@
   "devDependencies": {
     "tap": "latest",
     "through": "latest",
-    "concat-stream": "latest"
+    "concat-stream": "latest",
+    "combined-stream": "latest"
   },
 
   "scripts": {
-    "test": "tap ./test"
+    "test": "tap --stderr ./test"
   }
 }
