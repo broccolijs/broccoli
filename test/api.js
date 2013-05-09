@@ -7,15 +7,6 @@ var concat = require('concat-stream')
 var ab = require('../')
 
 test('compiler', function (t) {
-  // Virtual input tree containing one file.
-  // This is baroque. Fold into processor?
-  var inputTree = {
-    readFile: function(path) {
-      // To do: Make me relative to some base directory.
-      return fs.createReadStream(path)
-    }
-  }
-
   function testCompiler(processor, inFile, callback) {
     var vFileStream = through().pause()
     vFileStream.write(new Buffer('// Compiled\n'))
@@ -33,7 +24,7 @@ test('compiler', function (t) {
     callback(null, {stream: outStream})
   }
 
-  var processor = new ab.Processor(inputTree, testCompiler, testConcatenator)
+  var processor = new ab.Processor(testCompiler, testConcatenator)
 
   test('request', function(t) {
     processor.request('simpletree/test.js', function(err, outFile) {
