@@ -7,10 +7,11 @@ var concat = require('concat-stream')
 var ab = require('../')
 
 test('compiler', function (t) {
-  function testCompiler(processor, inFile, callback) {
+  function testCompiler(processor, inFilePath, callback) {
+    var inFileStream = processor.inFileStream(inFilePath)
     var vFileStream = through().pause()
     vFileStream.write(new Buffer('// Compiled\n'))
-    inFile.stream.pipe(vFileStream)
+    inFileStream.pipe(vFileStream)
     callback(null, [{stream: vFileStream}])
   }
 
