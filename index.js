@@ -18,5 +18,5 @@ exports.Processor.prototype.request = function(outFilePath, callback) {
 }
 
 exports.Processor.prototype.inFileStream = function(inFilePath) {
-  return fs.createReadStream(inFilePath)
+  return fs.createReadStream(inFilePath, {encoding: 'utf8'})
 };

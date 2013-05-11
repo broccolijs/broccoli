@@ -10,7 +10,7 @@ test('compiler', function (t) {
   function testCompiler(processor, inFilePath, callback) {
     var inFileStream = processor.inFileStream(inFilePath)
     var vFileStream = through().pause()
-    vFileStream.write(new Buffer('// Compiled\n'))
+    vFileStream.write('// Compiled\n')
     inFileStream.pipe(vFileStream)
     callback(null, [{stream: vFileStream}])
   }
@@ -18,7 +18,7 @@ test('compiler', function (t) {
   function testConcatenator(processor, vFiles, callback) {
     var outStream = CombinedStream.create()
     outStream.pause()
-    outStream.append(new Buffer('// Concatenated\n'))
+    outStream.append('// Concatenated\n')
     vFiles.forEach(function(vFile) {
       outStream.append(vFile.stream)
     })
