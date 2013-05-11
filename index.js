@@ -1,6 +1,4 @@
 var fs = require('fs')
-var EventEmitter = require('events').EventEmitter
-// how to configure compilers + concaters?
 
 exports.Processor = function(compiler, concatenator) {
   this.compiler = compiler
