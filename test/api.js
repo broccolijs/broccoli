@@ -13,6 +13,7 @@ test('compiler', function (t) {
     vFileStream.write('// Compiled\n')
     inFileStream.pipe(vFileStream)
     callback(null, [{stream: vFileStream}])
+    vFileStream.resume()
   }
 
   function testConcatenator(processor, vFiles, callback) {
@@ -23,6 +24,7 @@ test('compiler', function (t) {
       outStream.append(vFile.stream)
     })
     callback(null, {stream: outStream})
+    outStream.resume()
   }
 
   var processor = new ab.Processor(testCompiler, testConcatenator)
