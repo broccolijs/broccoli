@@ -6,13 +6,13 @@ var through = require('through')
 var concat = require('concat-stream')
 var ab = require('../')
 
-test('compiler', function (t) {
+test('request', function (t) {
   function testCompiler(processor, inFilePath, callback) {
     var inFileStream = processor.inFileStream(inFilePath)
     var vFileStream = through().pause()
     vFileStream.write('// Compiled\n')
     inFileStream.pipe(vFileStream)
-    callback(null, [{stream: vFileStream}])
+    callback(null, [{stream: vFileStream, path: inFilePath}])
     vFileStream.resume()
   }
 
@@ -29,17 +29,13 @@ test('compiler', function (t) {
 
   var processor = new ab.Processor(testCompiler, testConcatenator)
 
-  test('request', function(t) {
-    processor.request('simpletree/test.js', function(err, outFile) {
+  processor.request('simpletree/test.js', function(err, outFile) {
+    t.notOk(err)
+    outFile.stream.pipe(concat(checkData))
+    function checkData(err, data) {
       t.notOk(err)
-      outFile.stream.pipe(concat(checkData))
-      function checkData(err, data) {
-        t.notOk(err)
-        t.equal(data.toString(), '// Concatenated\n// Compiled\n// This is the test.js file.\n')
-        t.end()
-      }
-    })
+      t.equal(data.toString(), '// Concatenated\n// Compiled\n// This is the test.js file.\n')
+      t.end()
+    }
   })
-
-  t.end()
 })
