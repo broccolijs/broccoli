@@ -1,7 +1,7 @@
 {
   "name": "broccoli",
   "description": "Fast client-side asset builder",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Jo Liss <joliss42@gmail.com>",
   "main": "index.js",
   "license": "MIT",
