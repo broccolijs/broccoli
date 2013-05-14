@@ -1,10 +1,14 @@
 {
-  "name"         : "broccoli",
-  "description"  : "Fast client-side asset builder",
-  "private"      : true,
-  "version"      : "0.0.1",
-  "author"       : "Jo Liss",
-  "main"         : "index.js",
+  "name": "broccoli",
+  "description": "Fast client-side asset builder",
+  "version": "0.0.1",
+  "author": "Jo Liss <joliss42@gmail.com>",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joliss/broccoli"
+  },
 
   "dependencies" : {
     "rsvp": "latest",
