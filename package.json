@@ -1,6 +1,6 @@
 {
-  "name"         : "ab",
-  "description"  : "Fast client-side asset builder, built on top of npm",
+  "name"         : "broccoli",
+  "description"  : "Fast client-side asset builder",
   "private"      : true,
   "version"      : "0.0.1",
   "author"       : "Jo Liss",

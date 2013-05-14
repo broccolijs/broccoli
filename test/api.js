@@ -4,7 +4,7 @@ var test = require('tap').test
 var fs = require('fs')
 var through = require('through')
 var concat = require('concat-stream')
-var ab = require('../')
+var broccoli = require('../')
 
 test('request', function (t) {
   function testCompiler(processor, inFilePath, callback) {
@@ -27,7 +27,7 @@ test('request', function (t) {
     outStream.resume()
   }
 
-  var processor = new ab.Processor(testCompiler, testConcatenator)
+  var processor = new broccoli.Processor(testCompiler, testConcatenator)
 
   processor.request('simpletree/test.js', function(err, outFile) {
     t.notOk(err)
@@ -58,7 +58,7 @@ test('sourceUrlConcatenator', function (t) {
     }
   ]
 
-  ab.sourceUrlConcatenator(null, vFiles, function(err, outFile) {
+  broccoli.sourceUrlConcatenator(null, vFiles, function(err, outFile) {
     t.notOk(err)
     outFile.stream.pipe(concat(function(err, data) {
       t.notOk(err)
