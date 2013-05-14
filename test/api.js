@@ -34,8 +34,39 @@ test('request', function (t) {
     outFile.stream.pipe(concat(checkData))
     function checkData(err, data) {
       t.notOk(err)
-      t.equal(data.toString(), '// Concatenated\n// Compiled\n// This is the test.js file.\n')
+      t.equal(data, '// Concatenated\n// Compiled\n// This is the test.js file.\n')
       t.end()
     }
   })
+})
+
+test('sourceUrlConcatenator', function (t) {
+  var file1Stream = through().pause()
+  file1Stream.write("console.log('Hello World.')")
+  file1Stream.end()
+  var file2Stream = through().pause()
+  file2Stream.write("// File 2")
+  file2Stream.end()
+  var vFiles = [
+    {
+      stream: file1Stream,
+      path: 'file1.js'
+    },
+    {
+      stream: file2Stream,
+      path: 'file2.js'
+    }
+  ]
+
+  ab.sourceUrlConcatenator(null, vFiles, function(err, outFile) {
+    t.notOk(err)
+    outFile.stream.pipe(concat(function(err, data) {
+      t.notOk(err)
+      t.equal(data, "eval('console.log(\\'Hello World.\\')//@ sourceURL=file1.js')\neval('// File 2//@ sourceURL=file2.js')\n")
+      t.end()
+    }))
+  })
+
+  file1Stream.resume()
+  file2Stream.resume()
 })

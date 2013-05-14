@@ -9,17 +9,19 @@
   "dependencies" : {
     "rsvp": "latest",
     "underscore": "latest",
-    "graceful-fs": "latest"
+    "graceful-fs": "latest",
+    "concat-stream": "latest",
+    "js-string-escape": "latest",
+    "async": "latest"
   },
 
   "devDependencies": {
     "tap": "latest",
     "through": "latest",
-    "concat-stream": "latest",
     "combined-stream": "latest"
   },
 
   "scripts": {
-    "test": "tap --stderr ./test"
+    "test": "tap --stderr ./test/*.js"
   }
 }
