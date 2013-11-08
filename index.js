@@ -6,7 +6,8 @@ var walk = require('walk')
 var hapi = require('hapi')
 var synchronized = require('synchronized')
 var Gaze = require('gaze').Gaze
-var es6Compiler = require("es6-module-transpiler").Compiler;
+var es6Compiler = require('es6-module-transpiler').Compiler;
+var jsStringEscape = require('js-string-escape')
 
 
 var Generator
@@ -31,6 +32,7 @@ Generator.prototype.regenerate = function () {
 }
 
 Generator.prototype.writeAppJs = function (callback) {
+  var self = this
   appJs = fs.createWriteStream(this.dest + '/app.js')
 
   // Write vendor files (this needs to go away)
@@ -42,17 +44,41 @@ Generator.prototype.writeAppJs = function (callback) {
 
   // Write app files
   var modulePrefix = 'appkit/'
-  walkFiles(this.src, 'js', function (fileInfo, fileStats, next) {
-    var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-    var compiler = new es6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
-    var output = compiler.toAMD() // ERR: handle exceptions
-    appJs.write(output + "\n")
-    next()
-  }, function () {
-    appJs.end()
-    callback()
+
+  function compileJavascripts(callback) {
+    walkFiles(self.src, 'js', function (fileInfo, fileStats, next) {
+      var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
+      var compiler = new es6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
+      var output = compiler.toAMD() // ERR: handle exceptions
+      appJs.write(output + "\n")
+      next()
+    }, function () {
+      callback()
+    })
+  }
+
+  function compileTemplates(callback) {
+    walkFiles(self.src, 'hbs', function (fileInfo, fileStats, next) {
+      var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
+      var moduleContents = 'export default Ember.Handlebars.compile("' +
+        jsStringEscape(fileContents) + '");'
+      var compiler = new es6Compiler(moduleContents, modulePrefix + fileInfo.moduleName)
+      var output = compiler.toAMD() // ERR: handle exceptions
+      appJs.write(output + "\n")
+      next()
+    }, function () {
+      callback()
+    })
+  }
+
+  compileJavascripts(function () {
+    compileTemplates(function () {
+      appJs.end()
+      callback()
+    })
   })
 }
+
 
 Generator.prototype.copyHtmlFiles = function (callback) {
   var self = this

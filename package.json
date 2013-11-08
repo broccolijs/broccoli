@@ -17,6 +17,7 @@
     "hapi": "latest",
     "gaze": "latest",
     "es6-module-transpiler": "latest",
+    "js-string-escape": "latest",
     "synchronized": "latest"
   }
 }
