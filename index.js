@@ -116,6 +116,7 @@ Generator.prototype.serve = function () {
     self.regenerate()
   })
 
+  console.log('Serving on http://localhost:8000/')
   var server = hapi.createServer('localhost', 8000);
 
   // Add the route
