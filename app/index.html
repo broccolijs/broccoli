@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>App</title>
+
+  <!-- build:css(tmp/result) assets/app.min.css -->
+  <link rel="stylesheet" href="/assets/app.css">
+  <!-- endbuild -->
+
+
+  <!-- for more details visit: https://github.com/yeoman/grunt-usemin -->
+
+  <!-- build:js(tmp/result) assets/vendor.min.js -->
+
+    <script src="/vendor/jquery/jquery.js"></script>
+
+    <!-- @if dist=false -->
+    <script src="/vendor/handlebars/handlebars.js"></script>
+    <script src="/vendor/ember/ember.js"></script>
+    <!-- @endif --><!-- @if dist=true -->
+    <script src="/vendor/handlebars/handlebars.runtime.js"></script>
+    <script src="/vendor/ember/ember.prod.js"></script>
+    <!-- @endif -->
+
+    <script src="/vendor/ember-data-shim/ember-data.js"></script>
+    <script src="/vendor/almond.js"></script>
+    <script src="/vendor/ember-resolver/dist/ember-resolver.js"></script>
+
+  <!-- endbuild -->
+
+  <!-- build:js(tmp/result) assets/app.min.js -->
+
+    <script src="app.js"></script>
+    <script src="/assets/templates.js"></script>
+
+  <!-- endbuild -->
+
+  <!-- @if tests=true -->
+  <link rel="stylesheet" href="/vendor/qunit/qunit/qunit.css">
+  <script src="/vendor/qunit/qunit/qunit.js"></script>
+
+  <style>
+    #ember-testing-container {
+      position: absolute;
+      background: white;
+      bottom: 0;
+      right: 0;
+      width: 640px;
+      height: 384px;
+      overflow: auto;
+      z-index: 9999;
+      border: 1px solid #ccc;
+    }
+    #ember-testing {
+      zoom: 50%;
+    }
+  </style>
+  <!-- @endif -->
+
+</head>
+<body>
+
+  OK
+
+  <!-- @if tests=true -->
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="/tests/tests.js"></script>
+  <script src="/tests/test_helper.js"></script>
+  <script src="/tests/test_loader.js"></script>
+  <!-- @endif -->
+
+  <!-- @if tests=false -->
+  <script>
+    window.App = require('appkit/app').default.create();
+  </script>
+  <!-- @endif -->
+
+</body>
+</html>

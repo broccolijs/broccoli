@@ -1,0 +1,22 @@
+{
+  "name": "broccoli",
+  "description": "Fast client-side asset builder",
+  "version": "0.0.2",
+  "author": "Jo Liss <joliss42@gmail.com>",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joliss/broccoli"
+  },
+
+  "dependencies" : {
+    "mktemp": "latest",
+    "rimraf": "latest",
+    "walk": "latest",
+    "hapi": "latest",
+    "gaze": "latest",
+    "es6-module-transpiler": "latest",
+    "synchronized": "latest"
+  }
+}
