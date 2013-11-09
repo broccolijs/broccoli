@@ -6,7 +6,7 @@ var walk = require('walk')
 var hapi = require('hapi')
 var synchronized = require('synchronized')
 var Gaze = require('gaze').Gaze
-var es6Compiler = require('es6-module-transpiler').Compiler;
+var ES6Compiler = require('es6-module-transpiler').Compiler
 var jsStringEscape = require('js-string-escape')
 
 
@@ -47,7 +47,7 @@ Generator.prototype.writeAppJs = function (callback) {
   function compileJavascripts(callback) {
     walkFiles(self.src, 'js', function (fileInfo, fileStats, next) {
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-      var compiler = new es6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
+      var compiler = new ES6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
       var output = compiler.toAMD() // ERR: handle exceptions
       appJs.write(output + "\n")
       next()
@@ -61,7 +61,7 @@ Generator.prototype.writeAppJs = function (callback) {
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
       var moduleContents = 'export default Ember.Handlebars.compile("' +
         jsStringEscape(fileContents) + '");'
-      var compiler = new es6Compiler(moduleContents, modulePrefix + fileInfo.moduleName)
+      var compiler = new ES6Compiler(moduleContents, modulePrefix + fileInfo.moduleName)
       var output = compiler.toAMD() // ERR: handle exceptions
       appJs.write(output + "\n")
       next()
@@ -77,7 +77,6 @@ Generator.prototype.writeAppJs = function (callback) {
     })
   })
 }
-
 
 Generator.prototype.copyHtmlFiles = function (callback) {
   var self = this
@@ -109,16 +108,15 @@ Generator.prototype.serve = function () {
 
   this.regenerate()
 
-  var gaze = new Gaze([this.src + '/**/*', __dirname + '/vendor/**/*']);
+  var gaze = new Gaze([this.src + '/**/*', __dirname + '/vendor/**/*'])
   gaze.on('all', function () {
     // We should debounce this, e.g. when you do `touch *`
     self.regenerate()
   })
 
   console.log('Serving on http://localhost:8000/')
-  var server = hapi.createServer('localhost', 8000);
+  var server = hapi.createServer('localhost', 8000)
 
-  // Add the route
   server.route({
     method: 'GET',
     path: '/{path*}',
@@ -129,7 +127,7 @@ Generator.prototype.serve = function () {
         }
       }
     }
-  });
+  })
 
   server.ext('onRequest', function (request, next) {
     // `synchronized` delays serving until we've finished regenerating
@@ -139,8 +137,7 @@ Generator.prototype.serve = function () {
     })
   })
 
-  // Start the server
-  server.start();
+  server.start()
 }
 
 
@@ -178,16 +175,15 @@ var walkFiles = function (root, extension, fileCallback, endCallback) {
 
 var generator = new Generator('app')
 process.on('SIGINT', function () {
-  gotSigInt = true
-  setTimeout(function () {
-    console.error('Error: Something slow stopped us from cleaning up in time.')
-    console.error('This should *never* happen. Please file a bug report.')
-    process.exit()
-  }, 300)
   synchronized(generator, function () {
     generator.cleanup(function () {
       process.exit()
     })
   })
+  setTimeout(function () {
+    console.error('Error: Something slow stopped us from cleaning up in time.')
+    console.error('This should *never* happen. Please file a bug report.')
+    process.exit()
+  }, 300)
 })
 generator.serve()
