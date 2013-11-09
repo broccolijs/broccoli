@@ -8,6 +8,8 @@ var Gaze = require('gaze').Gaze
 var ES6Compiler = require('es6-module-transpiler').Compiler
 var jsStringEscape = require('js-string-escape')
 
+var helpers = require('./lib/helpers')
+
 
 var Generator
 exports.Generator = Generator = function (src) {
@@ -59,7 +61,7 @@ Generator.prototype.preprocess = function (callback) {
   })
 
   function processFile (fileRoot, fileStats, next) {
-    var fileInfo = getFileInfo(srcRoot, fileRoot, fileStats)
+    var fileInfo = helpers.getFileInfo(srcRoot, fileRoot, fileStats)
     var extensions = []
     for (var e in self.preprocessors) {
       if (self.preprocessors.hasOwnProperty(e)) {
@@ -126,7 +128,7 @@ Generator.prototype.writeAppJs = function (src, dest, callback) {
 
   // Write app files
   function compileJavascripts(callback) {
-    walkFiles(src, 'js', function (fileInfo, fileStats, next) {
+    helpers.walkFiles(src, 'js', function (fileInfo, fileStats, next) {
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
       var compiler = new ES6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
       var output = compiler.toAMD() // ERR: handle exceptions
@@ -144,7 +146,7 @@ Generator.prototype.writeAppJs = function (src, dest, callback) {
 }
 
 Generator.prototype.copyHtmlFiles = function (src, dest, callback) {
-  walkFiles(src, 'html', function (fileInfo, fileStats, next) {
+  helpers.walkFiles(src, 'html', function (fileInfo, fileStats, next) {
     var contents = fs.readFileSync(fileInfo.fullPath)
     fs.writeFileSync(dest + '/' + fileInfo.relativePath, contents)
     next()
@@ -203,55 +205,6 @@ Generator.prototype.serve = function () {
   })
 
   server.start()
-}
-
-
-// Tree recursion helper to iterate over files with given extension
-function walkFiles (root, extension, fileCallback, endCallback) {
-  var walker = walk.walk(root, {})
-
-  walker.on('names', function (fileRoot, nodeNamesArray) {
-    nodeNamesArray.sort()
-  })
-
-  function processFile (fileRoot, fileStats, next) {
-    if (fileStats.name.slice(-(extension.length + 1)) === '.' + extension) {
-      var fileInfo = getFileInfo(root, fileRoot, fileStats)
-      fileCallback(fileInfo, fileStats, next)
-    } else {
-      next()
-    }
-  }
-
-  walker.on('file', processFile)
-  walker.on('symbolicLink', processFile) // TODO: check if target is a file
-
-  walker.on('errors', function (fileRoot, nodeStatsArray, next) {
-    // ERR
-    console.error('Warning: unhandled error(s)', nodeStatsArray)
-    next()
-  })
-
-  walker.on('end', function () {
-    endCallback()
-  })
-}
-
-function getFileInfo(root, fileRoot, fileStats) {
-  var fileInfo = {}
-  fileInfo.baseName = fileStats.name
-  fileInfo.fullPath = fileRoot + '/' + fileStats.name
-  fileInfo.relativePath = fileInfo.fullPath.slice(root.length + 1)
-  var match = /.\.([^./]+)$/.exec(fileStats.name)
-  if (match) {
-    fileInfo.extension = match[1]
-    // Note: moduleName is also used to construct new file paths; maybe it
-    // shouldn't
-    fileInfo.moduleName = fileInfo.relativePath.slice(0, -(fileInfo.extension.length + 1))
-  } else {
-    fileInfo.moduleName = fileInfo.relativePath
-  }
-  return fileInfo
 }
 
 
