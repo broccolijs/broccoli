@@ -3,9 +3,10 @@ var mktemp = require('mktemp')
 var rimraf = require('rimraf')
 var walk = require('walk')
 var hapi = require('hapi')
+var async = require('async')
 var synchronized = require('synchronized')
 var Gaze = require('gaze').Gaze
-var ES6Compiler = require('es6-module-transpiler').Compiler
+var ES6Transpiler = require('es6-module-transpiler').Compiler
 var jsStringEscape = require('js-string-escape')
 
 var helpers = require('./lib/helpers')
@@ -15,6 +16,7 @@ var Generator
 exports.Generator = Generator = function (src) {
   this.src = src
   this.preprocessors = {}
+  this.compilers = []
 }
 
 Generator.prototype.regenerate = function () {
@@ -39,6 +41,10 @@ Generator.prototype.registerPreprocessor = function (preprocessorFunction) {
     }
     this.preprocessors[preprocessorFunction.extensions[i]] = preprocessorFunction
   }
+}
+
+Generator.prototype.registerCompiler = function (compilerFunction) {
+  this.compilers.push(compilerFunction)
 }
 
 Generator.prototype.preprocess = function (callback) {
@@ -106,51 +112,9 @@ Generator.prototype.compile = function (callback) {
   var self = this
   if (this.compileTarget != null) throw new Error('self.compileTarget is not null/undefined')
   this.compileTarget = mktemp.createDirSync(this.dest + '/compile_target-XXXXXX.tmp')
-  self.writeAppJs(self.preprocessTarget, self.compileTarget, function () {
-    self.copyHtmlFiles(self.preprocessTarget, self.compileTarget, function () {
-      callback()
-    })
-  })
-}
-
-Generator.prototype.writeAppJs = function (src, dest, callback) {
-  var appJs = fs.createWriteStream(dest + '/app.js')
-
-  // Write vendor files (this needs to go away)
-  var files = fs.readdirSync(__dirname + '/vendor')
-  for (var i = 0; i < files.length; i++) {
-    var contents = fs.readFileSync(__dirname + '/vendor/' + files[i])
-    appJs.write(contents)
-  }
-
-  // Make me configurable, or remove me?
-  var modulePrefix = 'appkit/'
-
-  // Write app files
-  function compileJavascripts(callback) {
-    helpers.walkFiles(src, 'js', function (fileInfo, fileStats, next) {
-      var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-      var compiler = new ES6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
-      var output = compiler.toAMD() // ERR: handle exceptions
-      appJs.write(output + '\n')
-      next()
-    }, function () {
-      callback()
-    })
-  }
-
-  compileJavascripts(function () {
-    appJs.end()
-    callback()
-  })
-}
-
-Generator.prototype.copyHtmlFiles = function (src, dest, callback) {
-  helpers.walkFiles(src, 'html', function (fileInfo, fileStats, next) {
-    var contents = fs.readFileSync(fileInfo.fullPath)
-    fs.writeFileSync(dest + '/' + fileInfo.relativePath, contents)
-    next()
-  }, function () {
+  async.eachSeries(self.compilers, function (compiler, callback) {
+    compiler(self.preprocessTarget, self.compileTarget, callback)
+  }, function (err) {
     callback()
   })
 }
@@ -219,8 +183,53 @@ function emberHandlebarsPreprocessor(fileInfo, targetPath, callback) {
 emberHandlebarsPreprocessor.extensions = ['hbs', 'handlebars']
 emberHandlebarsPreprocessor.targetExtension = 'js'
 
+function es6Compiler (src, dest, callback) {
+  var appJs = fs.createWriteStream(dest + '/app.js')
+
+  // Write vendor files (this needs to go away)
+  var files = fs.readdirSync(__dirname + '/vendor')
+  for (var i = 0; i < files.length; i++) {
+    var contents = fs.readFileSync(__dirname + '/vendor/' + files[i])
+    appJs.write(contents)
+  }
+
+  // Make me configurable, or remove me?
+  var modulePrefix = 'appkit/'
+
+  // Write app files
+  function compileJavascripts(callback) {
+    helpers.walkFiles(src, 'js', function (fileInfo, fileStats, next) {
+      var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
+      var compiler = new ES6Transpiler(fileContents, modulePrefix + fileInfo.moduleName)
+      var output = compiler.toAMD() // ERR: handle exceptions
+      appJs.write(output + '\n')
+      next()
+    }, function () {
+      callback()
+    })
+  }
+
+  compileJavascripts(function () {
+    appJs.end()
+    callback()
+  })
+}
+
+function staticFileCompiler (src, dest, callback) {
+  helpers.walkFiles(src, 'html', function (fileInfo, fileStats, next) {
+    var contents = fs.readFileSync(fileInfo.fullPath)
+    fs.writeFileSync(dest + '/' + fileInfo.relativePath, contents)
+    next()
+  }, function () {
+    callback()
+  })
+}
+
+
 var generator = new Generator('app')
 generator.registerPreprocessor(emberHandlebarsPreprocessor)
+generator.registerCompiler(es6Compiler)
+generator.registerCompiler(staticFileCompiler)
 process.on('SIGINT', function () {
   synchronized(generator, function () {
     generator.cleanup(function () {
