@@ -17,10 +17,9 @@ exports.Generator = Generator = function (src) {
 
 Generator.prototype.regenerate = function () {
   var self = this
-  // Should debounce, e.g. when you do `touch *`
   synchronized(this, function (done) {
-    self.cleanup()
-    self.createDest()
+    self.cleanup(function() { /* do not wait for cleanup to finish */ })
+    self.createDest() // create pristine directory with new name
 
     self.writeAppJs(function () {
       self.copyHtmlFiles(function () {
@@ -98,10 +97,9 @@ Generator.prototype.createDest = function () {
   return this.dest
 }
 
-Generator.prototype.cleanup = function () {
+Generator.prototype.cleanup = function (callback) {
   if (this.dest != null) {
-    // This is asynchronous, but we don't wait for the directory to disappear
-    rimraf(this.dest, function () { })
+    rimraf(this.dest, callback)
   }
   this.dest = null
 }
@@ -113,6 +111,7 @@ Generator.prototype.serve = function () {
 
   var gaze = new Gaze([this.src + '/**/*', __dirname + '/vendor/**/*']);
   gaze.on('all', function () {
+    // We should debounce this, e.g. when you do `touch *`
     self.regenerate()
   })
 
@@ -178,4 +177,17 @@ var walkFiles = function (root, extension, fileCallback, endCallback) {
 
 
 var generator = new Generator('app')
+process.on('SIGINT', function () {
+  gotSigInt = true
+  setTimeout(function () {
+    console.error('Error: Something slow stopped us from cleaning up in time.')
+    console.error('This should *never* happen. Please file a bug report.')
+    process.exit()
+  }, 300)
+  synchronized(generator, function () {
+    generator.cleanup(function () {
+      process.exit()
+    })
+  })
+})
 generator.serve()
