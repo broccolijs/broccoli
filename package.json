@@ -10,7 +10,7 @@
     "url": "https://github.com/joliss/broccoli"
   },
 
-  "dependencies" : {
+  "dependencies": {
     "mktemp": "latest",
     "rimraf": "latest",
     "walk": "latest",
@@ -19,5 +19,9 @@
     "es6-module-transpiler": "latest",
     "js-string-escape": "latest",
     "synchronized": "latest"
+  },
+
+  "devDependencies": {
+    "jshint": "~2.3.0"
   }
 }
