@@ -13,6 +13,7 @@ var jsStringEscape = require('js-string-escape')
 var Generator
 exports.Generator = Generator = function (src) {
   this.src = src
+  this.preprocessors = {}
 }
 
 Generator.prototype.regenerate = function () {
@@ -28,6 +29,15 @@ Generator.prototype.regenerate = function () {
       })
     })
   })
+}
+
+Generator.prototype.registerPreprocessor = function (preprocessorFunction) {
+  for (var i = 0; i < preprocessorFunction.extensions.length; i++) {
+    if (this.preprocessors[preprocessorFunction.extensions[i]]) {
+      console.warn('Warning: Extension ' + preprocessorFunction.extensions[i] + ' already registered; overwriting existing handler.')
+    }
+    this.preprocessors[preprocessorFunction.extensions[i]] = preprocessorFunction
+  }
 }
 
 Generator.prototype.preprocess = function (callback) {
@@ -51,20 +61,29 @@ Generator.prototype.preprocess = function (callback) {
 
   function processFile (fileRoot, fileStats, next) {
     var fileInfo = getFileInfo(srcRoot, fileRoot, fileStats)
-    if (fileInfo.extension == 'hbs' || fileInfo.extension == 'handlebars') {
-      var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-      var moduleContents = 'export default Ember.Handlebars.compile("' +
-        jsStringEscape(fileContents) + '");\n'
-      fs.writeFileSync(self.preprocessTarget + '/' + fileInfo.moduleName + '.js', moduleContents)
-      next()
-    } else {
-      // Wish we could hardlink, but that triggers inotify/watchFile on the
-      // original file because the link count increases. We'll have to work
-      // around that first.
-      var depth = (self.preprocessTarget + '/' + fileInfo.relativePath).split('/').length - 1
-      var parentDirs = new Array(depth + 1).join('../')
-      fs.symlinkSync(parentDirs + fileInfo.fullPath, self.preprocessTarget + '/' + fileInfo.relativePath)
-      next()
+    var extensions = []
+    for (var e in self.preprocessors) {
+      if (self.preprocessors.hasOwnProperty(e)) {
+        extensions.push(e)
+      }
+    }
+    extensions.sort()
+    extensions.push(null) // copy if no preprocessor found
+    for (var i = 0; i < extensions.length; i++) {
+      var extension = extensions[i]
+      if (extension === null) {
+        // No preprocessor; copy
+        var depth = (self.preprocessTarget + '/' + fileInfo.relativePath).split('/').length - 1
+        var parentDirs = new Array(depth + 1).join('../')
+        fs.symlinkSync(parentDirs + fileInfo.fullPath, self.preprocessTarget + '/' + fileInfo.relativePath)
+        next()
+        break
+      } else if (fileInfo.extension === extension) {
+        var preprocessor = self.preprocessors[extension]
+        targetPath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
+        preprocessor(fileInfo, targetPath, next)
+        break
+      }
     }
   }
 
@@ -223,6 +242,7 @@ function walkFiles (root, extension, fileCallback, endCallback) {
 
 function getFileInfo(root, fileRoot, fileStats) {
   var fileInfo = {}
+  fileInfo.baseName = fileStats.name
   fileInfo.fullPath = fileRoot + '/' + fileStats.name
   fileInfo.relativePath = fileInfo.fullPath.slice(root.length + 1)
   var match = /.\.([^./]+)$/.exec(fileStats.name)
@@ -238,7 +258,19 @@ function getFileInfo(root, fileRoot, fileStats) {
 }
 
 
+function emberHandlebarsPreprocessor(fileInfo, targetPath, callback) {
+  var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
+  var moduleContents = 'export default Ember.Handlebars.compile("' +
+    jsStringEscape(fileContents) + '");\n'
+  fs.writeFileSync(targetPath, moduleContents)
+  callback()
+}
+
+emberHandlebarsPreprocessor.extensions = ['hbs', 'handlebars']
+emberHandlebarsPreprocessor.targetExtension = 'js'
+
 var generator = new Generator('app')
+generator.registerPreprocessor(emberHandlebarsPreprocessor)
 process.on('SIGINT', function () {
   synchronized(generator, function () {
     generator.cleanup(function () {
