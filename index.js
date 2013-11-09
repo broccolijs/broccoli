@@ -1,5 +1,4 @@
 var fs = require('fs')
-var path = require('path')
 var mktemp = require('mktemp')
 var rimraf = require('rimraf')
 var walk = require('walk')
@@ -53,7 +52,7 @@ Generator.prototype.preprocess = function (callback) {
   walker.on('names', function (fileRoot, nodeNamesArray) { nodeNamesArray.sort() })
 
   walker.on('directory', function (dirRoot, dirStats, next) {
-    relativePath = dirRoot.slice(srcRoot.length + 1)
+    var relativePath = dirRoot.slice(srcRoot.length + 1)
     if (relativePath.length > 0) relativePath = relativePath + '/'
     fs.mkdirSync(self.preprocessTarget + '/' + relativePath + dirStats.name)
     next()
@@ -80,7 +79,7 @@ Generator.prototype.preprocess = function (callback) {
         break
       } else if (fileInfo.extension === extension) {
         var preprocessor = self.preprocessors[extension]
-        targetPath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
+        var targetPath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
         preprocessor(fileInfo, targetPath, next)
         break
       }
@@ -113,18 +112,17 @@ Generator.prototype.compile = function (callback) {
 }
 
 Generator.prototype.writeAppJs = function (src, dest, callback) {
-  var self = this
-  appJs = fs.createWriteStream(dest + '/app.js')
+  var appJs = fs.createWriteStream(dest + '/app.js')
 
   // Write vendor files (this needs to go away)
   var files = fs.readdirSync(__dirname + '/vendor')
   for (var i = 0; i < files.length; i++) {
-    contents = fs.readFileSync(__dirname + '/vendor/' + files[i])
+    var contents = fs.readFileSync(__dirname + '/vendor/' + files[i])
     appJs.write(contents)
   }
 
   // Make me configurable, or remove me?
-  modulePrefix = 'appkit/'
+  var modulePrefix = 'appkit/'
 
   // Write app files
   function compileJavascripts(callback) {
@@ -132,7 +130,7 @@ Generator.prototype.writeAppJs = function (src, dest, callback) {
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
       var compiler = new ES6Compiler(fileContents, modulePrefix + fileInfo.moduleName)
       var output = compiler.toAMD() // ERR: handle exceptions
-      appJs.write(output + "\n")
+      appJs.write(output + '\n')
       next()
     }, function () {
       callback()
@@ -146,7 +144,6 @@ Generator.prototype.writeAppJs = function (src, dest, callback) {
 }
 
 Generator.prototype.copyHtmlFiles = function (src, dest, callback) {
-  var self = this
   walkFiles(src, 'html', function (fileInfo, fileStats, next) {
     var contents = fs.readFileSync(fileInfo.fullPath)
     fs.writeFileSync(dest + '/' + fileInfo.relativePath, contents)
