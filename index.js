@@ -175,6 +175,34 @@ Generator.prototype.serve = function () {
 }
 
 
+var CoffeeScriptPreprocessor = function (options) {
+  this.options = {}
+  for (var key in options) {
+    if (options.hasOwnProperty(key)) {
+      this[key] = options[key]
+    }
+  }
+}
+
+CoffeeScriptPreprocessor.prototype.run = function (srcFilePath, destFilePath, callback) {
+  // Copy options; https://github.com/jashkenas/coffee-script/issues/1924
+  var optionsCopy = {}
+  for (var key in this.options) {
+    if (this.options.hasOwnProperty(key)) {
+      optionsCopy[key] = this.options[key]
+    }
+  }
+
+  var code = fs.readFileSync(srcFilePath).toString()
+  var output = require('coffee-script').compile(code, optionsCopy)
+  fs.writeFileSync(destFilePath, output)
+  callback()
+}
+
+CoffeeScriptPreprocessor.prototype.extensions = ['coffee']
+CoffeeScriptPreprocessor.prototype.targetExtension = 'js'
+
+
 var ES6TemplatePreprocessor = function (options) {
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -268,14 +296,21 @@ StaticFileCompiler.prototype.run = function (src, dest, callback) {
 
 
 var generator = new Generator('app')
+
 generator.registerPreprocessor(new ES6TemplatePreprocessor({
   extensions: ['hbs', 'handlebars'],
   compileFunction: 'Ember.Handlebars.compile'
+}))
+generator.registerPreprocessor(new CoffeeScriptPreprocessor({
+  options: {
+    bare: true
+  }
 }))
 generator.registerCompiler(new ES6Compiler)
 generator.registerCompiler(new StaticFileCompiler({
   files: ['**/*.html']
 }))
+
 process.on('SIGINT', function () {
   synchronized(generator, function () {
     generator.cleanup(function () {
@@ -288,4 +323,5 @@ process.on('SIGINT', function () {
     process.exit()
   }, 300)
 })
+
 generator.serve()
