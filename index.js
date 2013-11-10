@@ -24,16 +24,35 @@ exports.Generator = Generator = function (src) {
 
 Generator.prototype.regenerate = function () {
   var self = this
+
   synchronized(this, function (done) {
-    self.cleanup(function() { /* do not wait for cleanup to finish */ })
+    self.buildError = null
+
+    self.cleanup(function (err) {
+      // Do not wait for cleanup to finish, just check for errors
+      if (err) throw err
+    })
     self.createDest() // create pristine directory with new name
 
-    self.preprocess(function () {
-      self.compile(function () {
+    self.preprocess(function (err) {
+      if (err) {
+        handleError(err)
+        return
+      }
+      self.compile(function (err) {
+        if (err) {
+          handleError(err)
+          return
+        }
         console.log('Regenerated')
         done()
       })
     })
+
+    function handleError(err) {
+      self.buildError = err
+      done()
+    }
   })
 }
 
@@ -91,7 +110,21 @@ Generator.prototype.preprocess = function (callback) {
       } else if (fileInfo.extension === extension) {
         var preprocessor = self.preprocessors[extension]
         var destFilePath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
-        preprocessor.run(fileInfo.fullPath, destFilePath, next)
+        /* jshint loopfunc: true */
+        ;(function (fileInfo) { // closure to capture fileInfo for callback
+          preprocessor.run(fileInfo.fullPath, destFilePath, function (err) {
+            if (err) {
+              // fullPath could at some point contain nasty tmp directories. We
+              // may have to find a better way to communicate the path of the
+              // file.
+              err.file = fileInfo.fullPath
+              walker.emit('end', err)
+            } else {
+              next()
+            }
+          })
+        })(fileInfo)
+        /* jshint loopfunc: false */
         break
       }
     }
@@ -100,14 +133,12 @@ Generator.prototype.preprocess = function (callback) {
   walker.on('file', processFile)
   walker.on('symbolicLink', processFile) // TODO: check if target is a file
 
-  walker.on('errors', function (fileRoot, nodeStatsArray, next) {
-    // ERR
-    console.error('Warning: unhandled error(s)', nodeStatsArray)
-    next()
-  })
+  walker.on('errors', helpers.unexpectedWalkError)
+  walker.on('directoryError', helpers.unexpectedWalkError)
+  walker.on('nodeError', helpers.unexpectedWalkError)
 
-  walker.on('end', function () {
-    callback()
+  walker.on('end', function (err) {
+    callback(err)
   })
 }
 
@@ -118,7 +149,7 @@ Generator.prototype.compile = function (callback) {
   async.eachSeries(self.compilers, function (compiler, callback) {
     compiler.run(self.preprocessTarget, self.compileTarget, callback)
   }, function (err) {
-    callback()
+    callback(err)
   })
 }
 
@@ -139,8 +170,6 @@ Generator.prototype.cleanup = function (callback) {
 Generator.prototype.serve = function () {
   var self = this
 
-  this.regenerate()
-
   var gaze = new Gaze([this.src + '/**/*', __dirname + '/vendor/**/*'])
   gaze.on('all', function (event, filepath) {
     console.error(event, filepath)
@@ -149,7 +178,14 @@ Generator.prototype.serve = function () {
   })
 
   console.log('Serving on http://localhost:8000/')
-  var server = hapi.createServer('localhost', 8000)
+  var server = hapi.createServer('localhost', 8000, {
+    views: {
+      engines: {
+        html: 'handlebars'
+      },
+      path: __dirname + '/templates'
+    }
+  })
 
   server.route({
     method: 'GET',
@@ -157,6 +193,12 @@ Generator.prototype.serve = function () {
     handler: {
       directory: {
         path: function (request) {
+          if (!self.compileTarget) {
+            throw new Error('Expected self.compileTarget to be set')
+          }
+          if (self.buildError) {
+            throw new Error('Did not expect self.buildError to be set')
+          }
           return self.compileTarget
         }
       }
@@ -166,12 +208,27 @@ Generator.prototype.serve = function () {
   server.ext('onRequest', function (request, next) {
     // `synchronized` delays serving until we've finished regenerating
     synchronized(self, function (done) {
+      if (self.buildError) {
+        var context = {
+          message: self.buildError.message,
+          file: self.buildError.file,
+          line: self.buildError.line,
+          column: self.buildError.column
+        }
+        // Cannot use request.generateView - https://github.com/spumko/hapi/issues/1137
+        var view = new hapi.response.View(request.server._views, 'error', context)
+        next(view.code(500))
+      } else {
+        // Good to go
+        next()
+      }
       done() // release lock immediately
-      next()
     })
   })
 
   server.start()
+
+  this.regenerate()
 }
 
 
@@ -194,7 +251,17 @@ CoffeeScriptPreprocessor.prototype.run = function (srcFilePath, destFilePath, ca
   }
 
   var code = fs.readFileSync(srcFilePath).toString()
-  var output = require('coffee-script').compile(code, optionsCopy)
+  var output
+  try {
+    output = require('coffee-script').compile(code, optionsCopy)
+  } catch (err) {
+    /* jshint camelcase: false */
+    err.line = err.location && err.location.first_line
+    err.column = err.location && err.location.first_column
+    /* jshint camelcase: true */
+    callback(err)
+    return
+  }
   fs.writeFileSync(destFilePath, output)
   callback()
 }
@@ -239,22 +306,39 @@ ES6Compiler.prototype.run = function (src, dest, callback) {
   // Make me configurable, or remove me?
   var modulePrefix = 'appkit/'
 
-  // Write app files
-  function compileJavascripts(callback) {
-    helpers.walkFiles(src, 'js', function (fileInfo, fileStats, next) {
+  var walker = walk.walk(src, {})
+
+  walker.on('names', function (fileRoot, nodeNamesArray) { nodeNamesArray.sort() })
+
+  function processFile (fileRoot, fileStats, next) {
+    var extension = 'js'
+    if (fileStats.name.slice(-(extension.length + 1)) === '.' + extension) {
+      var fileInfo = helpers.getFileInfo(src, fileRoot, fileStats)
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-      var compiler = new ES6Transpiler(fileContents, modulePrefix + fileInfo.moduleName)
-      var output = compiler.toAMD() // ERR: handle exceptions
+      var compiler, output;
+      try {
+        compiler = new ES6Transpiler(fileContents, modulePrefix + fileInfo.moduleName)
+        output = compiler.toAMD()
+      } catch (err) {
+        err.file = fileInfo.relativePath
+        this.emit('end', err)
+        return
+      }
       appJs.write(output + '\n')
-      next()
-    }, function () {
-      callback()
-    })
+    }
+    next()
   }
 
-  compileJavascripts(function () {
+  walker.on('file', processFile)
+  walker.on('symbolicLink', processFile) // TODO: check if target is a file
+
+  walker.on('errors', helpers.unexpectedWalkError)
+  walker.on('directoryError', helpers.unexpectedWalkError)
+  walker.on('nodeError', helpers.unexpectedWalkError)
+
+  walker.on('end', function (err) {
     appJs.end()
-    callback()
+    callback(err)
   })
 }
 

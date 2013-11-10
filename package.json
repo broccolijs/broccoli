@@ -21,7 +21,8 @@
     "async": "~0.2.9",
     "glob": "~3.2.6",
     "mkdirp": "~0.3.5",
-    "coffee-script": "~1.6.3"
+    "coffee-script": "~1.6.3",
+    "handlebars": "~1.1.2"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
