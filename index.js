@@ -90,8 +90,8 @@ Generator.prototype.preprocess = function (callback) {
         break
       } else if (fileInfo.extension === extension) {
         var preprocessor = self.preprocessors[extension]
-        var targetPath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
-        preprocessor.run(fileInfo, targetPath, next)
+        var destFilePath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
+        preprocessor.run(fileInfo.fullPath, destFilePath, next)
         break
       }
     }
@@ -183,11 +183,11 @@ var ES6TemplatePreprocessor = function (options) {
   }
 }
 
-ES6TemplatePreprocessor.prototype.run = function (fileInfo, targetPath, callback) {
-  var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
+ES6TemplatePreprocessor.prototype.run = function (srcFilePath, destFilePath, callback) {
+  var fileContents = fs.readFileSync(srcFilePath).toString()
   var moduleContents = 'export default ' + this.compileFunction +
     '("' + jsStringEscape(fileContents) + '");\n'
-  fs.writeFileSync(targetPath, moduleContents)
+  fs.writeFileSync(destFilePath, moduleContents)
   callback()
 }
 
