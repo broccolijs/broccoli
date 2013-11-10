@@ -1,5 +1,7 @@
 # Broccoli
 
+[![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
+
 A fast, reliable asset builder & server. Hard-coded to build Ember apps for
 now, to be generalized later.
 
