@@ -34,12 +34,12 @@ Generator.prototype.regenerate = function () {
   })
 }
 
-Generator.prototype.registerPreprocessor = function (preprocessorFunction) {
-  for (var i = 0; i < preprocessorFunction.extensions.length; i++) {
-    if (this.preprocessors[preprocessorFunction.extensions[i]]) {
-      console.warn('Warning: Extension ' + preprocessorFunction.extensions[i] + ' already registered; overwriting existing handler.')
+Generator.prototype.registerPreprocessor = function (preprocessor) {
+  for (var i = 0; i < preprocessor.extensions.length; i++) {
+    if (this.preprocessors[preprocessor.extensions[i]]) {
+      console.warn('Warning: Extension ' + preprocessor.extensions[i] + ' already registered; overwriting existing handler.')
     }
-    this.preprocessors[preprocessorFunction.extensions[i]] = preprocessorFunction
+    this.preprocessors[preprocessor.extensions[i]] = preprocessor
   }
 }
 
@@ -88,7 +88,7 @@ Generator.prototype.preprocess = function (callback) {
       } else if (fileInfo.extension === extension) {
         var preprocessor = self.preprocessors[extension]
         var targetPath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
-        preprocessor(fileInfo, targetPath, next)
+        preprocessor.run(fileInfo, targetPath, next)
         break
       }
     }
@@ -113,7 +113,7 @@ Generator.prototype.compile = function (callback) {
   if (this.compileTarget != null) throw new Error('self.compileTarget is not null/undefined')
   this.compileTarget = mktemp.createDirSync(this.dest + '/compile_target-XXXXXX.tmp')
   async.eachSeries(self.compilers, function (compiler, callback) {
-    compiler(self.preprocessTarget, self.compileTarget, callback)
+    compiler.run(self.preprocessTarget, self.compileTarget, callback)
   }, function (err) {
     callback()
   })
@@ -172,7 +172,9 @@ Generator.prototype.serve = function () {
 }
 
 
-function emberHandlebarsPreprocessor(fileInfo, targetPath, callback) {
+var EmberHandlebarsPreprocessor = function () { }
+
+EmberHandlebarsPreprocessor.prototype.run = function (fileInfo, targetPath, callback) {
   var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
   var moduleContents = 'export default Ember.Handlebars.compile("' +
     jsStringEscape(fileContents) + '");\n'
@@ -180,10 +182,13 @@ function emberHandlebarsPreprocessor(fileInfo, targetPath, callback) {
   callback()
 }
 
-emberHandlebarsPreprocessor.extensions = ['hbs', 'handlebars']
-emberHandlebarsPreprocessor.targetExtension = 'js'
+EmberHandlebarsPreprocessor.prototype.extensions = ['hbs', 'handlebars']
+EmberHandlebarsPreprocessor.prototype.targetExtension = 'js'
 
-function es6Compiler (src, dest, callback) {
+
+var ES6Compiler = function () {}
+
+ES6Compiler.prototype.run = function (src, dest, callback) {
   var appJs = fs.createWriteStream(dest + '/app.js')
 
   // Write vendor files (this needs to go away)
@@ -215,7 +220,10 @@ function es6Compiler (src, dest, callback) {
   })
 }
 
-function staticFileCompiler (src, dest, callback) {
+
+StaticFileCompiler = function () {}
+
+StaticFileCompiler.prototype.run = function (src, dest, callback) {
   helpers.walkFiles(src, 'html', function (fileInfo, fileStats, next) {
     var contents = fs.readFileSync(fileInfo.fullPath)
     fs.writeFileSync(dest + '/' + fileInfo.relativePath, contents)
@@ -227,9 +235,9 @@ function staticFileCompiler (src, dest, callback) {
 
 
 var generator = new Generator('app')
-generator.registerPreprocessor(emberHandlebarsPreprocessor)
-generator.registerCompiler(es6Compiler)
-generator.registerCompiler(staticFileCompiler)
+generator.registerPreprocessor(new EmberHandlebarsPreprocessor)
+generator.registerCompiler(new ES6Compiler)
+generator.registerCompiler(new StaticFileCompiler)
 process.on('SIGINT', function () {
   synchronized(generator, function () {
     generator.cleanup(function () {
