@@ -175,18 +175,25 @@ Generator.prototype.serve = function () {
 }
 
 
-var EmberHandlebarsPreprocessor = function () { }
+var ES6TemplatePreprocessor = function (options) {
+  for (var key in options) {
+    if (options.hasOwnProperty(key)) {
+      this[key] = options[key]
+    }
+  }
+}
 
-EmberHandlebarsPreprocessor.prototype.run = function (fileInfo, targetPath, callback) {
+ES6TemplatePreprocessor.prototype.run = function (fileInfo, targetPath, callback) {
   var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-  var moduleContents = 'export default Ember.Handlebars.compile("' +
-    jsStringEscape(fileContents) + '");\n'
+  var moduleContents = 'export default ' + this.compileFunction +
+    '("' + jsStringEscape(fileContents) + '");\n'
   fs.writeFileSync(targetPath, moduleContents)
   callback()
 }
 
-EmberHandlebarsPreprocessor.prototype.extensions = ['hbs', 'handlebars']
-EmberHandlebarsPreprocessor.prototype.targetExtension = 'js'
+ES6TemplatePreprocessor.prototype.compileFunction = ''
+ES6TemplatePreprocessor.prototype.extensions = [] // set when instantiating
+ES6TemplatePreprocessor.prototype.targetExtension = 'js'
 
 
 var ES6Compiler = function () {}
@@ -261,7 +268,10 @@ StaticFileCompiler.prototype.run = function (src, dest, callback) {
 
 
 var generator = new Generator('app')
-generator.registerPreprocessor(new EmberHandlebarsPreprocessor())
+generator.registerPreprocessor(new ES6TemplatePreprocessor({
+  extensions: ['hbs', 'handlebars'],
+  compileFunction: 'Ember.Handlebars.compile'
+}))
 generator.registerCompiler(new ES6Compiler)
 generator.registerCompiler(new StaticFileCompiler({
   files: ['**/*.html']
