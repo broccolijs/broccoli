@@ -78,5 +78,8 @@
     "white"         : false,    // true: Check against strict whitespace and indentation rules
 
     // Custom Globals
-    "globals"       : {}        // additional predefined global variables
+    "globals"       : {},       // additional predefined global variables
+
+    // Suppress specific warnings
+    "-W058": true  // Missing '()' invoking a constructor.
 }

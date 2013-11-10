@@ -1,7 +1,10 @@
 var fs = require('fs')
+var path = require('path')
 var mktemp = require('mktemp')
+var mkdirp = require('mkdirp')
 var rimraf = require('rimraf')
 var walk = require('walk')
+var glob = require('glob')
 var hapi = require('hapi')
 var async = require('async')
 var synchronized = require('synchronized')
@@ -221,23 +224,48 @@ ES6Compiler.prototype.run = function (src, dest, callback) {
 }
 
 
-StaticFileCompiler = function () {}
+var StaticFileCompiler = function (options) {
+  this.files = []
+  for (var key in options) {
+    if (options.hasOwnProperty(key)) {
+      this[key] = options[key]
+    }
+  }
+  for (var i = 0; i < this.files.length; i++) {
+    if (this.files[i].length > 0 && this.files[i][0] === '/') {
+      throw new Error('Patterns must not be absolute: ' + this.files[i])
+    }
+  }
+}
 
 StaticFileCompiler.prototype.run = function (src, dest, callback) {
-  helpers.walkFiles(src, 'html', function (fileInfo, fileStats, next) {
-    var contents = fs.readFileSync(fileInfo.fullPath)
-    fs.writeFileSync(dest + '/' + fileInfo.relativePath, contents)
-    next()
-  }, function () {
-    callback()
+  var globPatterns = this.files.map(function (pattern) {
+    return src + '/' + pattern
   })
+  // Constructing globs like `{**/*.html,**/*.png}` should work reliably. If
+  // not, we may need to switch to some multi-glob module.
+  var combinedPattern = globPatterns.join(',')
+  if (globPatterns.length > 1) {
+    combinedPattern = '{' + combinedPattern + '}'
+  }
+  var paths = glob.sync(combinedPattern)
+  for (var i = 0; i < paths.length; i++) {
+    var relativePath = path.relative(src, paths[i])
+    var destPath = dest + '/' + relativePath
+    var contents = fs.readFileSync(paths[i])
+    mkdirp.sync(path.dirname(destPath))
+    fs.writeFileSync(destPath, contents)
+  }
+  callback()
 }
 
 
 var generator = new Generator('app')
-generator.registerPreprocessor(new EmberHandlebarsPreprocessor)
+generator.registerPreprocessor(new EmberHandlebarsPreprocessor())
 generator.registerCompiler(new ES6Compiler)
-generator.registerCompiler(new StaticFileCompiler)
+generator.registerCompiler(new StaticFileCompiler({
+  files: ['**/*.html']
+}))
 process.on('SIGINT', function () {
   synchronized(generator, function () {
     generator.cleanup(function () {

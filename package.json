@@ -18,7 +18,9 @@
     "es6-module-transpiler": "latest",
     "js-string-escape": "latest",
     "synchronized": "latest",
-    "async": "~0.2.9"
+    "async": "~0.2.9",
+    "glob": "~3.2.6",
+    "mkdirp": "~0.3.5"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
