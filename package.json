@@ -10,14 +10,14 @@
     "url": "https://github.com/joliss/broccoli"
   },
   "dependencies": {
-    "mktemp": "latest",
-    "rimraf": "latest",
-    "walk": "latest",
-    "hapi": "latest",
-    "gaze": "latest",
-    "es6-module-transpiler": "latest",
-    "js-string-escape": "latest",
-    "synchronized": "latest",
+    "mktemp": "~0.3.2",
+    "rimraf": "~2.2.2",
+    "walk": "~2.2.1",
+    "hapi": "~1.16.1",
+    "gaze": "~0.4.3",
+    "es6-module-transpiler": "~0.3.3",
+    "js-string-escape": "~1.0.0",
+    "synchronized": "~0.1.7",
     "async": "~0.2.9",
     "glob": "~3.2.6",
     "mkdirp": "~0.3.5"
