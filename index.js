@@ -372,9 +372,16 @@ ES6TranspilerPreprocessor.prototype.run = function (srcFilePath, destFilePath, i
 }
 
 
-function JavaScriptConcatenatorCompiler () {}
+function JavaScriptConcatenatorCompiler (options) {
+  for (var key in options) {
+    if (options.hasOwnProperty(key)) {
+      this[key] = options[key]
+    }
+  }
+}
 
 JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
+  var self = this
   var appJs = fs.createWriteStream(dest + '/app.js')
 
   // Write vendor files (this needs to go away)
@@ -393,8 +400,16 @@ JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
     if (fileStats.name.slice(-(extension.length + 1)) === '.' + extension) {
       var fileInfo = helpers.getFileInfo(src, fileRoot, fileStats)
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-      // Wrap in eval for sourceURL?
-      appJs.write(fileContents + '\n')
+      if (!self.useSourceURL) {
+        appJs.write(fileContents + '\n')
+      } else {
+        // Should pull out copyright comment headers
+        var evalExpression = "eval('" +
+          jsStringEscape(fileContents) +
+          "//# sourceURL=" + jsStringEscape(fileInfo.relativePath) +
+          "');\n"
+        appJs.write(evalExpression)
+      }
     }
     next()
   }
@@ -411,6 +426,8 @@ JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
     callback(err)
   })
 }
+
+JavaScriptConcatenatorCompiler.prototype.useSourceURL = true
 
 
 function StaticFileCompiler (options) {
