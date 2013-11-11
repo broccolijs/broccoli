@@ -18,7 +18,7 @@ var helpers = require('./lib/helpers')
 var Generator
 exports.Generator = Generator = function (src) {
   this.src = src
-  this.preprocessors = {}
+  this.preprocessors = []
   this.compilers = []
 }
 
@@ -28,10 +28,7 @@ Generator.prototype.regenerate = function () {
   synchronized(this, function (done) {
     self.buildError = null
 
-    self.cleanup(function (err) {
-      // Do not wait for cleanup to finish, just check for errors
-      if (err) throw err
-    })
+    self.cleanup()
     self.createDest() // create pristine directory with new name
 
     self.preprocess(function (err) {
@@ -41,6 +38,7 @@ Generator.prototype.regenerate = function () {
       }
       self.compile(function (err) {
         if (err) {
+          console.log('Regenerated with error')
           handleError(err)
           return
         }
@@ -57,12 +55,7 @@ Generator.prototype.regenerate = function () {
 }
 
 Generator.prototype.registerPreprocessor = function (preprocessor) {
-  for (var i = 0; i < preprocessor.extensions.length; i++) {
-    if (this.preprocessors[preprocessor.extensions[i]]) {
-      console.warn('Warning: Extension ' + preprocessor.extensions[i] + ' already registered; overwriting existing handler.')
-    }
-    this.preprocessors[preprocessor.extensions[i]] = preprocessor
-  }
+  this.preprocessors.push(preprocessor)
 }
 
 Generator.prototype.registerCompiler = function (compilerFunction) {
@@ -88,46 +81,92 @@ Generator.prototype.preprocess = function (callback) {
     next()
   })
 
+  // These methods should be moved into a preprocessor base class, so
+  // preprocessors can override the logic.
+
+  function preprocessorGetTargetFilePath (preprocessor, filePath) {
+    var extension = path.extname(filePath).replace(/^\./, '')
+    if (preprocessor.constructor.name === 'CopyPreprocessor') {
+      // Gah, this special-casing does not belong here
+      return filePath
+    }
+    if ((preprocessor.extensions || []).indexOf(extension) !== -1) {
+      if (preprocessor.targetExtension) {
+        return filePath.slice(0, -extension.length) + preprocessor.targetExtension
+      } else {
+        return filePath
+      }
+    }
+    return null
+  }
+
+  function preprocessorsForFile (filePath) {
+    var allPreprocessors = self.preprocessors.slice()
+    var preprocessors = []
+    while (allPreprocessors.length > 0) {
+      var targetPath, preprocessor = null
+      for (var i = 0; i < allPreprocessors.length; i++) {
+        targetPath = preprocessorGetTargetFilePath(allPreprocessors[i], filePath)
+        if (targetPath != null) {
+          preprocessor = allPreprocessors[i]
+          allPreprocessors.splice(i, 1)
+          break
+        }
+      }
+      if (preprocessor != null) {
+        preprocessors.push(preprocessor)
+        filePath = targetPath
+      } else {
+        // None of the remaining preprocessors are applicable
+        break
+      }
+    }
+    if (preprocessors.length === 0) {
+      preprocessors.push(new CopyPreprocessor)
+    }
+    return preprocessors
+  }
+
   function processFile (fileRoot, fileStats, next) {
     var fileInfo = helpers.getFileInfo(srcRoot, fileRoot, fileStats)
-    var extensions = []
-    for (var e in self.preprocessors) {
-      if (self.preprocessors.hasOwnProperty(e)) {
-        extensions.push(e)
+    var preprocessors = preprocessorsForFile(fileInfo.relativePath)
+    var filePath = fileInfo.fullPath
+    var relativePath = fileInfo.relativePath
+    var tmpDir, oldTmpDir
+    async.eachSeries(preprocessors, function (preprocessor, callback) {
+      var newRelativePath = preprocessorGetTargetFilePath(preprocessor, relativePath)
+      if (newRelativePath == null) {
+        throw new Error('Unexpectedly could not find target file path anymore for ' + relativePath + ' using ' + preprocessor.constructor.name)
       }
-    }
-    extensions.sort()
-    extensions.push(null) // copy if no preprocessor found
-    for (var i = 0; i < extensions.length; i++) {
-      var extension = extensions[i]
-      if (extension === null) {
-        // No preprocessor; copy
-        var depth = (self.preprocessTarget + '/' + fileInfo.relativePath).split('/').length - 1
-        var parentDirs = new Array(depth + 1).join('../')
-        fs.symlinkSync(parentDirs + fileInfo.fullPath, self.preprocessTarget + '/' + fileInfo.relativePath)
+      // console.log(relativePath, '->', newRelativePath, 'using', preprocessor.constructor.name)
+      oldTmpDir = tmpDir
+      tmpDir = mktemp.createDirSync(self.dest + '/preprocess-XXXXXX.tmp')
+      var newFilePath = tmpDir + '/' + path.basename(newRelativePath)
+      var info = {
+        moduleName: fileInfo.moduleName
+      }
+      preprocessor.run(filePath, newFilePath, info, function (err) {
+        if (err) {
+          err.file = relativePath // augment
+          callback(err)
+        } else {
+          relativePath = newRelativePath
+          filePath = newFilePath
+          if (oldTmpDir != null) helpers.backgroundRimraf(oldTmpDir)
+          callback()
+        }
+      })
+    }, function (err) {
+      if (err) {
+        walker.emit('end', err)
+      } else {
+        var fileContents = fs.readFileSync(filePath)
+        var destFilePath = self.preprocessTarget + '/' + relativePath
+        fs.writeFileSync(destFilePath, fileContents)
+        if (tmpDir != null) helpers.backgroundRimraf(tmpDir)
         next()
-        break
-      } else if (fileInfo.extension === extension) {
-        var preprocessor = self.preprocessors[extension]
-        var destFilePath = self.preprocessTarget + '/' + fileInfo.moduleName + '.' + (preprocessor.targetExtension || extension)
-        /* jshint loopfunc: true */
-        ;(function (fileInfo) { // closure to capture fileInfo for callback
-          preprocessor.run(fileInfo.fullPath, destFilePath, function (err) {
-            if (err) {
-              // fullPath could at some point contain nasty tmp directories. We
-              // may have to find a better way to communicate the path of the
-              // file.
-              err.file = fileInfo.fullPath
-              walker.emit('end', err)
-            } else {
-              next()
-            }
-          })
-        })(fileInfo)
-        /* jshint loopfunc: false */
-        break
       }
-    }
+    })
   }
 
   walker.on('file', processFile)
@@ -158,9 +197,9 @@ Generator.prototype.createDest = function () {
   this.dest = mktemp.createDirSync('broccoli-XXXXXX.tmp')
 }
 
-Generator.prototype.cleanup = function (callback) {
+Generator.prototype.cleanup = function () {
   if (this.dest != null) {
-    rimraf(this.dest, callback)
+    helpers.backgroundRimraf(this.dest)
   }
   this.dest = null
   this.preprocessTarget = null
@@ -232,7 +271,21 @@ Generator.prototype.serve = function () {
 }
 
 
-var CoffeeScriptPreprocessor = function (options) {
+// Special pass-through preprocessor that applies when no other preprocessor
+// matches
+function CopyPreprocessor () {}
+
+CopyPreprocessor.prototype.run = function (srcFilePath, destFilePath, info, callback) {
+  var fileContents = fs.readFileSync(srcFilePath)
+  fs.writeFileSync(destFilePath, fileContents)
+  callback()
+}
+
+CopyPreprocessor.extensions = []
+CopyPreprocessor.targetExtension = null
+
+
+function CoffeeScriptPreprocessor (options) {
   this.options = {}
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -241,7 +294,7 @@ var CoffeeScriptPreprocessor = function (options) {
   }
 }
 
-CoffeeScriptPreprocessor.prototype.run = function (srcFilePath, destFilePath, callback) {
+CoffeeScriptPreprocessor.prototype.run = function (srcFilePath, destFilePath, info, callback) {
   // Copy options; https://github.com/jashkenas/coffee-script/issues/1924
   var optionsCopy = {}
   for (var key in this.options) {
@@ -270,7 +323,7 @@ CoffeeScriptPreprocessor.prototype.extensions = ['coffee']
 CoffeeScriptPreprocessor.prototype.targetExtension = 'js'
 
 
-var ES6TemplatePreprocessor = function (options) {
+function ES6TemplatePreprocessor (options) {
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
       this[key] = options[key]
@@ -278,7 +331,7 @@ var ES6TemplatePreprocessor = function (options) {
   }
 }
 
-ES6TemplatePreprocessor.prototype.run = function (srcFilePath, destFilePath, callback) {
+ES6TemplatePreprocessor.prototype.run = function (srcFilePath, destFilePath, info, callback) {
   var fileContents = fs.readFileSync(srcFilePath).toString()
   var moduleContents = 'export default ' + this.compileFunction +
     '("' + jsStringEscape(fileContents) + '");\n'
@@ -291,9 +344,37 @@ ES6TemplatePreprocessor.prototype.extensions = [] // set when instantiating
 ES6TemplatePreprocessor.prototype.targetExtension = 'js'
 
 
-var ES6Compiler = function () {}
+function ES6TranspilerPreprocessor (options) {
+  for (var key in options) {
+    if (options.hasOwnProperty(key)) {
+      this[key] = options[key]
+    }
+  }
+}
 
-ES6Compiler.prototype.run = function (src, dest, callback) {
+ES6TranspilerPreprocessor.prototype.extensions = ['js']
+
+ES6TranspilerPreprocessor.prototype.run = function (srcFilePath, destFilePath, info, callback) {
+  // Make me configurable, or remove me?
+  var modulePrefix = 'appkit/'
+
+  var fileContents = fs.readFileSync(srcFilePath).toString()
+  var compiler, output;
+  try {
+    compiler = new ES6Transpiler(fileContents, modulePrefix + info.moduleName)
+    output = compiler.toAMD()
+  } catch (err) {
+    callback(err)
+    return
+  }
+  fs.writeFileSync(destFilePath, output)
+  callback()
+}
+
+
+function JavaScriptConcatenatorCompiler () {}
+
+JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
   var appJs = fs.createWriteStream(dest + '/app.js')
 
   // Write vendor files (this needs to go away)
@@ -302,9 +383,6 @@ ES6Compiler.prototype.run = function (src, dest, callback) {
     var contents = fs.readFileSync(__dirname + '/vendor/' + files[i])
     appJs.write(contents)
   }
-
-  // Make me configurable, or remove me?
-  var modulePrefix = 'appkit/'
 
   var walker = walk.walk(src, {})
 
@@ -315,16 +393,8 @@ ES6Compiler.prototype.run = function (src, dest, callback) {
     if (fileStats.name.slice(-(extension.length + 1)) === '.' + extension) {
       var fileInfo = helpers.getFileInfo(src, fileRoot, fileStats)
       var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
-      var compiler, output;
-      try {
-        compiler = new ES6Transpiler(fileContents, modulePrefix + fileInfo.moduleName)
-        output = compiler.toAMD()
-      } catch (err) {
-        err.file = fileInfo.relativePath
-        this.emit('end', err)
-        return
-      }
-      appJs.write(output + '\n')
+      // Wrap in eval for sourceURL?
+      appJs.write(fileContents + '\n')
     }
     next()
   }
@@ -343,7 +413,7 @@ ES6Compiler.prototype.run = function (src, dest, callback) {
 }
 
 
-var StaticFileCompiler = function (options) {
+function StaticFileCompiler (options) {
   this.files = []
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
@@ -390,7 +460,8 @@ generator.registerPreprocessor(new CoffeeScriptPreprocessor({
     bare: true
   }
 }))
-generator.registerCompiler(new ES6Compiler)
+generator.registerPreprocessor(new ES6TranspilerPreprocessor)
+generator.registerCompiler(new JavaScriptConcatenatorCompiler)
 generator.registerCompiler(new StaticFileCompiler({
   files: ['**/*.html']
 }))
