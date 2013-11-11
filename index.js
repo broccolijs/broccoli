@@ -404,10 +404,10 @@ JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
         appJs.write(fileContents + '\n')
       } else {
         // Should pull out copyright comment headers
-        var evalExpression = "eval('" +
+        var evalExpression = 'eval("' +
           jsStringEscape(fileContents) +
-          "//# sourceURL=" + jsStringEscape(fileInfo.relativePath) +
-          "');\n"
+          '//# sourceURL=' + jsStringEscape(fileInfo.relativePath) +
+          '");\n'
         appJs.write(evalExpression)
       }
     }
