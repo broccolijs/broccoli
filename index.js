@@ -65,8 +65,8 @@ Generator.prototype.registerCompiler = function (compilerFunction) {
 Generator.prototype.preprocess = function (callback) {
   var self = this
 
-  if (this.preprocessTarget != null) throw new Error('self.preprocessTarget is not null/undefined')
-  this.preprocessTarget = mktemp.createDirSync(this.dest + '/preprocess_target-XXXXXX.tmp')
+  if (this.preprocessDest != null) throw new Error('self.preprocessDest is not null/undefined')
+  this.preprocessDest = mktemp.createDirSync(this.dest + '/preprocess_dest-XXXXXX.tmp')
 
   var srcRoot = this.src
   var walker = walk.walk(srcRoot, {})
@@ -77,14 +77,14 @@ Generator.prototype.preprocess = function (callback) {
   walker.on('directory', function (dirRoot, dirStats, next) {
     var relativePath = dirRoot.slice(srcRoot.length + 1)
     if (relativePath.length > 0) relativePath = relativePath + '/'
-    fs.mkdirSync(self.preprocessTarget + '/' + relativePath + dirStats.name)
+    fs.mkdirSync(self.preprocessDest + '/' + relativePath + dirStats.name)
     next()
   })
 
   // These methods should be moved into a preprocessor base class, so
   // preprocessors can override the logic.
 
-  function preprocessorGetTargetFilePath (preprocessor, filePath) {
+  function preprocessorGetDestFilePath (preprocessor, filePath) {
     var extension = path.extname(filePath).replace(/^\./, '')
     if (preprocessor.constructor.name === 'CopyPreprocessor') {
       // Gah, this special-casing does not belong here
@@ -104,10 +104,10 @@ Generator.prototype.preprocess = function (callback) {
     var allPreprocessors = self.preprocessors.slice()
     var preprocessors = []
     while (allPreprocessors.length > 0) {
-      var targetPath, preprocessor = null
+      var destPath, preprocessor = null
       for (var i = 0; i < allPreprocessors.length; i++) {
-        targetPath = preprocessorGetTargetFilePath(allPreprocessors[i], filePath)
-        if (targetPath != null) {
+        destPath = preprocessorGetDestFilePath(allPreprocessors[i], filePath)
+        if (destPath != null) {
           preprocessor = allPreprocessors[i]
           allPreprocessors.splice(i, 1)
           break
@@ -115,7 +115,7 @@ Generator.prototype.preprocess = function (callback) {
       }
       if (preprocessor != null) {
         preprocessors.push(preprocessor)
-        filePath = targetPath
+        filePath = destPath
       } else {
         // None of the remaining preprocessors are applicable
         break
@@ -134,9 +134,9 @@ Generator.prototype.preprocess = function (callback) {
     var relativePath = fileInfo.relativePath
     var tmpDir, oldTmpDir
     async.eachSeries(preprocessors, function (preprocessor, callback) {
-      var newRelativePath = preprocessorGetTargetFilePath(preprocessor, relativePath)
+      var newRelativePath = preprocessorGetDestFilePath(preprocessor, relativePath)
       if (newRelativePath == null) {
-        throw new Error('Unexpectedly could not find target file path anymore for ' + relativePath + ' using ' + preprocessor.constructor.name)
+        throw new Error('Unexpectedly could not find destination file path anymore for ' + relativePath + ' using ' + preprocessor.constructor.name)
       }
       // console.log(relativePath, '->', newRelativePath, 'using', preprocessor.constructor.name)
       oldTmpDir = tmpDir
@@ -161,7 +161,7 @@ Generator.prototype.preprocess = function (callback) {
         walker.emit('end', err)
       } else {
         var fileContents = fs.readFileSync(filePath)
-        var destFilePath = self.preprocessTarget + '/' + relativePath
+        var destFilePath = self.preprocessDest + '/' + relativePath
         fs.writeFileSync(destFilePath, fileContents)
         if (tmpDir != null) helpers.backgroundRimraf(tmpDir)
         next()
@@ -183,10 +183,10 @@ Generator.prototype.preprocess = function (callback) {
 
 Generator.prototype.compile = function (callback) {
   var self = this
-  if (this.compileTarget != null) throw new Error('self.compileTarget is not null/undefined')
-  this.compileTarget = mktemp.createDirSync(this.dest + '/compile_target-XXXXXX.tmp')
+  if (this.compileDest != null) throw new Error('self.compileDest is not null/undefined')
+  this.compileDest = mktemp.createDirSync(this.dest + '/compile_dest-XXXXXX.tmp')
   async.eachSeries(self.compilers, function (compiler, callback) {
-    compiler.run(self.preprocessTarget, self.compileTarget, callback)
+    compiler.run(self.preprocessDest, self.compileDest, callback)
   }, function (err) {
     callback(err)
   })
@@ -202,8 +202,8 @@ Generator.prototype.cleanup = function () {
     helpers.backgroundRimraf(this.dest)
   }
   this.dest = null
-  this.preprocessTarget = null
-  this.compileTarget = null
+  this.preprocessDest = null
+  this.compileDest = null
 }
 
 Generator.prototype.serve = function () {
@@ -232,13 +232,13 @@ Generator.prototype.serve = function () {
     handler: {
       directory: {
         path: function (request) {
-          if (!self.compileTarget) {
-            throw new Error('Expected self.compileTarget to be set')
+          if (!self.compileDest) {
+            throw new Error('Expected self.compileDest to be set')
           }
           if (self.buildError) {
             throw new Error('Did not expect self.buildError to be set')
           }
-          return self.compileTarget
+          return self.compileDest
         }
       }
     }
