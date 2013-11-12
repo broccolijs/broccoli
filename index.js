@@ -7,7 +7,7 @@ var glob = require('glob')
 var hapi = require('hapi')
 var async = require('async')
 var synchronized = require('synchronized')
-var Gaze = require('gaze').Gaze
+var watch = require('watch')
 var ES6Transpiler = require('es6-module-transpiler').Compiler
 var jsStringEscape = require('js-string-escape')
 
@@ -19,12 +19,45 @@ function Generator (options) {
   this.packages = options.packages
   this.preprocessors = []
   this.compilers = []
+  // Debounce logic; should probably be extracted
+  this.postRegenerateLock = {}
+  this.regenerateScheduled = false
+  this.lockReleaseTimer = null
+  this.lockReleaseFunction = null
+  this.lockReleaseFirstScheduledAt = null
 }
 
 Generator.prototype.regenerate = function () {
   var self = this
 
+  function scheduleLockReleaseTimer () {
+    if (!self.lockReleaseFirstScheduledAt) self.lockReleaseFirstScheduledAt = Date.now()
+    self.lockReleaseTimer = setTimeout(self.lockReleaseFunction, 100)
+  }
+
+  if (self.lockReleaseTimer && Date.now() < self.lockReleaseFirstScheduledAt + 1000) {
+    // Reschedule running timer because we keep getting events, but never put
+    // off more than 1000 milliseconds in total
+    clearTimeout(self.lockReleaseTimer)
+    scheduleLockReleaseTimer()
+  }
+
+  if (this.regenerateScheduled) return
+  this.regenerateScheduled = true
+
   synchronized(this, function (done) {
+    self.regenerateScheduled = false
+
+    function releaseAfterDelay () {
+      self.lockReleaseFunction = function () {
+        self.lockReleaseTimer = null
+        self.lockReleaseFunction = null
+        self.lockReleaseFirstScheduledAt = null
+        done()
+      }
+      scheduleLockReleaseTimer()
+    }
+
     self.buildError = null
 
     self.cleanup()
@@ -42,13 +75,13 @@ Generator.prototype.regenerate = function () {
           return
         }
         console.log('Regenerated')
-        done()
+        releaseAfterDelay()
       })
     })
 
     function handleError(err) {
       self.buildError = err
-      done()
+      releaseAfterDelay()
     }
   })
 }
@@ -194,9 +227,11 @@ Generator.prototype.createDest = function () {
   this.dest = mktemp.createDirSync('broccoli-XXXXXX.tmp')
 }
 
-Generator.prototype.cleanup = function () {
+Generator.prototype.cleanup = function (callback) {
   if (this.dest != null) {
-    helpers.backgroundRimraf(this.dest)
+    helpers.backgroundRimraf(this.dest, callback)
+  } else {
+    if (callback) callback()
   }
   this.dest = null
   this.preprocessDest = null
@@ -206,12 +241,14 @@ Generator.prototype.cleanup = function () {
 Generator.prototype.serve = function () {
   var self = this
 
-  var gaze = new Gaze([this.src + '/**/*', __dirname + '/vendor/**/*'])
-  gaze.on('all', function (event, filepath) {
-    console.error(event, filepath)
-    // We should debounce this, e.g. when you do `touch *`
-    self.regenerate()
-  })
+  var watchedDirectories = this.packages.map(function (p) { return p.srcDir })
+  console.log('Watching directories:')
+  console.log(watchedDirectories.join('\n') + '\n')
+  for (var i = 0; i < watchedDirectories.length; i++) {
+    watch.watchTree(watchedDirectories[i], {
+      interval: 30
+    }, this.regenerate.bind(this))
+  }
 
   console.log('Serving on http://localhost:8000/')
   var server = hapi.createServer('localhost', 8000, {
@@ -290,14 +327,15 @@ function bowerPackages (bowerDir, packageOptions) {
   var directories = files.filter(function (f) { return fs.statSync(bowerDir + '/' + f).isDirectory() })
   var packages = []
   for (var i = 0; i < directories.length; i++) {
-    srcDir = bowerDir + '/' + directories[i]
-    var options = (packageOptions || {})[directories[i]]
-    if (options != null) {
-      if (options.assetDirectory) {
-        srcDir = srcDir + '/' + options.assetDirectory
+    var srcDir = bowerDir + '/' + directories[i]
+    var options = (packageOptions || {})[directories[i]] || {}
+    if (options.assetDirs != null) {
+      for (var j = 0; j < options.assetDirs.length; j++) {
+        packages.push(new Package(srcDir + '/' + options.assetDirs[j]))
       }
+    } else {
+      packages.push(new Package(srcDir))
     }
-    packages.push(new Package(srcDir))
   }
   return packages
 }
@@ -498,7 +536,7 @@ var vendorPackage = new Package('vendor')
 
 var bowerPackages = bowerPackages({
   'ember-resolver': {
-    assetDirectory: 'dist'
+    assetDirs: ['dist']
   }
 })
 

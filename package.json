@@ -13,7 +13,6 @@
     "mktemp": "~0.3.2",
     "rimraf": "~2.2.2",
     "hapi": "~1.16.1",
-    "gaze": "~0.4.3",
     "es6-module-transpiler": "~0.3.3",
     "js-string-escape": "~1.0.0",
     "synchronized": "~0.1.7",
@@ -21,7 +20,8 @@
     "glob": "~3.2.6",
     "mkdirp": "~0.3.5",
     "coffee-script": "~1.6.3",
-    "handlebars": "~1.1.2"
+    "handlebars": "~1.1.2",
+    "watch": "~0.8.0"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
