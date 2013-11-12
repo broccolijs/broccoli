@@ -10,6 +10,8 @@ Work in progress, not really usable for anything yet.
 To run, type:
 
 ```
+npm install -g bower
+bower install
 npm install
 node index.js
 ```

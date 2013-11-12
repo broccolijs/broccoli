@@ -76,9 +76,7 @@ Generator.prototype.preprocess = function (callback) {
     })
     async.eachSeries(paths, function (path, pathCallback) {
       if (path.slice(-1) === '/') {
-        if (path !== '/') { // base directory
-          fs.mkdirSync(self.preprocessDest + '/' + path)
-        }
+        mkdirp.sync(self.preprocessDest + '/' + path)
         pathCallback()
       } else {
         var preprocessors = [].concat(package.preprocessors, self.preprocessors)
@@ -279,6 +277,31 @@ Package.prototype.registerPreprocessor = function (preprocessor) {
   this.preprocessors.push(preprocessor)
 }
 
+function bowerPackages (bowerDir, packageOptions) {
+  if (typeof bowerDir !== 'string' && packageOptions == null) {
+    // bowerDir is optional
+    packageOptions = bowerDir
+    bowerDir = null
+  }
+  if (bowerDir == null) {
+    bowerDir = 'bower_components'
+  }
+  var files = fs.readdirSync(bowerDir)
+  var directories = files.filter(function (f) { return fs.statSync(bowerDir + '/' + f).isDirectory() })
+  var packages = []
+  for (var i = 0; i < directories.length; i++) {
+    srcDir = bowerDir + '/' + directories[i]
+    var options = (packageOptions || {})[directories[i]]
+    if (options != null) {
+      if (options.assetDirectory) {
+        srcDir = srcDir + '/' + options.assetDirectory
+      }
+    }
+    packages.push(new Package(srcDir))
+  }
+  return packages
+}
+
 
 // Special pass-through preprocessor that applies when no other preprocessor
 // matches
@@ -473,8 +496,14 @@ assetsPackage.registerPreprocessor(new ES6TranspilerPreprocessor)
 
 var vendorPackage = new Package('vendor')
 
+var bowerPackages = bowerPackages({
+  'ember-resolver': {
+    assetDirectory: 'dist'
+  }
+})
+
 var generator = new Generator({
-  packages: [assetsPackage, vendorPackage]
+  packages: [assetsPackage, vendorPackage].concat(bowerPackages)
 })
 generator.registerCompiler(new JavaScriptConcatenatorCompiler({
   files: [
