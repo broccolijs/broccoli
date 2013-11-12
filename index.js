@@ -15,9 +15,9 @@ var jsStringEscape = require('js-string-escape')
 var helpers = require('./lib/helpers')
 
 
-var Generator
-exports.Generator = Generator = function (src) {
-  this.src = src
+exports.Generator = Generator
+function Generator (options) {
+  this.packages = options.packages
   this.preprocessors = []
   this.compilers = []
 }
@@ -36,14 +36,6 @@ Generator.prototype.regenerate = function () {
         handleError(err)
         return
       }
-
-      // Copy vendor directory. This will need to go away.
-      var vendorFiles = glob.sync('**/*', {cwd: 'vendor'})
-      for (var i = 0; i < vendorFiles.length; i++) {
-        var fileContents = fs.readFileSync('vendor/' + vendorFiles[i])
-        fs.writeFileSync(self.preprocessDest + '/' + vendorFiles[i], fileContents)
-      }
-
       self.compile(function (err) {
         if (err) {
           console.log('Regenerated with error')
@@ -76,17 +68,30 @@ Generator.prototype.preprocess = function (callback) {
   if (this.preprocessDest != null) throw new Error('self.preprocessDest is not null/undefined')
   this.preprocessDest = mktemp.createDirSync(this.dest + '/preprocess_dest-XXXXXX.tmp')
 
-  var srcRoot = this.src
-  var walker = walk.walk(srcRoot, {})
-
-  // Be deterministic
-  walker.on('names', function (fileRoot, nodeNamesArray) { nodeNamesArray.sort() })
-
-  walker.on('directory', function (dirRoot, dirStats, next) {
-    var relativePath = dirRoot.slice(srcRoot.length + 1)
-    if (relativePath.length > 0) relativePath = relativePath + '/'
-    fs.mkdirSync(self.preprocessDest + '/' + relativePath + dirStats.name)
-    next()
+  async.eachSeries(this.packages, function (package, packageCallback) {
+    var paths = glob.sync('**', {
+      cwd: package.srcDir,
+      dot: true, // should we ignore .dotfiles?
+      mark: true, // trailing slash for directories; requires additional stat calls
+      strict: true
+    })
+    async.eachSeries(paths, function (path, pathCallback) {
+      if (path.slice(-1) === '/') {
+        if (path !== '/') { // base directory
+          fs.mkdirSync(self.preprocessDest + '/' + path)
+        }
+        pathCallback()
+      } else {
+        var preprocessors = [].concat(package.preprocessors, self.preprocessors)
+        processFile(package.srcDir, path, preprocessors, function (err) {
+          pathCallback(err)
+        })
+      }
+    }, function (err) {
+      packageCallback(err)
+    })
+  }, function (err) {
+    callback(err)
   })
 
   // These methods should be moved into a preprocessor base class, so
@@ -108,8 +113,8 @@ Generator.prototype.preprocess = function (callback) {
     return null
   }
 
-  function preprocessorsForFile (filePath) {
-    var allPreprocessors = self.preprocessors.slice()
+  function preprocessorsForFile (allPreprocessors, filePath) {
+    allPreprocessors = allPreprocessors.slice()
     var preprocessors = []
     while (allPreprocessors.length > 0) {
       var destPath, preprocessor = null
@@ -135,13 +140,11 @@ Generator.prototype.preprocess = function (callback) {
     return preprocessors
   }
 
-  function processFile (fileRoot, fileStats, next) {
-    var fileInfo = helpers.getFileInfo(srcRoot, fileRoot, fileStats)
-    var preprocessors = preprocessorsForFile(fileInfo.relativePath)
-    var filePath = fileInfo.fullPath
-    var relativePath = fileInfo.relativePath
+  function processFile (srcDir, relativePath, preprocessors, callback) {
+    var preprocessorsToApply = preprocessorsForFile(preprocessors, relativePath)
+    var fullPath = srcDir + '/' + relativePath
     var tmpDir, oldTmpDir
-    async.eachSeries(preprocessors, function (preprocessor, callback) {
+    async.eachSeries(preprocessorsToApply, function (preprocessor, eachCallback) {
       var newRelativePath = preprocessorGetDestFilePath(preprocessor, relativePath)
       if (newRelativePath == null) {
         throw new Error('Unexpectedly could not find destination file path anymore for ' + relativePath + ' using ' + preprocessor.constructor.name)
@@ -149,44 +152,33 @@ Generator.prototype.preprocess = function (callback) {
       // console.log(relativePath, '->', newRelativePath, 'using', preprocessor.constructor.name)
       oldTmpDir = tmpDir
       tmpDir = mktemp.createDirSync(self.dest + '/preprocess-XXXXXX.tmp')
-      var newFilePath = tmpDir + '/' + path.basename(newRelativePath)
+      var newFullPath = tmpDir + '/' + path.basename(newRelativePath)
       var info = {
-        moduleName: fileInfo.moduleName
+        moduleName: relativePath.replace(/\.([^.\/]+)$/, '')
       }
-      preprocessor.run(filePath, newFilePath, info, function (err) {
+      preprocessor.run(fullPath, newFullPath, info, function (err) {
         if (err) {
           err.file = relativePath // augment
-          callback(err)
+          eachCallback(err)
         } else {
           relativePath = newRelativePath
-          filePath = newFilePath
+          fullPath = newFullPath
           if (oldTmpDir != null) helpers.backgroundRimraf(oldTmpDir)
-          callback()
+          eachCallback()
         }
       })
     }, function (err) {
       if (err) {
-        walker.emit('end', err)
+        callback(err)
       } else {
-        var fileContents = fs.readFileSync(filePath)
+        var fileContents = fs.readFileSync(fullPath)
         var destFilePath = self.preprocessDest + '/' + relativePath
         fs.writeFileSync(destFilePath, fileContents)
         if (tmpDir != null) helpers.backgroundRimraf(tmpDir)
-        next()
+        callback()
       }
     })
   }
-
-  walker.on('file', processFile)
-  walker.on('symbolicLink', processFile) // TODO: check if target is a file
-
-  walker.on('errors', helpers.unexpectedWalkError)
-  walker.on('directoryError', helpers.unexpectedWalkError)
-  walker.on('nodeError', helpers.unexpectedWalkError)
-
-  walker.on('end', function (err) {
-    callback(err)
-  })
 }
 
 Generator.prototype.compile = function (callback) {
@@ -276,6 +268,16 @@ Generator.prototype.serve = function () {
   server.start()
 
   this.regenerate()
+}
+
+
+function Package (srcDir) {
+  this.srcDir = srcDir
+  this.preprocessors = []
+}
+
+Package.prototype.registerPreprocessor = function (preprocessor) {
+  this.preprocessors.push(preprocessor)
 }
 
 
@@ -394,7 +396,8 @@ JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
     var pattern = this.files[i]
     var matchingFiles = glob.sync(pattern, {
       cwd: src,
-      nomount: true
+      nomount: true,
+      strict: true
     })
     if (matchingFiles.length === 0) {
       callback(new Error('Path or pattern "' + pattern + '" did not match any files'))
@@ -443,7 +446,8 @@ StaticFileCompiler.prototype.run = function (src, dest, callback) {
   }
   var paths = glob.sync(combinedPattern, {
     cwd: src,
-    nomount: true
+    nomount: true,
+    strict: true
   })
   for (var i = 0; i < paths.length; i++) {
     var srcPath = src + '/' + paths[i]
@@ -456,18 +460,23 @@ StaticFileCompiler.prototype.run = function (src, dest, callback) {
 }
 
 
-var generator = new Generator('assets')
-
-generator.registerPreprocessor(new ES6TemplatePreprocessor({
+var assetsPackage = new Package('assets')
+assetsPackage.registerPreprocessor(new ES6TemplatePreprocessor({
   extensions: ['hbs', 'handlebars'],
   compileFunction: 'Ember.Handlebars.compile'
 }))
-generator.registerPreprocessor(new CoffeeScriptPreprocessor({
+assetsPackage.registerPreprocessor(new CoffeeScriptPreprocessor({
   options: {
     bare: true
   }
 }))
-generator.registerPreprocessor(new ES6TranspilerPreprocessor)
+assetsPackage.registerPreprocessor(new ES6TranspilerPreprocessor)
+
+var vendorPackage = new Package('vendor')
+
+var generator = new Generator({
+  packages: [assetsPackage, vendorPackage]
+})
 generator.registerCompiler(new JavaScriptConcatenatorCompiler({
   files: [
     'jquery.js',
