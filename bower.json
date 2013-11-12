@@ -1,6 +1,7 @@
 {
   "name": "ember-app-kit",
   "dependencies": {
+    "almond": "~0.2.6",
     "handlebars": "1.0.0",
     "jquery": "~1.9.1",
     "qunit": "~1.12.0",
