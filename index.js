@@ -382,7 +382,8 @@ function JavaScriptConcatenatorCompiler (options) {
 
 JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
   var self = this
-  var appJs = fs.createWriteStream(dest + '/app.js')
+  mkdirp.sync(dest + '/' + path.dirname(this.outputPath))
+  var appJs = fs.createWriteStream(dest + '/' + this.outputPath)
 
   // Write vendor files (this needs to go away)
   var files = fs.readdirSync(__dirname + '/vendor')
@@ -428,6 +429,7 @@ JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
 }
 
 JavaScriptConcatenatorCompiler.prototype.useSourceURL = true
+JavaScriptConcatenatorCompiler.prototype.outputPath = 'app.js'
 
 
 function StaticFileCompiler (options) {
