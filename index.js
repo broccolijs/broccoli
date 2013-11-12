@@ -393,7 +393,8 @@ JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
   for (var i = 0; i < this.files.length; i++) {
     var pattern = this.files[i]
     var matchingFiles = glob.sync(pattern, {
-      cwd: src
+      cwd: src,
+      nomount: true
     })
     if (matchingFiles.length === 0) {
       callback(new Error('Path or pattern "' + pattern + '" did not match any files'))
@@ -431,28 +432,23 @@ function StaticFileCompiler (options) {
       this[key] = options[key]
     }
   }
-  for (var i = 0; i < this.files.length; i++) {
-    if (this.files[i].length > 0 && this.files[i][0] === '/') {
-      throw new Error('Patterns must not be absolute: ' + this.files[i])
-    }
-  }
 }
 
 StaticFileCompiler.prototype.run = function (src, dest, callback) {
-  var globPatterns = this.files.map(function (pattern) {
-    return src + '/' + pattern
-  })
   // Constructing globs like `{**/*.html,**/*.png}` should work reliably. If
   // not, we may need to switch to some multi-glob module.
-  var combinedPattern = globPatterns.join(',')
-  if (globPatterns.length > 1) {
+  var combinedPattern = this.files.join(',')
+  if (this.files.length > 1) {
     combinedPattern = '{' + combinedPattern + '}'
   }
-  var paths = glob.sync(combinedPattern)
+  var paths = glob.sync(combinedPattern, {
+    cwd: src,
+    nomount: true
+  })
   for (var i = 0; i < paths.length; i++) {
-    var relativePath = path.relative(src, paths[i])
-    var destPath = dest + '/' + relativePath
-    var contents = fs.readFileSync(paths[i])
+    var srcPath = src + '/' + paths[i]
+    var destPath = dest + '/' + paths[i]
+    var contents = fs.readFileSync(srcPath)
     mkdirp.sync(path.dirname(destPath))
     fs.writeFileSync(destPath, contents)
   }
