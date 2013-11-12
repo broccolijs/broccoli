@@ -12,7 +12,6 @@
   "dependencies": {
     "mktemp": "~0.3.2",
     "rimraf": "~2.2.2",
-    "walk": "~2.2.1",
     "hapi": "~1.16.1",
     "gaze": "~0.4.3",
     "es6-module-transpiler": "~0.3.3",
