@@ -36,6 +36,14 @@ Generator.prototype.regenerate = function () {
         handleError(err)
         return
       }
+
+      // Copy vendor directory. This will need to go away.
+      var vendorFiles = glob.sync('**/*', {cwd: 'vendor'})
+      for (var i = 0; i < vendorFiles.length; i++) {
+        var fileContents = fs.readFileSync('vendor/' + vendorFiles[i])
+        fs.writeFileSync(self.preprocessDest + '/' + vendorFiles[i], fileContents)
+      }
+
       self.compile(function (err) {
         if (err) {
           console.log('Regenerated with error')
@@ -355,13 +363,10 @@ function ES6TranspilerPreprocessor (options) {
 ES6TranspilerPreprocessor.prototype.extensions = ['js']
 
 ES6TranspilerPreprocessor.prototype.run = function (srcFilePath, destFilePath, info, callback) {
-  // Make me configurable, or remove me?
-  var modulePrefix = 'appkit/'
-
   var fileContents = fs.readFileSync(srcFilePath).toString()
   var compiler, output;
   try {
-    compiler = new ES6Transpiler(fileContents, modulePrefix + info.moduleName)
+    compiler = new ES6Transpiler(fileContents, info.moduleName)
     output = compiler.toAMD()
   } catch (err) {
     callback(err)
@@ -383,49 +388,36 @@ function JavaScriptConcatenatorCompiler (options) {
 JavaScriptConcatenatorCompiler.prototype.run = function (src, dest, callback) {
   var self = this
   mkdirp.sync(dest + '/' + path.dirname(this.outputPath))
-  var appJs = fs.createWriteStream(dest + '/' + this.outputPath)
+  var writeStream = fs.createWriteStream(dest + '/' + this.outputPath)
 
-  // Write vendor files (this needs to go away)
-  var files = fs.readdirSync(__dirname + '/vendor')
-  for (var i = 0; i < files.length; i++) {
-    var contents = fs.readFileSync(__dirname + '/vendor/' + files[i])
-    appJs.write(contents)
-  }
-
-  var walker = walk.walk(src, {})
-
-  walker.on('names', function (fileRoot, nodeNamesArray) { nodeNamesArray.sort() })
-
-  function processFile (fileRoot, fileStats, next) {
-    var extension = 'js'
-    if (fileStats.name.slice(-(extension.length + 1)) === '.' + extension) {
-      var fileInfo = helpers.getFileInfo(src, fileRoot, fileStats)
-      var fileContents = fs.readFileSync(fileInfo.fullPath).toString()
+  for (var i = 0; i < this.files.length; i++) {
+    var pattern = this.files[i]
+    var matchingFiles = glob.sync(pattern, {
+      cwd: src
+    })
+    if (matchingFiles.length === 0) {
+      callback(new Error('Path or pattern "' + pattern + '" did not match any files'))
+      return
+    }
+    for (var j = 0; j < matchingFiles.length; j++) {
+      var relativePath = matchingFiles[j]
+      var fullPath = src + '/' + relativePath
+      var fileContents = fs.readFileSync(fullPath).toString()
       if (!self.useSourceURL) {
-        appJs.write(fileContents + '\n')
+        writeStream.write(fileContents + '\n')
       } else {
         // Should pull out copyright comment headers
         var evalExpression = 'eval("' +
           jsStringEscape(fileContents) +
-          '//# sourceURL=' + jsStringEscape(fileInfo.relativePath) +
+          '//# sourceURL=' + jsStringEscape(relativePath) +
           '");\n'
-        appJs.write(evalExpression)
+        writeStream.write(evalExpression)
       }
     }
-    next()
   }
 
-  walker.on('file', processFile)
-  walker.on('symbolicLink', processFile) // TODO: check if target is a file
-
-  walker.on('errors', helpers.unexpectedWalkError)
-  walker.on('directoryError', helpers.unexpectedWalkError)
-  walker.on('nodeError', helpers.unexpectedWalkError)
-
-  walker.on('end', function (err) {
-    appJs.end()
-    callback(err)
-  })
+  writeStream.end()
+  callback()
 }
 
 JavaScriptConcatenatorCompiler.prototype.useSourceURL = true
@@ -468,7 +460,7 @@ StaticFileCompiler.prototype.run = function (src, dest, callback) {
 }
 
 
-var generator = new Generator('app')
+var generator = new Generator('assets')
 
 generator.registerPreprocessor(new ES6TemplatePreprocessor({
   extensions: ['hbs', 'handlebars'],
@@ -480,7 +472,16 @@ generator.registerPreprocessor(new CoffeeScriptPreprocessor({
   }
 }))
 generator.registerPreprocessor(new ES6TranspilerPreprocessor)
-generator.registerCompiler(new JavaScriptConcatenatorCompiler)
+generator.registerCompiler(new JavaScriptConcatenatorCompiler({
+  files: [
+    'jquery.js',
+    'almond.js',
+    'handlebars.js',
+    'ember.js',
+    'ember-data.js',
+    'ember-resolver.js',
+    'appkit/**/*.js']
+}))
 generator.registerCompiler(new StaticFileCompiler({
   files: ['**/*.html']
 }))
