@@ -67,7 +67,7 @@ Generator.prototype.regenerate = function () {
 
     function finish (err) {
       if (err) self.buildError = err
-      console.error('Regenerated ' + (err ? 'with error ' : '') + '(' + (Date.now() - startTime) + ' ms)')
+      console.log('Regenerated ' + (err ? 'with error ' : '') + '(' + (Date.now() - startTime) + ' ms)')
       releaseAfterDelay()
     }
 
@@ -213,7 +213,9 @@ Generator.prototype.compile = function (callback) {
   if (this.compileDest != null) throw new Error('self.compileDest is not null/undefined')
   this.compileDest = mktemp.createDirSync(this.dest + '/compile_dest-XXXXXX.tmp')
   async.eachSeries(self.compilers, function (compiler, callback) {
-    compiler.run(self.preprocessDest, self.compileDest, callback)
+    compiler.run(self.preprocessDest, self.compileDest, function (err) {
+      callback(err)
+    })
   }, function (err) {
     callback(err)
   })
@@ -239,15 +241,15 @@ Generator.prototype.serve = function () {
   var self = this
 
   var watchedDirectories = this.packages.map(function (p) { return p.srcDir })
-  console.log('Watching directories:')
-  console.log(watchedDirectories.join('\n') + '\n')
+  console.log('Watching the following directories:')
+  console.log(watchedDirectories.map(function (d) { return '* ' + d + '\n' }).join(''))
   for (var i = 0; i < watchedDirectories.length; i++) {
     watch.watchTree(watchedDirectories[i], {
       interval: 30
     }, this.regenerate.bind(this))
   }
 
-  console.log('Serving on http://localhost:8000/')
+  console.log('Serving on http://localhost:8000/\n')
   var server = hapi.createServer('localhost', 8000, {
     views: {
       engines: {
@@ -551,7 +553,7 @@ generator.registerCompiler(new JavaScriptConcatenatorCompiler({
     'appkit/**/*.js']
 }))
 generator.registerCompiler(new StaticFileCompiler({
-  files: ['**/*.html']
+  files: ['index.html']
 }))
 
 process.on('SIGINT', function () {
