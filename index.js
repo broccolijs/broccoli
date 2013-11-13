@@ -48,15 +48,7 @@ Generator.prototype.regenerate = function () {
   synchronized(this, function (done) {
     self.regenerateScheduled = false
 
-    function releaseAfterDelay () {
-      self.lockReleaseFunction = function () {
-        self.lockReleaseTimer = null
-        self.lockReleaseFunction = null
-        self.lockReleaseFirstScheduledAt = null
-        done()
-      }
-      scheduleLockReleaseTimer()
-    }
+    var startTime = Date.now()
 
     self.buildError = null
 
@@ -65,23 +57,28 @@ Generator.prototype.regenerate = function () {
 
     self.preprocess(function (err) {
       if (err) {
-        handleError(err)
+        finish(err)
         return
       }
       self.compile(function (err) {
-        if (err) {
-          console.log('Regenerated with error')
-          handleError(err)
-          return
-        }
-        console.log('Regenerated')
-        releaseAfterDelay()
+        finish(err)
       })
     })
 
-    function handleError(err) {
-      self.buildError = err
+    function finish (err) {
+      if (err) self.buildError = err
+      console.error('Regenerated ' + (err ? 'with error ' : '') + '(' + (Date.now() - startTime) + ' ms)')
       releaseAfterDelay()
+    }
+
+    function releaseAfterDelay () {
+      self.lockReleaseFunction = function () {
+        self.lockReleaseTimer = null
+        self.lockReleaseFunction = null
+        self.lockReleaseFirstScheduledAt = null
+        done()
+      }
+      scheduleLockReleaseTimer()
     }
   })
 }
