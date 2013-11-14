@@ -5,7 +5,7 @@
 A fast, reliable asset builder & server. Hard-coded to build Ember apps for
 now, to be generalized later.
 
-Work in progress, not really usable for anything yet.
+**This is pre-alpha work-in-progress. It's not usable for building actual JavaScript applications yet.**
 
 To run, type:
 
