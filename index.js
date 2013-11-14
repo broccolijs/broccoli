@@ -19,6 +19,11 @@ function Generator (options) {
   this.packages = options.packages
   this.preprocessors = []
   this.compilers = []
+
+  this.dest = mktemp.createDirSync('broccoli-XXXXXX.tmp')
+  this.cacheDir = this.dest + '/cache.tmp'
+  fs.mkdirSync(this.cacheDir)
+
   // Debounce logic; should probably be extracted
   this.postRegenerateLock = {}
   this.regenerateScheduled = false
@@ -52,8 +57,7 @@ Generator.prototype.regenerate = function () {
 
     self.buildError = null
 
-    self.cleanup()
-    self.createDest() // create pristine directory with new name
+    self.cleanupBuildProducts() // remove last build's directories
 
     self.preprocess(function (err) {
       if (err) {
@@ -168,43 +172,100 @@ Generator.prototype.preprocess = function (callback) {
   }
 
   function processFile (srcDir, relativePath, preprocessors, callback) {
-    var preprocessorsToApply = preprocessorsForFile(preprocessors, relativePath)
+    // For now, we support generating only one output file per input file, but
+    // in the future we may support more (e.g. to add source maps, or to
+    // convert media to multiple formats)
+    var relativeDir = path.dirname(relativePath)
     var fullPath = srcDir + '/' + relativePath
-    var tmpDir, oldTmpDir
-    async.eachSeries(preprocessorsToApply, function (preprocessor, eachCallback) {
-      var newRelativePath = preprocessorGetDestFilePath(preprocessor, relativePath)
-      if (newRelativePath == null) {
-        throw new Error('Unexpectedly could not find destination file path anymore for ' + relativePath + ' using ' + preprocessor.constructor.name)
-      }
-      // console.log(relativePath, '->', newRelativePath, 'using', preprocessor.constructor.name)
-      oldTmpDir = tmpDir
-      tmpDir = mktemp.createDirSync(self.dest + '/preprocess-XXXXXX.tmp')
-      var newFullPath = tmpDir + '/' + path.basename(newRelativePath)
-      var info = {
-        moduleName: relativePath.replace(/\.([^.\/]+)$/, '')
-      }
-      preprocessor.run(fullPath, newFullPath, info, function (err) {
+    var tmpDir = null
+    var hash = helpers.statsHash('preprocess', fullPath, fs.statSync(fullPath))
+    var preprocessCacheDir = self.cacheDir + '/' + hash
+    var cachedFiles
+    // If we have cached preprocessing output for this file, link the cached
+    // file(s) in place. Else, run all the preprocessors in sequence, cache
+    // the final output, and then link the cached file(s) in place.
+    try {
+      cachedFiles = fs.readdirSync(preprocessCacheDir)
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err
+    }
+    if (cachedFiles) {
+      linkFilesFromCache(cachedFiles)
+      callback()
+    } else {
+      runPreprocessors(function (err, cachedFiles) {
         if (err) {
-          err.file = relativePath // augment
-          eachCallback(err)
-        } else {
-          relativePath = newRelativePath
-          fullPath = newFullPath
-          if (oldTmpDir != null) helpers.backgroundRimraf(oldTmpDir)
-          eachCallback()
+          callback(err)
+          return
         }
-      })
-    }, function (err) {
-      if (err) {
-        callback(err)
-      } else {
-        var fileContents = fs.readFileSync(fullPath)
-        var destFilePath = self.preprocessDest + '/' + relativePath
-        fs.writeFileSync(destFilePath, fileContents)
-        if (tmpDir != null) helpers.backgroundRimraf(tmpDir)
+        linkFilesFromCache(cachedFiles)
         callback()
+      })
+    }
+
+    function runPreprocessors (callback) {
+      var preprocessorsToApply = preprocessorsForFile(preprocessors, relativePath)
+      tmpDir = mktemp.createDirSync(self.dest + '/preprocess-XXXXXX.tmp')
+      var i = 0
+      var preprocessStageDestDir
+      async.eachSeries(preprocessorsToApply, function (preprocessor, eachCallback) {
+        var newRelativePath = preprocessorGetDestFilePath(preprocessor, relativePath)
+        if (newRelativePath == null) {
+          throw new Error('Unexpectedly could not find destination file path anymore for ' + relativePath + ' using ' + preprocessor.constructor.name)
+        }
+        // console.log(relativePath, '->', newRelativePath, 'using', preprocessor.constructor.name)
+        preprocessStageDestDir = tmpDir + '/' + i++
+        fs.mkdirSync(preprocessStageDestDir)
+        var newFullPath = preprocessStageDestDir + '/' + path.basename(newRelativePath)
+        var info = {
+          moduleName: relativePath.replace(/\.([^.\/]+)$/, '')
+        }
+        preprocessor.run(fullPath, newFullPath, info, function (err) {
+          if (err) {
+            err.file = relativePath // augment
+            eachCallback(err)
+          } else {
+            relativePath = newRelativePath
+            fullPath = newFullPath
+            eachCallback()
+          }
+        })
+      }, function (err) {
+        if (err) {
+          callback(err)
+          return
+        }
+        // preprocessStageDestDir is now the directory with the output from
+        // the last preprocessor
+        var entries = linkFilesToCache(preprocessStageDestDir)
+        rimraf(tmpDir, function (err) { if (err) throw err })
+        callback(null, entries)
+      })
+    }
+
+    function linkFilesToCache (dirPath) {
+      fs.mkdirSync(preprocessCacheDir)
+      var entries = fs.readdirSync(dirPath)
+      for (var i = 0; i < entries.length; i++) {
+        fs.linkSync(dirPath + '/' + entries[i], preprocessCacheDir + '/' + entries[i])
       }
-    })
+      return entries // return entries for performance
+    }
+
+    function linkFilesFromCache (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        var srcFilePath = preprocessCacheDir + '/' + entries[i]
+        var destFilePath = self.preprocessDest + '/' + relativeDir + '/' + entries[i]
+        try {
+          fs.linkSync(srcFilePath, destFilePath)
+        } catch (err) {
+          if (err.code !== 'EEXIST') throw err
+          // console.warn('Warning: Overwriting', relativeDir + '/' + entries[i])
+          fs.unlinkSync(destFilePath)
+          fs.linkSync(srcFilePath, destFilePath)
+        }
+      }
+    }
   }
 }
 
@@ -221,20 +282,31 @@ Generator.prototype.compile = function (callback) {
   })
 }
 
-Generator.prototype.createDest = function () {
-  if (this.dest != null) throw new Error('Expected generator.dest to be null/undefined; did something go out of sync?')
-  this.dest = mktemp.createDirSync('broccoli-XXXXXX.tmp')
+Generator.prototype.cleanupAll = function (callback) {
+  var self = this
+  synchronized(this, function () {
+    if (self.dest != null) {
+      rimraf(self.dest, function (err) {
+        if (err) throw err
+        if (callback) callback()
+      })
+    } else {
+      if (callback) callback()
+    }
+    this.dest = null
+  })
 }
 
-Generator.prototype.cleanup = function (callback) {
-  if (this.dest != null) {
-    helpers.backgroundRimraf(this.dest, callback)
-  } else {
-    if (callback) callback()
-  }
-  this.dest = null
-  this.preprocessDest = null
-  this.compileDest = null
+Generator.prototype.cleanupBuildProducts = function () {
+  var self = this
+  ;['preprocessDest', 'compileDest'].forEach(function (field) {
+    if (self[field] != null) {
+      rimraf(self[field], function (err) {
+        if (err) throw err
+      })
+      self[field] = null
+    }
+  })
 }
 
 Generator.prototype.serve = function () {
@@ -558,7 +630,7 @@ generator.registerCompiler(new StaticFileCompiler({
 
 process.on('SIGINT', function () {
   synchronized(generator, function () {
-    generator.cleanup(function () {
+    generator.cleanupAll(function () {
       process.exit()
     })
   })

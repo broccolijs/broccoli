@@ -7,6 +7,8 @@ now, to be generalized later.
 
 **This is pre-alpha work-in-progress. It's not usable for building actual JavaScript applications yet.**
 
+Windows is not yet supported.
+
 To run, type:
 
 ```
