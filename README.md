@@ -15,7 +15,7 @@ To run, type:
 npm install -g bower
 bower install
 npm install
-node index.js
+node lib/cli.js
 ```
 
 Design goals:

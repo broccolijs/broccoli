@@ -3,7 +3,7 @@
   "description": "Fast client-side asset builder",
   "version": "0.0.2",
   "author": "Jo Liss <joliss42@gmail.com>",
-  "main": "index.js",
+  "main": "lib/index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
