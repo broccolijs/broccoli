@@ -9,13 +9,19 @@ now, to be generalized later.
 
 Windows is not yet supported.
 
-To run, type:
+To open the preview server, type:
 
 ```
 npm install -g bower
 bower install
 npm install
-node lib/cli.js
+node lib/cli.js serve
+```
+
+Or to run a one-off build, type:
+
+```
+node lib/cli.js build public
 ```
 
 Design goals:

@@ -22,7 +22,8 @@
     "coffee-script": "~1.6.3",
     "handlebars": "~1.1.2",
     "watch": "~0.8.0",
-    "jshashes": "~1.0.4"
+    "jshashes": "~1.0.4",
+    "commander": "~2.0.0"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
