@@ -11,12 +11,10 @@ module.exports = function (broccoli) {
   }))
   assetsPackage.registerPreprocessor(new broccoli.preprocessors.ES6TranspilerPreprocessor)
 
-  var vendorPackage = new broccoli.packages.Package('vendor')
-
   var bowerPackages = broccoli.packages.bowerPackages()
 
   var generator = new broccoli.Generator({
-    packages: [assetsPackage, vendorPackage].concat(bowerPackages)
+    packages: [assetsPackage].concat(bowerPackages)
   })
   generator.registerCompiler(new broccoli.compilers.JavaScriptConcatenatorCompiler({
     files: [
