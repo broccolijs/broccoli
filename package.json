@@ -23,7 +23,8 @@
     "handlebars": "~1.1.2",
     "watch": "~0.8.0",
     "jshashes": "~1.0.4",
-    "commander": "~2.0.0"
+    "commander": "~2.0.0",
+    "findup-sync": "~0.1.2"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
