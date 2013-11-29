@@ -13,22 +13,25 @@ module.exports = function (broccoli) {
 
   var bowerPackages = broccoli.packages.bowerPackages()
 
+  var compilerCollection = new broccoli.treeTransforms.CompilerCollection([
+    new broccoli.compilers.JavaScriptConcatenatorCompiler({
+      files: [
+        'jquery.js',
+        'almond.js',
+        'handlebars.js',
+        'ember.js',
+        'ember-data.js',
+        'ember-resolver.js',
+        'appkit/**/*.js']
+    }),
+    new broccoli.compilers.StaticFileCompiler({
+      files: ['index.html']
+    })
+  ])
   var builder = new broccoli.Builder({
-    packages: [assetsPackage].concat(bowerPackages)
+    packages: [assetsPackage].concat(bowerPackages),
+    compilerCollection: compilerCollection
   })
-  builder.registerCompiler(new broccoli.compilers.JavaScriptConcatenatorCompiler({
-    files: [
-      'jquery.js',
-      'almond.js',
-      'handlebars.js',
-      'ember.js',
-      'ember-data.js',
-      'ember-resolver.js',
-      'appkit/**/*.js']
-  }))
-  builder.registerCompiler(new broccoli.compilers.StaticFileCompiler({
-    files: ['index.html']
-  }))
 
   return builder
 }
