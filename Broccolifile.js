@@ -13,10 +13,10 @@ module.exports = function (broccoli) {
 
   var bowerPackages = broccoli.packages.bowerPackages()
 
-  var generator = new broccoli.Generator({
+  var builder = new broccoli.Builder({
     packages: [assetsPackage].concat(bowerPackages)
   })
-  generator.registerCompiler(new broccoli.compilers.JavaScriptConcatenatorCompiler({
+  builder.registerCompiler(new broccoli.compilers.JavaScriptConcatenatorCompiler({
     files: [
       'jquery.js',
       'almond.js',
@@ -26,9 +26,9 @@ module.exports = function (broccoli) {
       'ember-resolver.js',
       'appkit/**/*.js']
   }))
-  generator.registerCompiler(new broccoli.compilers.StaticFileCompiler({
+  builder.registerCompiler(new broccoli.compilers.StaticFileCompiler({
     files: ['index.html']
   }))
 
-  return generator
+  return builder
 }
