@@ -1,5 +1,5 @@
 module.exports = function (broccoli) {
-  var assetsPackage = new broccoli.packages.Package('assets', new broccoli.treeTransforms.PreprocessorCollection([
+  var assetsPackage = new broccoli.packages.Package('assets', new broccoli.transformers.PreprocessorCollection([
     new broccoli.preprocessors.ES6TemplatePreprocessor({
       extensions: ['hbs', 'handlebars'],
       compileFunction: 'Ember.Handlebars.compile'
@@ -17,7 +17,7 @@ module.exports = function (broccoli) {
   var packages = [assetsPackage].concat(bowerPackages)
   var packageReader = new broccoli.readers.PackageReader(packages)
 
-  var compilerCollection = new broccoli.treeTransforms.CompilerCollection([
+  var compilerCollection = new broccoli.transformers.CompilerCollection([
     new broccoli.compilers.JavaScriptConcatenatorCompiler({
       files: [
         'jquery.js',
