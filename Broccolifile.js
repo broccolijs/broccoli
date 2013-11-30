@@ -1,15 +1,15 @@
 module.exports = function (broccoli) {
-  var assetsPackage = new broccoli.packages.Package('assets', new broccoli.transformers.PreprocessorCollection([
-    new broccoli.preprocessors.ES6TemplatePreprocessor({
+  var assetsPackage = new broccoli.packages.Package('assets', new broccoli.transformers.preprocessors.PreprocessorCollection([
+    new broccoli.transformers.preprocessors.ES6TemplatePreprocessor({
       extensions: ['hbs', 'handlebars'],
       compileFunction: 'Ember.Handlebars.compile'
     }),
-    new broccoli.preprocessors.CoffeeScriptPreprocessor({
+    new broccoli.transformers.preprocessors.CoffeeScriptPreprocessor({
       options: {
         bare: true
       }
     }),
-    new broccoli.preprocessors.ES6TranspilerPreprocessor
+    new broccoli.transformers.preprocessors.ES6TranspilerPreprocessor
   ]))
 
   var bowerPackages = broccoli.packages.bowerPackages()
@@ -17,8 +17,8 @@ module.exports = function (broccoli) {
   var packages = [assetsPackage].concat(bowerPackages)
   var packageReader = new broccoli.readers.PackageReader(packages)
 
-  var compilerCollection = new broccoli.transformers.CompilerCollection([
-    new broccoli.compilers.JavaScriptConcatenatorCompiler({
+  var compilerCollection = new broccoli.transformers.compilers.CompilerCollection([
+    new broccoli.transformers.compilers.JavaScriptConcatenatorCompiler({
       files: [
         'jquery.js',
         'almond.js',
@@ -28,7 +28,7 @@ module.exports = function (broccoli) {
         'ember-resolver.js',
         'appkit/**/*.js']
     }),
-    new broccoli.compilers.StaticFileCompiler({
+    new broccoli.transformers.compilers.StaticFileCompiler({
       files: ['index.html']
     })
   ])
