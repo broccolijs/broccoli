@@ -1,5 +1,5 @@
 module.exports = function (broccoli) {
-  var assetsPackage = new broccoli.readers.Package('assets', new broccoli.transformers.preprocessors.PreprocessorCollection([
+  var assetsPackage = new broccoli.readers.Package('assets', new broccoli.transformers.preprocessors.PreprocessorPipeline([
     new broccoli.transformers.preprocessors.ES6TemplatePreprocessor({
       extensions: ['hbs', 'handlebars'],
       compileFunction: 'Ember.Handlebars.compile'
