@@ -1,5 +1,5 @@
 module.exports = function (broccoli) {
-  var assetsPackage = new broccoli.packages.Package('assets', new broccoli.transformers.preprocessors.PreprocessorCollection([
+  var assetsPackage = new broccoli.readers.Package('assets', new broccoli.transformers.preprocessors.PreprocessorCollection([
     new broccoli.transformers.preprocessors.ES6TemplatePreprocessor({
       extensions: ['hbs', 'handlebars'],
       compileFunction: 'Ember.Handlebars.compile'
@@ -12,7 +12,7 @@ module.exports = function (broccoli) {
     new broccoli.transformers.preprocessors.ES6TranspilerPreprocessor
   ]))
 
-  var bowerPackages = broccoli.packages.bowerPackages()
+  var bowerPackages = broccoli.readers.bowerPackages()
 
   var packages = [assetsPackage].concat(bowerPackages)
   var packageReader = new broccoli.readers.PackageReader(packages)
