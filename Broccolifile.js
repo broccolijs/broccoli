@@ -1,17 +1,21 @@
 module.exports = function (broccoli) {
-  var assetsPackage = new broccoli.packages.Package('assets')
-  assetsPackage.registerPreprocessor(new broccoli.preprocessors.ES6TemplatePreprocessor({
-    extensions: ['hbs', 'handlebars'],
-    compileFunction: 'Ember.Handlebars.compile'
-  }))
-  assetsPackage.registerPreprocessor(new broccoli.preprocessors.CoffeeScriptPreprocessor({
-    options: {
-      bare: true
-    }
-  }))
-  assetsPackage.registerPreprocessor(new broccoli.preprocessors.ES6TranspilerPreprocessor)
+  var assetsPackage = new broccoli.packages.Package('assets', new broccoli.treeTransforms.PreprocessorCollection([
+    new broccoli.preprocessors.ES6TemplatePreprocessor({
+      extensions: ['hbs', 'handlebars'],
+      compileFunction: 'Ember.Handlebars.compile'
+    }),
+    new broccoli.preprocessors.CoffeeScriptPreprocessor({
+      options: {
+        bare: true
+      }
+    }),
+    new broccoli.preprocessors.ES6TranspilerPreprocessor
+  ]))
 
   var bowerPackages = broccoli.packages.bowerPackages()
+
+  var packages = [assetsPackage].concat(bowerPackages)
+  var packageReader = new broccoli.readers.PackageReader(packages)
 
   var compilerCollection = new broccoli.treeTransforms.CompilerCollection([
     new broccoli.compilers.JavaScriptConcatenatorCompiler({
@@ -29,7 +33,7 @@ module.exports = function (broccoli) {
     })
   ])
   var builder = new broccoli.Builder({
-    packages: [assetsPackage].concat(bowerPackages),
+    reader: packageReader,
     compilerCollection: compilerCollection
   })
 
