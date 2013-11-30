@@ -34,7 +34,7 @@ module.exports = function (broccoli) {
   ])
   var builder = new broccoli.Builder({
     reader: packageReader,
-    compilerCollection: compilerCollection
+    transformer: compilerCollection
   })
 
   return builder
