@@ -20,11 +20,11 @@ module.exports = function (broccoli) {
     staticFiles: ['index.html'],
     compilers: [
       new broccoli.transformers.compilers.ES6ConcatenatorCompiler({
-        loaderPath: 'almond.js', // make this a default
+        loaderFile: 'almond.js', // make this a default
         ignoredModules: [
           'resolver'
         ],
-        inputPaths: [
+        inputFiles: [
           'appkit/**/*.js'
         ],
         legacyFilesToAppend: [
@@ -34,7 +34,7 @@ module.exports = function (broccoli) {
           'ember-data.js',
           'ember-resolver.js'
         ],
-        outputPath: 'app.js'
+        outputFile: 'app.js'
       })
     ]
   })
