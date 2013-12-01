@@ -8,8 +8,7 @@ module.exports = function (broccoli) {
       options: {
         bare: true
       }
-    }),
-    new broccoli.transformers.preprocessors.ES6TranspilerPreprocessor
+    })
   ]))
 
   var bowerPackages = broccoli.readers.bowerPackages()
@@ -18,15 +17,22 @@ module.exports = function (broccoli) {
   var packageReader = new broccoli.readers.PackageReader(packages)
 
   var compilerCollection = new broccoli.transformers.compilers.CompilerCollection([
-    new broccoli.transformers.compilers.JavaScriptConcatenatorCompiler({
-      files: [
+    new broccoli.transformers.compilers.ES6ConcatenatorCompiler({
+      loaderPath: 'almond.js', // make this a default
+      ignoredModules: [
+        'resolver'
+      ],
+      inputPaths: [
+        'appkit/**/*.js'
+      ],
+      legacyFilesToAppend: [
         'jquery.js',
-        'almond.js',
         'handlebars.js',
         'ember.js',
         'ember-data.js',
-        'ember-resolver.js',
-        'appkit/**/*.js']
+        'ember-resolver.js'
+      ],
+      outputPath: 'app.js'
     }),
     new broccoli.transformers.compilers.StaticFileCompiler({
       files: ['index.html']
