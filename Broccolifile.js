@@ -16,28 +16,28 @@ module.exports = function (broccoli) {
   var packages = [assetsPackage].concat(bowerPackages)
   var packageReader = new broccoli.readers.PackageReader(packages)
 
-  var compilerCollection = new broccoli.transformers.compilers.CompilerCollection([
-    new broccoli.transformers.compilers.ES6ConcatenatorCompiler({
-      loaderPath: 'almond.js', // make this a default
-      ignoredModules: [
-        'resolver'
-      ],
-      inputPaths: [
-        'appkit/**/*.js'
-      ],
-      legacyFilesToAppend: [
-        'jquery.js',
-        'handlebars.js',
-        'ember.js',
-        'ember-data.js',
-        'ember-resolver.js'
-      ],
-      outputPath: 'app.js'
-    }),
-    new broccoli.transformers.compilers.StaticFileCompiler({
-      files: ['index.html']
-    })
-  ])
+  var compilerCollection = new broccoli.transformers.compilers.CompilerCollection({
+    staticFiles: ['index.html'],
+    compilers: [
+      new broccoli.transformers.compilers.ES6ConcatenatorCompiler({
+        loaderPath: 'almond.js', // make this a default
+        ignoredModules: [
+          'resolver'
+        ],
+        inputPaths: [
+          'appkit/**/*.js'
+        ],
+        legacyFilesToAppend: [
+          'jquery.js',
+          'handlebars.js',
+          'ember.js',
+          'ember-data.js',
+          'ember-resolver.js'
+        ],
+        outputPath: 'app.js'
+      })
+    ]
+  })
   var builder = new broccoli.Builder({
     reader: packageReader,
     transformer: compilerCollection
