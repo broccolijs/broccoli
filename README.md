@@ -9,20 +9,9 @@ now, to be generalized later.
 
 Windows is not yet supported.
 
-To open the preview server, type:
+For the command line interface, see [https://github.com/joliss/broccoli-cli](broccoli-cli).
 
-```
-npm install -g bower
-bower install
-npm install
-node lib/cli.js serve
-```
-
-Or to run a one-off build, type:
-
-```
-node lib/cli.js build public
-```
+For a sample app, see [https://github.com/joliss/broccoli-sample-app](broccoli-sample-app).
 
 Design goals:
 
