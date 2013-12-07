@@ -1,4 +1,4 @@
 language: node_js
 node_js:
   - "0.10"
-script: "jshint *.js lib/*.js lib/*/*.js"
+script: "jshint lib/*.js lib/*/*.js"
