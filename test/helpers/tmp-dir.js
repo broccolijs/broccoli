@@ -13,8 +13,4 @@ var tmpDir = temp.mkdirSync({
   prefix: 'test-run-'
 })
 
-console.error('Temporary directory:')
-console.error(tmpDir)
-console.error('')
-
 module.exports = tmpDir
