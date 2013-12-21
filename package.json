@@ -26,6 +26,11 @@
     "tiny-lr": "0.0.5"
   },
   "devDependencies": {
-    "jshint": "~2.3.0"
+    "jshint": "~2.3.0",
+    "tap": "~0.4.6",
+    "temp": "~0.6.0"
+  },
+  "scripts": {
+    "test": "tap --stderr --timeout 2 ./test/*.js"
   }
 }

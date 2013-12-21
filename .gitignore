@@ -1,1 +1,3 @@
 node_modules
+/test/tmp
+npm-debug.log
