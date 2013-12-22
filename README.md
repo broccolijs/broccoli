@@ -2,11 +2,12 @@
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
 
-A fast, reliable asset builder & server.
+A fast, reliable asset builder & server. Like Sprockets, but better
+architected and not tied to Rails.
 
 For the command line interface, see [broccoli-cli](https://github.com/joliss/broccoli-cli).
 
-For a sample app, see [joliss's broccoli branch of ember-app-kit](https://github.com/joliss/ember-app-kit/tree/broccoli).
+For a sample app, see [joliss/ember-app-kit#broccoli](https://github.com/joliss/ember-app-kit/tree/broccoli).
 
 **This is pre-alpha work-in-progress. It's not usable for building actual JavaScript applications yet.**
 
