@@ -1,8 +1,7 @@
 var fs = require('fs')
 var test = require('tap').test
-var mktemp = require('mktemp')
+var temp = require('temp'); temp.track()
 var broccoli = require('../')
-var tmpDir = require('./helpers/tmp-dir')
 
 var Component = broccoli.Component
 
@@ -12,8 +11,8 @@ test('Component', function (t) {
   var perBuildTmpDir
   function makeComponent () {
     component = new Component
-    globalCacheDir = mktemp.createDirSync(tmpDir + '/component-test-cache-XXXXX')
-    perBuildTmpDir = mktemp.createDirSync(tmpDir + '/component-test-build-XXXXX')
+    globalCacheDir = temp.mkdirSync({ prefix: 'component-cache-', suffix: '.tmp', dir: '.' })
+    perBuildTmpDir = temp.mkdirSync({ prefix: 'component-build-', suffix: '.tmp', dir: '.' })
     component.setup({
       tmpDir: perBuildTmpDir,
       cacheDir: globalCacheDir
