@@ -6,7 +6,7 @@ A fast, reliable asset builder & server.
 
 For the command line interface, see [broccoli-cli](https://github.com/joliss/broccoli-cli).
 
-For a sample app, see [broccoli-sample-app](https://github.com/joliss/broccoli-sample-app).
+For a sample app, see [joliss's broccoli branch of ember-app-kit](https://github.com/joliss/ember-app-kit/tree/broccoli).
 
 **This is pre-alpha work-in-progress. It's not usable for building actual JavaScript applications yet.**
 
