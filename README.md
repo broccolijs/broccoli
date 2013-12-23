@@ -34,8 +34,9 @@ preprocessors that other packages should not have to know about, such as
 CoffeeScript.
 
 When you build your app, all the broccolis are compiled and concatenated as
-defined by the Stirfryfile.js. For instance, Sass would be invoked in the
-Stirfryfile.js.
+defined by the Stirfryfile.js. In other words, the Stirfryfile.js code applies
+not just to your app code but also to all its dependencies. For instance, Sass
+would be invoked in the Stirfryfile.js.
 
 When you push a package to bower, its Stirfryfile.js is ignored. Only the
 Broccolifile.js defines the external interface that gets exported to other
