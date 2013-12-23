@@ -96,5 +96,26 @@ test('PreprocessorPipeline', function (t) {
     })
   })
 
+  test('getDestFileName API', function (t) {
+    var preprocessor = new TestPreprocessor({ name: 'test' })
+    preprocessor.getDestFileName = function (relativePath) {
+      if (relativePath === 'x') {
+        return 'y'
+      }
+      return null
+    }
+    var pipeline = testHelpers.setupComponent(new PreprocessorPipeline)
+      .addPreprocessor(preprocessor)
+    var srcDir = testHelpers.makeTree({
+      'dir/x': 'x contents',
+      'dir/z': 'z contents'
+    })
+    transform(pipeline, srcDir, function (destDir) {
+      t.equal(fs.readFileSync(destDir + '/dir/y').toString(), 'x contents [test]')
+      t.equal(fs.readFileSync(destDir + '/dir/z').toString(), 'z contents')
+      t.end()
+    })
+  })
+
   t.end()
 })
