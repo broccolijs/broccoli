@@ -35,9 +35,9 @@ test('PreprocessorPipeline', function (t) {
 
   test('processes depending on extension', function (t) {
     var jsPreprocessor = new TestPreprocessor({
-      name: 'js',
-      extensions: ['js'],
-      targetExtension: 'js'
+      name: 'es6.js',
+      extensions: ['es6.js'],
+      targetExtension: null
     })
     var aPreprocessor = new TestPreprocessor({
       name: 'a',
@@ -56,7 +56,7 @@ test('PreprocessorPipeline', function (t) {
       .addPreprocessor(jsPreprocessor)
 
     var srcDir = testHelpers.makeTree({
-      'x/y.js': 'y.js contents',
+      'x/y.es6.js': 'y.es6.js contents',
       'x/y.a': 'y.a contents',
       'x/y.foo': 'y.foo contents'
     })
@@ -64,11 +64,11 @@ test('PreprocessorPipeline', function (t) {
     transform(pipeline, srcDir, function (destDir) {
       var files = fs.readdirSync(destDir + '/x')
       files.sort()
-      t.deepEqual(files, ['y.c', 'y.foo', 'y.js'])
+      t.deepEqual(files, ['y.c', 'y.es6.js', 'y.foo'])
 
       t.equal(
-        fs.readFileSync(destDir + '/x/y.js').toString(),
-        'y.js contents [js]',
+        fs.readFileSync(destDir + '/x/y.es6.js').toString(),
+        'y.es6.js contents [es6.js]',
         'preprocessor is applied')
       t.equal(
         fs.readFileSync(destDir + '/x/y.c').toString(),
