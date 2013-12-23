@@ -25,3 +25,13 @@ Design goals:
 
 * Package manager integration: It should not matter whether files come from
   your local repository or are supplied by a package manager (like bower).
+
+## Broccolifile.js and Stirfryfile.js
+
+Every package (including your app itself) has a Broccolifile.js. When you
+build your app, all the broccolis are compiled and concatenated as defined by
+the Stirfryfile.js.
+
+When you push a package to bower, its Stirfryfile.js is ignored. Only the
+Broccolifile.js defines the external interface that gets exported to other
+packages.
