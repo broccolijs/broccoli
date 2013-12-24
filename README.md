@@ -13,7 +13,7 @@ For a sample app, see [joliss/ember-app-kit#broccoli](https://github.com/joliss/
 
 Windows is not yet supported.
 
-Design goals:
+## Design goals
 
 * Reliable: No dodgy cache invalidation or left-over files. You should never
   have to `rm -rf tmp` or restart the server.
@@ -28,10 +28,10 @@ Design goals:
 
 ## Broccolifile.js and Stirfryfile.js
 
-Every package (including your app itself) has a Broccolifile.js. The
-Broccolifile.js defines where source files live, and whether to apply
-preprocessors that other packages should not have to know about, such as
-CoffeeScript.
+Every package (your app itself as well as all its dependencies) has a
+Broccolifile.js. The Broccolifile.js defines where source files live, and
+whether to apply preprocessors that other packages should not have to know
+about, such as CoffeeScript.
 
 When you build your app, all the broccolis are compiled and concatenated as
 defined by the Stirfryfile.js. In other words, the Stirfryfile.js code applies
