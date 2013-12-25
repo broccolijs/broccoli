@@ -28,7 +28,7 @@ Windows is not yet supported.
 
 ## Broccolifile.js and Stirfryfile.js
 
-Every package (your app itself as well as all its dependencies) has a
+Every package -- your app itself as well as each of its dependencies -- has a
 Broccolifile.js. The Broccolifile.js defines where source files live, and
 whether to apply preprocessors that other packages should not have to know
 about, such as CoffeeScript.
