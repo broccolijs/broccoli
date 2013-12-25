@@ -26,11 +26,9 @@ test('PreprocessorPipeline', function (t) {
     this.callCount = 0
   }
 
-  TestPreprocessor.prototype.process = function (srcFilePath, destFilePath, callback) {
-    var contents = fs.readFileSync(srcFilePath)
-    fs.writeFileSync(destFilePath, contents + ' [' + this.name + ']')
+  TestPreprocessor.prototype.processContents = function (contents, callback) {
     this.callCount += 1
-    callback()
+    callback(null, contents + ' [' + this.name + ']')
   }
 
   test('processes depending on extension', function (t) {
