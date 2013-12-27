@@ -26,9 +26,9 @@ test('PreprocessorPipeline', function (t) {
     this.callCount = 0
   }
 
-  TestPreprocessor.prototype.processContents = function (contents, callback) {
+  TestPreprocessor.prototype.processString = function (string, callback) {
     this.callCount += 1
-    callback(null, contents + ' [' + this.name + ']')
+    callback(null, string + ' [' + this.name + ']')
   }
 
   test('processes depending on extension', function (t) {
