@@ -26,7 +26,7 @@ test('PreprocessorPipeline', function (t) {
     this.callCount = 0
   }
 
-  TestPreprocessor.prototype.processString = function (string, callback) {
+  TestPreprocessor.prototype.processString = function (string, info, callback) {
     this.callCount += 1
     callback(null, string + ' [' + this.name + ']')
   }
