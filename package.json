@@ -13,8 +13,6 @@
     "mktemp": "~0.3.2",
     "rimraf": "~2.2.2",
     "hapi": "~1.16.1",
-    "es6-module-transpiler": "0.3.5",
-    "js-string-escape": "~1.0.0",
     "synchronized": "~0.1.7",
     "async": "~0.2.9",
     "glob": "~3.2.6",
