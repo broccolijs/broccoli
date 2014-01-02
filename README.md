@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
 [![Analytics](https://ga-beacon.appspot.com/UA-46801091-1/broccoli/README.md?pixel)](https://github.com/igrigorik/ga-beacon)
 
-A fast, reliable asset builder & server. Like Sprockets, but better
-architected and not tied to Rails.
+A fast, reliable asset pipeline, supporting constant-time rebuilds. Like
+Sprockets, but with more modern architecture and not tied to Rails.
 
 For the command line interface, see [broccoli-cli](https://github.com/joliss/broccoli-cli).
 
@@ -19,7 +19,7 @@ Windows is not yet supported.
 * Reliable: No dodgy cache invalidation or left-over files. You should never
   have to `rm -rf tmp` or restart the server.
 
-* Fast: Rebuilding should take less than 200ms.
+* Fast: Rebuilding should be O(1) and take less than 200ms.
 
 * Universal: Not just for JavaScript, but also for CSS, HTML, images, and
   other types of assets.
