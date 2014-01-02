@@ -1,6 +1,7 @@
 # Broccoli
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
+[![Analytics](https://ga-beacon.appspot.com/UA-46801091-1/broccoli/README.md?pixel)](https://github.com/igrigorik/ga-beacon)
 
 A fast, reliable asset builder & server. Like Sprockets, but better
 architected and not tied to Rails.
