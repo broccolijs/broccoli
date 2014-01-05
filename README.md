@@ -9,6 +9,8 @@ Sprockets, but with more modern architecture and not tied to Rails.
 For the command line interface, see [broccoli-cli](https://github.com/joliss/broccoli-cli).
 
 For a sample app, see [joliss/ember-app-kit#broccoli](https://github.com/joliss/ember-app-kit/tree/broccoli).
+Be sure to `npm link` (symlink) the current master branch of Broccoli into
+your `node_modules`, as releases are infrequent and usually out-of-date.
 
 **This is pre-alpha work-in-progress. It's not usable for building actual JavaScript applications yet.**
 
