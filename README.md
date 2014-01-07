@@ -1,7 +1,6 @@
 # Broccoli
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
-[![Analytics](https://ga-beacon.appspot.com/UA-46801091-1/broccoli/README.md?pixel)](https://github.com/igrigorik/ga-beacon)
 
 A fast, reliable asset pipeline, supporting constant-time rebuilds. Like
 Sprockets, but with more modern architecture and not tied to Rails.
