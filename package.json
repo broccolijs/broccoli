@@ -21,7 +21,8 @@
     "commander": "~2.0.0",
     "findup-sync": "~0.1.2",
     "tiny-lr": "0.0.5",
-    "bower": "~1.2.8"
+    "bower": "~1.2.8",
+    "rsvp": "~3.0.3"
   },
   "devDependencies": {
     "jshint": "~2.3.0",
