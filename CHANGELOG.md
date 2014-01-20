@@ -1,5 +1,7 @@
 # master
 
+# 0.0.8
+
 * Fold `Reader` into `Tree`
 * Replace `PreprocessorPipeline` and `Preprocessor` with `Filter`; each
   `Filter` is added directly on the tree or builder with `addTransform`
