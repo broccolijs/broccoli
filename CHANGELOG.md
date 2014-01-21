@@ -1,5 +1,8 @@
 # master
 
+* Show per-component timings
+* Various performance improvements
+
 # 0.0.9
 
 * Expect a `Tree`, not a `Builder`, returned from Broccolifile.js
