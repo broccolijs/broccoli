@@ -1,5 +1,7 @@
 # master
 
+# 0.0.9
+
 * Expect a `Tree`, not a `Builder`, returned from Broccolifile.js
 
 # 0.0.8
