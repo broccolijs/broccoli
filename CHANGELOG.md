@@ -1,5 +1,7 @@
 # master
 
+* Expect a `Tree`, not a `Builder`, returned from Broccolifile.js
+
 # 0.0.8
 
 * Fold `Reader` into `Tree`
