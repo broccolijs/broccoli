@@ -38,3 +38,8 @@ Windows is not yet supported.
   theoretically safe, it exposes a needlessly large amount of attack surface
   just for serving static assets. Instead, use `broccoli build` to precompile
   your assets, and serve the static files from a web server of your choice.
+
+## License
+
+Broccoli was originally written by [Jo Liss](http://www.solitr.com/) and is
+licensed under the [MIT license](LICENSE.md).
