@@ -5,6 +5,8 @@
 * Various plugin API changes
 * Added MergedTree
 * Broccolifile may now return an array of trees, which will be merged
+* Expose `broccoli.bowerTrees()`, which will hopefully be redesigned and go
+  away again
 
 # 0.0.9
 
