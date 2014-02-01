@@ -2,6 +2,9 @@
 
 * Show per-component timings
 * Various performance improvements
+* Various plugin API changes
+* Added MergedTree
+* Broccolifile may now return an array of trees, which will be merged
 
 # 0.0.9
 
