@@ -8,6 +8,8 @@
 * Expose `broccoli.bowerTrees()`, which will hopefully be redesigned and go
   away again
 * All component constructors get an `injector` as first argument
+* Remove `Component::makeTmpDir` and `Component::getCacheDir` in favor of
+  injected `TmpDirManager` and `CacheManager`
 
 # 0.0.9
 
