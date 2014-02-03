@@ -7,6 +7,7 @@
 * Broccolifile may now return an array of trees, which will be merged
 * Expose `broccoli.bowerTrees()`, which will hopefully be redesigned and go
   away again
+* All component constructors get an `injector` as first argument
 
 # 0.0.9
 
