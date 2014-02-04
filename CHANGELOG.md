@@ -10,6 +10,8 @@
 * All component constructors get an `injector` as first argument
 * Remove `Component::makeTmpDir` and `Component::getCacheDir` in favor of
   injected `TmpDirManager` and `CacheManager`
+* Remove `Component` base class
+* Remove timing output; this will be revived at some point
 
 # 0.0.9
 
