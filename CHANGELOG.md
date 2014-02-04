@@ -3,13 +3,11 @@
 * Show per-component timings
 * Various performance improvements
 * Various plugin API changes
-* Added MergedTree
+* Add `MergedTree`
 * Broccolifile may now return an array of trees, which will be merged
 * Expose `broccoli.bowerTrees()`, which will hopefully be redesigned and go
   away again
 * All component constructors get an `injector` as first argument
-* Remove `Component::makeTmpDir` and `Component::getCacheDir` in favor of
-  injected `TmpDirManager` and `CacheManager`
 * Remove `Component` base class
 * Remove timing output; this will be revived at some point
 
