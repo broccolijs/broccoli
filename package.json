@@ -12,7 +12,7 @@
   "dependencies": {
     "mktemp": "~0.3.2",
     "rimraf": "~2.2.2",
-    "hapi": "~1.16.1",
+    "hapi": "~2.1.2",
     "synchronized": "~0.1.7",
     "async": "~0.2.9",
     "glob": "~3.2.6",
