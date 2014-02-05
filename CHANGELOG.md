@@ -10,6 +10,7 @@
 * Remove `Component` base class
 * Remove `CompilerCollection` and `Compiler` base class; use a `Transformer`
 * Remove `Tree::addTransform`, `Tree::addTrees`, and `Tree::addBower`
+* `Builder::build` now has a promise interface as well
 
 # 0.0.9
 
