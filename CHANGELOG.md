@@ -9,6 +9,7 @@
   away again
 * Remove `Component` base class
 * Remove `CompilerCollection` and `Compiler` base class; use a `Transformer`
+* Remove `Tree::addTransform`, `Tree::addTrees`, and `Tree::addBower`
 
 # 0.0.9
 
