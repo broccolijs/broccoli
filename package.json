@@ -27,10 +27,9 @@
     "temp": "~0.6.0"
   },
   "devDependencies": {
-    "jshint": "~2.3.0",
-    "tap": "~0.4.6"
+    "jshint": "~2.3.0"
   },
   "scripts": {
-    "test": "jshint lib/*.js lib/*/*.js test/*.js && tap --stderr --timeout 2 ./test/*.js"
+    "test": "jshint lib/*.js lib/*/*.js"
   }
 }
