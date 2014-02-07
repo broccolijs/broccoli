@@ -1,6 +1,7 @@
 # master
 
 * Extract `factory.env` into broccoli-env package
+* Eliminate `factory` argument to Broccolifile
 
 # 0.0.10
 
