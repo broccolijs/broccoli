@@ -1,5 +1,7 @@
 # master
 
+* Extract `factory.env` into broccoli-env package
+
 # 0.0.10
 
 * Change to a `.read`-based everything-is-a-tree architecture
