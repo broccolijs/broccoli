@@ -15,6 +15,13 @@ your `node_modules`, as releases are infrequent and usually out-of-date.
 
 Windows is not yet supported.
 
+## Installation
+
+```bash
+npm install --save broccoli
+npm install --global broccoli-cli
+```
+
 ## Design goals
 
 * Reliable: No dodgy cache invalidation or left-over files. You should never
