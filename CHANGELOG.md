@@ -1,5 +1,7 @@
 # master
 
+# 0.0.13
+
 * Extract `Transformer` into `broccoli-transform` package (now "`Transform`")
 * Extract `Filter` into `broccoli-filter` package
 
