@@ -27,6 +27,6 @@
     "jshint": "~2.3.0"
   },
   "scripts": {
-    "test": "jshint lib/*.js lib/*/*.js"
+    "test": "jshint lib/*.js"
   }
 }
