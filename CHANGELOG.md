@@ -1,5 +1,7 @@
 # master
 
+* Extract `Transformer` into `broccoli-transform` (now "`Transform`")
+
 # 0.0.12
 
 * In plugin (tree) API, replace `.afterBuild` with `.cleanup`
