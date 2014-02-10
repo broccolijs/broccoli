@@ -1,5 +1,7 @@
 # master
 
+# 0.0.12
+
 * In plugin (tree) API, replace `.afterBuild` with `.cleanup`
 * Move temporary directories out of the way
 
