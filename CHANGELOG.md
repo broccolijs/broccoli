@@ -1,5 +1,8 @@
 # master
 
+* In plugin (tree) API, replace `.afterBuild` with `.cleanup`
+* Move temporary directories out of the way
+
 # 0.0.11
 
 * Extract `factory.env` into broccoli-env package
