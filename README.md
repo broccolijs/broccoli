@@ -2,16 +2,14 @@
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
 
-A fast, reliable asset pipeline, supporting constant-time rebuilds. Like
-Sprockets, but with more modern architecture and not tied to Rails.
+A fast, reliable asset pipeline, supporting constant-time rebuilds. Like the
+Rails asset pipeline, but with more modern architecture and not tied to Rails.
 
 For the command line interface, see [broccoli-cli](https://github.com/joliss/broccoli-cli).
 
 For a sample app, see [joliss/ember-app-kit#broccoli](https://github.com/joliss/ember-app-kit/tree/broccoli).
-Be sure to `npm link` (symlink) the current master branch of Broccoli into
-your `node_modules`, as releases are infrequent and usually out-of-date.
 
-**This is pre-alpha work-in-progress. It's not usable for building actual JavaScript applications yet.**
+**This is 0.x beta software.**
 
 Windows is not yet supported.
 
@@ -22,18 +20,23 @@ npm install --save broccoli
 npm install --global broccoli-cli
 ```
 
-## Design goals
+## Plugins
 
-* Reliable: No dodgy cache invalidation or left-over files. You should never
-  have to `rm -rf tmp` or restart the server.
+* [broccoli-coffee](https://github.com/joliss/broccoli-coffee)
+* [broccoli-template](https://github.com/joliss/broccoli-template)
+* [broccoli-static-compiler](https://github.com/joliss/broccoli-static-compiler)
+* [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
+* [broccoli-es6-concatenator](https://github.com/joliss/broccoli-es6-concatenator)
+* [broccoli-sass](https://github.com/joliss/broccoli-sass) (incomplete)
 
-* Fast: Rebuilding should be O(1) and take less than 200ms.
+### Helpers
 
-* Universal: Not just for JavaScript, but also for CSS, HTML, images, and
-  other types of assets.
+Shared code for writing plugins.
 
-* Package manager integration: It should not matter whether files come from
-  your local repository or are supplied by a package manager (like bower).
+* [broccoli-filter](https://github.com/joliss/broccoli-filter)
+* [broccoli-transform](https://github.com/joliss/broccoli-transform)
+* [broccoli-env](https://github.com/joliss/broccoli-env)
+* [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
 ## Security
 
