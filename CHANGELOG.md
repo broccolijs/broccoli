@@ -1,5 +1,10 @@
 # master
 
+# 0.1.0
+
+* Bump to indicate beta status
+* Remove unused `helpers.walkSync` (now in node-walk-sync)
+
 # 0.0.13
 
 * Extract `Transformer` into `broccoli-transform` package (now "`Transform`")
