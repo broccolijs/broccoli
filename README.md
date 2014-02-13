@@ -40,7 +40,7 @@ Shared code for writing plugins.
 
 ## Security
 
-* Currently Broccoli binds to on `0.0.0.0`, exposing your app to the world,
+* Currently Broccoli binds to `0.0.0.0`, exposing your app to the world,
   unless you use a firewall. This is what Rails does, but it still seems like
   bad practice.
 
