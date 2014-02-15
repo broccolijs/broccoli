@@ -43,6 +43,44 @@ Shared code for writing plugins.
 * [broccoli-env](https://github.com/joliss/broccoli-env)
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
+## Plugin API Specification
+
+Broccoli defines a single plugin API: a tree. A tree object represents a tree
+(directory hierarchy) of files that can be regenerated on each build.
+
+By convention, plugins will export a function that takes one or more input
+trees, and returns an output tree object.
+
+A tree object must supply two methods that will be called by Broccoli:
+
+### `tree.read(readTree)`
+
+The `.read` method must return a path or a promise for a path, containing the
+tree contents.
+
+It receives a `readTree` function argument from Broccoli. If `.read` needs to
+read other trees, it must not call `otherTree.read` directly. Instead, it must
+call `readTree(otherTree)`, which returns a promise for the path containing
+`otherTree`'s contents. It must not call `readTree` again until the promise
+has resolved; that is, it cannot call `readTree` on multiple trees in
+parallel.
+
+Broccoli will call the `.read` method repeatedly to rebuild the tree, but at
+most once per rebuild; that is, if a tree is used multiple times in a build
+definition, Broccoli will reuse the path returned instead of calling `.read`
+again.
+
+The `.read` method is responsible for creating a new temporary directory to
+store the tree contents in. Subsequent invocations of `.read` should remove
+temporary directories created in previous invocations.
+
+### `tree.cleanup()`
+
+For every tree whose `.read` method was called one or more times, the
+`.cleanup` method will be called exactly once. No further `.read` calls will
+follow `.cleanup`. The `.cleanup` method should remove all temporary
+directories created by `.read`.
+
 ## Security
 
 * Currently Broccoli binds to `0.0.0.0`, exposing your app to the world,
