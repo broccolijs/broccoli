@@ -43,6 +43,21 @@ Shared code for writing plugins.
 * [broccoli-env](https://github.com/joliss/broccoli-env)
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
+## Broccolifile.js
+
+A `Broccolifile.js` file contains the build specification. It has the
+following format:
+
+```js
+module.exports = function (broccoli) {
+};
+```
+
+The function may use `broccoli.makeTree(path)` to create trees from paths on
+the file system. It may use plugins to create new, generated trees.
+
+The function must return a tree, or an array of trees.
+
 ## Plugin API Specification
 
 Broccoli defines a single plugin API: a tree. A tree object represents a tree

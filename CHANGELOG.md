@@ -1,5 +1,6 @@
 # master
 
+* Make `tree.cleanup` non-optional
 * Rename `broccoli.read` to `broccoli.makeTree`
 
 # 0.1.0
