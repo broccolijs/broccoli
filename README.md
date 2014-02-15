@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
 
-A fast, reliable asset pipeline, supporting constant-time rebuilds. Like the
-Rails asset pipeline, but with more modern architecture and not tied to Rails.
+A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
+build definitions. Comparable to the Rails asset pipeline in scope, though it
+runs on Node and is backend-agnostic.
 
-For the command line interface, see [broccoli-cli](https://github.com/joliss/broccoli-cli).
-
-For a sample app, see [joliss/ember-app-kit#broccoli](https://github.com/joliss/ember-app-kit/tree/broccoli).
+For the command line interface, see
+[broccoli-cli](https://github.com/joliss/broccoli-cli).
 
 **This is 0.x beta software.**
 
@@ -19,6 +19,11 @@ Windows is not yet supported.
 npm install --save broccoli
 npm install --global broccoli-cli
 ```
+
+## Getting Started
+
+Check out
+[broccoli-sample-app](https://github.com/joliss/broccoli-sample-app).
 
 ## Plugins
 
