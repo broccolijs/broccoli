@@ -1,5 +1,7 @@
 # master
 
+* Rename `broccoli.read` to `broccoli.makeTree`
+
 # 0.1.0
 
 * Bump to indicate beta status
