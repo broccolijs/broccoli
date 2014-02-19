@@ -25,10 +25,10 @@ npm install --global broccoli-cli
 Check out
 [broccoli-sample-app](https://github.com/joliss/broccoli-sample-app).
 
-## Broccolifile.js
+## Brocfile.js
 
-A `Broccolifile.js` file contains the build specification. It has the
-following format:
+A `Brocfile.js` file in the project root contains the build specification. It
+has the following format:
 
 ```js
 module.exports = function (broccoli) {

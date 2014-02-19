@@ -1,5 +1,7 @@
 # master
 
+* Rename `Broccolifile.js` to `Brocfile.js`
+
 # 0.1.1
 
 * Make `tree.cleanup` non-optional
