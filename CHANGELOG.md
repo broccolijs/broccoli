@@ -1,6 +1,7 @@
 # master
 
 * Rename `Broccolifile.js` to `Brocfile.js`
+* Change default port from 8000 to 4200
 
 # 0.1.1
 
