@@ -4,7 +4,8 @@
 
 A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
-runs on Node and is backend-agnostic.
+runs on Node and is backend-agnostic. For background and architecture, see the
+[introductory blog post](http://www.solitr.com/blog/2014/02/broccoli-first-release/).
 
 For the command line interface, see
 [broccoli-cli](https://github.com/joliss/broccoli-cli).
