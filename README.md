@@ -48,6 +48,7 @@ The function must return a tree, or an array of trees.
 * [broccoli-static-compiler](https://github.com/joliss/broccoli-static-compiler)
 * [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
 * [broccoli-es6-concatenator](https://github.com/joliss/broccoli-es6-concatenator)
+* [broccoli-es6-module-filter](https://github.com/rpflorence/broccoli-es6-module-filter)
 * [broccoli-sass](https://github.com/joliss/broccoli-sass) (incomplete)
 
 ### Helpers
