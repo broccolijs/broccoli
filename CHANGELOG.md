@@ -1,5 +1,7 @@
 # master
 
+* In addition to `Brocfile.js`, accept lowercase `brocfile.js`
+
 # 0.2.0
 
 * Rename `Broccolifile.js` to `Brocfile.js`
