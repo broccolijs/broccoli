@@ -52,6 +52,7 @@ The function must return a tree, or an array of trees.
 * [broccoli-sass](https://github.com/joliss/broccoli-sass) (incomplete)
 * [broccoli-swig](https://github.com/shanielh/broccoli-swig)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
+* [broccoli-eslint](https://github.com/makepanic/broccoli-eslint)
 
 ### Helpers
 
