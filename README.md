@@ -68,6 +68,8 @@ The function must return a tree, or an array of trees.
 * [broccoli-strip-json-comments](https://github.com/sindresorhus/broccoli-strip-json-comments)
 * [broccoli-es6-transpiler](https://github.com/sindresorhus/broccoli-es6-transpiler)
 
+More plugins may be found under the [broccoli-plugin
+keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
 ### Helpers
 
