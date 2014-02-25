@@ -52,6 +52,25 @@ The function must return a tree, or an array of trees.
 * [broccoli-sass](https://github.com/joliss/broccoli-sass) (incomplete)
 * [broccoli-swig](https://github.com/shanielh/broccoli-swig)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
+* [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
+* [broccoli-svgo](https://github.com/sindresorhus/broccoli-svgo)
+* [broccoli-csso](https://github.com/sindresorhus/broccoli-csso)
+* [broccoli-htmlmin](https://github.com/sindresorhus/broccoli-htmlmin)
+* [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
+* [broccoli-uncss](https://github.com/sindresorhus/broccoli-uncss)
+* [broccoli-strip-debug](https://github.com/sindresorhus/broccoli-strip-debug)
+* [broccoli-less](https://github.com/sindresorhus/broccoli-less)
+* [broccoli-stylus](https://github.com/sindresorhus/broccoli-stylus)
+* [broccoli-traceur](https://github.com/sindresorhus/broccoli-traceur)
+* [broccoli-sweetjs](https://github.com/sindresorhus/broccoli-sweetjs)
+* [broccoli-closure-compiler](https://github.com/sindresorhus/broccoli-closure-compiler)
+* [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
+* [broccoli-defeatureify](https://github.com/sindresorhus/broccoli-defeatureify)
+* [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
+* [broccoli-dust](https://github.com/sindresorhus/broccoli-dust)
+* [broccoli-strip-json-comments](https://github.com/sindresorhus/broccoli-strip-json-comments)
+* [broccoli-es6-transpiler](https://github.com/sindresorhus/broccoli-es6-transpiler)
+
 
 ### Helpers
 
