@@ -1,5 +1,7 @@
 # master
 
+# 0.2.1
+
 * In addition to `Brocfile.js`, accept lowercase `brocfile.js`
 * Fix error reporting for string exceptions
 
