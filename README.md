@@ -49,6 +49,7 @@ The function must return a tree, or an array of trees.
 * [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
 * [broccoli-es6-concatenator](https://github.com/joliss/broccoli-es6-concatenator)
 * [broccoli-es6-module-filter](https://github.com/rpflorence/broccoli-es6-module-filter)
+* [broccoli-sass](https://github.com/joliss/broccoli-sass)
 * [broccoli-swig](https://github.com/shanielh/broccoli-swig)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
 * [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
