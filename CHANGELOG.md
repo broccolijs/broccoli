@@ -1,5 +1,7 @@
 # master
 
+# 0.2.2
+
 * Update hapi dependency to avoid file handle leaks, causing EMFILE errors
 
 # 0.2.1
