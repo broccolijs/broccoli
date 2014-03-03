@@ -10,7 +10,7 @@
     "url": "https://github.com/joliss/broccoli"
   },
   "dependencies": {
-    "hapi": "~2.1.2",
+    "hapi": "^2.6.0",
     "synchronized": "~0.1.7",
     "glob": "~3.2.6",
     "mkdirp": "~0.3.5",

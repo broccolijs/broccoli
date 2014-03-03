@@ -1,5 +1,7 @@
 # master
 
+* Update hapi dependency to avoid file handle leaks, causing EMFILE errors
+
 # 0.2.1
 
 * In addition to `Brocfile.js`, accept lowercase `brocfile.js`
