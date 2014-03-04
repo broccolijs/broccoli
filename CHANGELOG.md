@@ -1,5 +1,7 @@
 # master
 
+# 0.2.3
+
 * Add `--port`, `--host`, and `--live-reload-port` options to `serve` command
 
 # 0.2.2
