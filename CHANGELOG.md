@@ -1,5 +1,7 @@
 # master
 
+* Add `--port`, `--host`, and `--live-reload-port` options to `serve` command
+
 # 0.2.2
 
 * Update hapi dependency to avoid file handle leaks, causing EMFILE errors
