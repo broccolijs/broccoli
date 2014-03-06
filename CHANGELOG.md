@@ -1,5 +1,7 @@
 # master
 
+* Refactor watcher logic
+
 # 0.2.4
 
 * Use smaller `bower-config` package instead of `bower` to parse `bower.json`
