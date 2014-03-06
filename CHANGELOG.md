@@ -1,5 +1,8 @@
 # master
 
+* Use smaller `bower-config` package instead of `bower` to parse `bower.json`
+  files
+
 # 0.2.3
 
 * Add `--port`, `--host`, and `--live-reload-port` options to `serve` command
