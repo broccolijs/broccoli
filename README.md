@@ -130,6 +130,13 @@ directories created by `.read`.
   just for serving static assets. Instead, use `broccoli build` to precompile
   your assets, and serve the static files from a web server of your choice.
 
+## Get Help
+
+* IRC: `#broccolijs` on Freenode
+* Twitter: mention @jo_liss with your question
+* GitHub: Open an issue on a specific plugin repository, or on this
+  repository for general questions.
+
 ## License
 
 Broccoli was originally written by [Jo Liss](http://www.solitr.com/) and is
