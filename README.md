@@ -72,6 +72,10 @@ The function must return a tree, or an array of trees.
 More plugins may be found under the [broccoli-plugin
 keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
+### Grunt Integration
+
+You can execute Broccoli configurations as Grunt task with [grunt-broccoli](https://github.com/quandl/grunt-broccoli).
+
 ### Helpers
 
 Shared code for writing plugins.
