@@ -125,10 +125,6 @@ directories created by `.read`.
 
 ## Security
 
-* Currently Broccoli binds to `0.0.0.0`, exposing your app to the world,
-  unless you use a firewall. This is what Rails does, but it still seems like
-  bad practice.
-
 * Do not run `broccoli serve` on a production server. While this is
   theoretically safe, it exposes a needlessly large amount of attack surface
   just for serving static assets. Instead, use `broccoli build` to precompile
