@@ -1,5 +1,7 @@
 # master
 
+# 0.2.5
+
 * Refactor watcher logic to use promises
 * Turn the hapi server into a connect middleware
 
