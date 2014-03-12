@@ -1,5 +1,7 @@
 # master
 
+* Improve watcher logic to stop double builds when build errors happen
+
 # 0.3.0
 
 * Bind to `localhost` instead of `0.0.0.0` (whole wide world) by default
