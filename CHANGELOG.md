@@ -1,5 +1,7 @@
 # master
 
+# 0.3.0
+
 * Bind to `localhost` instead of `0.0.0.0` (whole wide world) by default
 
 # 0.2.6
