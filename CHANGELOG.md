@@ -1,5 +1,9 @@
 # master
 
+# 0.2.6
+
+* Overwrite mis-pushed release
+
 # 0.2.5
 
 * Refactor watcher logic to use promises
