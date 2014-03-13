@@ -75,6 +75,7 @@ keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 ### Plugging Broccoli Into Other Tools
 
 * [grunt-broccoli](https://github.com/quandl/grunt-broccoli)
+* [grunt-broccoli-build](https://github.com/ericf/grunt-broccoli-build)
 
 ### Helpers
 
