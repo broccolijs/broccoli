@@ -1,5 +1,7 @@
 # master
 
+* Extract `broccoli.helpers` into broccoli-kitchen-sink-helpers package
+
 # 0.3.1
 
 * Report unhandled errors in the watcher
