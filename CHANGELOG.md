@@ -1,5 +1,7 @@
 # master
 
+# 0.4.0
+
 * Extract `broccoli.helpers` into broccoli-kitchen-sink-helpers package
 
 # 0.3.1
