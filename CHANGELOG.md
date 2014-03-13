@@ -1,5 +1,7 @@
 # master
 
+# 0.3.1
+
 * Report unhandled errors in the watcher
 * Add support for `.treeDir` property on error objects
 * Improve watcher logic to stop double builds when build errors happen
