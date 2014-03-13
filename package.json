@@ -21,7 +21,8 @@
     "quick-temp": "^0.1.0",
     "bower-config": "^0.5.0",
     "connect": "~2.14.1",
-    "send": "~0.2.0"
+    "send": "~0.2.0",
+    "http-proxy": "~1.0.2"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
