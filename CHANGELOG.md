@@ -1,5 +1,7 @@
 # master
 
+* Preserve value/error on Watcher::current promise
+
 # 0.4.1
 
 * Extract `broccoli.helpers` into broccoli-kitchen-sink-helpers package
