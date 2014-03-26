@@ -1,5 +1,7 @@
 # master
 
+# 0.4.2
+
 * Preserve value/error on Watcher::current promise
 
 # 0.4.1
