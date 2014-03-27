@@ -2,11 +2,12 @@
 
 # 0.4.3
 
-* Repush since npm seems confused
+* Correct mis-publish on npm
 
 # 0.4.2
 
 * Preserve value/error on Watcher::current promise
+* This version has been unpublished due to a mis-publish
 
 # 0.4.1
 
