@@ -1,5 +1,7 @@
 # master
 
+* Add `--version` command line option
+
 # 0.4.3
 
 * Correct mis-publish on npm
