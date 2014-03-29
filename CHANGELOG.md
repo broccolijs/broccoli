@@ -1,5 +1,7 @@
 # master
 
+# 0.5.0
+
 * Remove `broccoli.makeTree('foo')` in favor of string literals (just `'foo'`)
 * Remove `broccoli.Reader`
 * Add `--version` command line option
