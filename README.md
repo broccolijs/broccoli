@@ -54,6 +54,7 @@ The function must return a tree, or an array of trees.
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
 * [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
 * [broccoli-svgo](https://github.com/sindresorhus/broccoli-svgo)
+* [broccoli-rsvg](https://github.com/myfreeweb/broccoli-rsvg)
 * [broccoli-csso](https://github.com/sindresorhus/broccoli-csso)
 * [broccoli-htmlmin](https://github.com/sindresorhus/broccoli-htmlmin)
 * [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
