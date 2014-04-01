@@ -1,5 +1,7 @@
 # master
 
+* Disallow returning arrays from Brocfile.js, in favor of broccoli-merge-trees plugin
+
 # 0.5.0
 
 * Remove `broccoli.makeTree('foo')` in favor of string literals (just `'foo'`)
