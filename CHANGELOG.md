@@ -1,5 +1,7 @@
 # master
 
+# 0.6.0
+
 * Disallow returning arrays from Brocfile.js, in favor of broccoli-merge-trees plugin
 
 # 0.5.0
