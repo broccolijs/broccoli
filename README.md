@@ -36,10 +36,8 @@ module.exports = function (broccoli) {
 };
 ```
 
-The function may use `broccoli.makeTree(path)` to create trees from paths on
-the file system. It may use plugins to create new, generated trees.
-
-The function must return a tree, or an array of trees.
+The function must return a tree object, which is typically created using a
+Broccoli plugin.
 
 ## Plugins
 
