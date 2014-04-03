@@ -2,11 +2,13 @@
 
 # 0.6.0
 
-* Disallow returning arrays from Brocfile.js, in favor of broccoli-merge-trees plugin
+* Disallow returning arrays from Brocfile.js, in favor of broccoli-merge-trees
+  plugin ([sample diff](https://github.com/joliss/broccoli-sample-app/commit/b6b30d5dd23ddf86d8b95b1440b2937de1b8bbcd))
 
 # 0.5.0
 
 * Remove `broccoli.makeTree('foo')` in favor of string literals (just `'foo'`)
+  ([sample diff](https://github.com/joliss/broccoli-sample-app/commit/ccd03da8e803a15fdd50e47c0ee71f9bbcfd911e))
 * Remove `broccoli.Reader`
 * Add `--version` command line option
 
