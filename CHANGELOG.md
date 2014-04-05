@@ -1,5 +1,8 @@
 # master
 
+* Remove `broccoli.MergedTree`; it has been extracted into broccoli-merge-trees
+  ([sample diff](https://github.com/joliss/broccoli-sample-app/commit/b6b30d5dd23ddf86d8b95b1440b2937de1b8bbcd#diff-ec6fb87583b2323d013c3e30c0a5084dL50))
+
 # 0.6.0
 
 * Disallow returning arrays from Brocfile.js, in favor of broccoli-merge-trees
