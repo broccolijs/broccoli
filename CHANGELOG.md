@@ -1,5 +1,7 @@
 # master
 
+# 0.7.1
+
 * Do not use hardlinks in bower implementation
 
 # 0.7.0
