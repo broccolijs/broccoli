@@ -1,5 +1,7 @@
 # master
 
+* Do not use hardlinks in bower implementation
+
 # 0.7.0
 
 * Remove `broccoli.MergedTree`; it has been extracted into broccoli-merge-trees
