@@ -1,5 +1,7 @@
 # master
 
+* Update dependencies
+
 # 0.7.1
 
 * Do not use hardlinks in bower implementation
