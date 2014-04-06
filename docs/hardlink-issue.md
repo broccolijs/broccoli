@@ -1,4 +1,4 @@
-## Broccoli Hardlinking Issue Potentially Causing Data Loss on OS X"
+# Broccoli: Potential Data Loss On OS X Due To Hardlinking
 
 **[DRAFT -- please do not post on Twitter yet!]**
 
@@ -60,20 +60,20 @@ npm-check-affected https://raw.githubusercontent.com/joliss/broccoli/master/docs
 If you are using a plugin that depends on an older, affected version of some
 package, please kindly send them a pull request updating their dependency.
 
-## Possible Future `npm unpublish`
+## Possible `npm unpublish` In The Future
 
 It is possible to encounter the data loss issue in the future, for instance if
-you are using a plugin whose dependency spec hasn't been updated. But I don't
-want people to still have to worry about this problem months from now.
+you are using a plugin whose dependency spec hasn't been updated. I don't want
+people to still have to worry about this problem months from now.
 
 So I'm considering yanking all affected versions from npm (using `npm
 unpublish`) at some point, perhaps two to three weeks from now.
 
 The older versions would still be tagged on their git repositories if you
-desperately need them. Note that `npm` (wisely) does not allow us to overwrite
+desperately need them. Note that npm (wisely) does not allow us to overwrite
 previously released versions with fixed versions; we can only delete them.
 
-Please tell me on [Twitter](https://twitter.com/jo_liss) or
+Please let me know on [Twitter](https://twitter.com/jo_liss) or
 [email](mailto:joliss42@gmail.com) whether or not you think this is a good
 idea.
 
