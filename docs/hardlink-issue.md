@@ -1,11 +1,11 @@
-# Broccoli: Potential Data Loss On OS X Due To Hardlinking
+# Broccoli: Potential Data Loss On OS X
 
 **[DRAFT -- please do not post on Twitter yet!]**
 
 *Posted April 7, 2014 by [Jo Liss](https://twitter.com/jo_liss)*
 
 There is an issue in Broccoli and several helper libraries that can cause data
-loss on Mac OS X.
+loss on Mac OS X, stemming from their use of hardlinks.
 
 ## Background
 
@@ -16,7 +16,8 @@ a cache directory.
 
 It turns out that on OS X, it is possible to hardlink directories. While we
 never intentionally try to do this, it is possible to accidentally hardlink
-directories (for instance when we hardlink a symlink pointing to a directory).
+directories -- for instance when we hardlink a symlink pointing to a
+directory.
 
 Hardlinked directories can lead to data loss: If one of the directories
 underneath the `tmp` directory is hardlinked to a directory outside the `tmp`
@@ -66,8 +67,8 @@ It is possible to encounter the data loss issue in the future, for instance if
 you are using a plugin whose dependency spec hasn't been updated. I don't want
 people to still have to worry about this problem months from now.
 
-So I'm considering yanking all affected versions from npm (using `npm
-unpublish`) at some point, perhaps two to three weeks from now.
+So I'm considering yanking all affected versions from npm using `npm
+unpublish` at some point, perhaps two to three weeks from now.
 
 The older versions would still be tagged on their git repositories if you
 desperately need them. Note that npm (wisely) does not allow us to overwrite
