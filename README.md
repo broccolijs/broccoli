@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
 
+*Note April 7, 2014: There was a recent **data loss** issue on OS X in
+Broccoli and several plugins. [Check to see if you're
+affected.](https://github.com/joliss/broccoli/blob/master/docs/hardlink-issue.md)*
+
 A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
 runs on Node and is backend-agnostic. For background and architecture, see the
