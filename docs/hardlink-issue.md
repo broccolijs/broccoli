@@ -81,5 +81,6 @@ idea.
 Thanks to [@thomasABoyt](https://twitter.com/thomasABoyt) for reporting this
 issue and helping me identify the cause.
 
-*Questions? Comments? [Discuss on Twitter](https://twitter.com/jo_liss) or
-open a GitHub issue.*
+*Questions? Comments? [Discuss on
+Twitter](https://twitter.com/jo_liss/status/453240313583124480) or open a
+GitHub issue.*
