@@ -1,7 +1,5 @@
 # Broccoli: Potential Data Loss On OS X
 
-**[DRAFT -- please do not post on Twitter yet!]**
-
 *Posted April 7, 2014 by [Jo Liss](https://twitter.com/jo_liss)*
 
 There is an issue in Broccoli and several helper libraries that can cause data
@@ -47,9 +45,9 @@ whether it occurs on Windows.
 You are advised to upgrade to package versions greater than those listed
 above.
 
-Even if your app does not depend on any of the affected package versions
-directly, you might still be using them indirectly through some Broccoli
-plugin. To check whether you are affected, run
+Even if your `package.json` does not depend on any of the affected package
+versions directly, you might still be using them indirectly through some
+Broccoli plugin. To check whether you are affected, run
 
 ```bash
 npm install -g npm-check-affected
@@ -82,3 +80,6 @@ idea.
 
 Thanks to [@thomasABoyt](https://twitter.com/thomasABoyt) for reporting this
 issue and helping me identify the cause.
+
+*Questions? Comments? [Discuss on Twitter](https://twitter.com/jo_liss) or
+open a GitHub issue.*
