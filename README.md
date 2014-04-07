@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
 
-*Note April 7, 2014: There was a recent **data loss** issue on OS X in
+*Note April 7, 2014: There was a recent <strong>data loss</strong> issue on OS X in
 Broccoli and several plugins. [Check to see if you're
 affected.](https://github.com/joliss/broccoli/blob/master/docs/hardlink-issue.md)*
 
