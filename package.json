@@ -20,7 +20,8 @@
     "bower-config": "^0.5.0",
     "connect": "~2.14.1",
     "send": "~0.2.0",
-    "broccoli-kitchen-sink-helpers": "^0.2.0"
+    "broccoli-kitchen-sink-helpers": "^0.2.0",
+    "xtend": "^2.2.0"
   },
   "devDependencies": {
     "jshint": "~2.3.0"
