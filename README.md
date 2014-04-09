@@ -70,6 +70,7 @@ Broccoli plugin.
 * [broccoli-dust](https://github.com/sindresorhus/broccoli-dust)
 * [broccoli-strip-json-comments](https://github.com/sindresorhus/broccoli-strip-json-comments)
 * [broccoli-es6-transpiler](https://github.com/sindresorhus/broccoli-es6-transpiler)
+* [broccoli-ember-script](https://github.com/aradabaugh/broccoli-ember-script)
 
 More plugins may be found under the [broccoli-plugin
 keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
