@@ -1,5 +1,7 @@
 # master
 
+* Move process.exit listener out of builder into server
+
 # 0.9.0
 
 * `Brocfile.js` now exports a tree, not a function ([sample diff](https://gist.github.com/joliss/15630762fa0f43976418))
