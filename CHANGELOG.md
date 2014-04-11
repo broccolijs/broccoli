@@ -1,5 +1,7 @@
 # master
 
+* `Brocfile.js` now exports a tree, not a function
+
 # 0.8.0
 
 * Extract bowerTrees into broccoli-bower plugin ([sample diff](https://github.com/joliss/broccoli-sample-app/commit/829e869f795012c08f5643a047b3f46c61dd0168))
