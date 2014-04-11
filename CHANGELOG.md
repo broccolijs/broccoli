@@ -1,5 +1,7 @@
 # master
 
+# 0.9.0
+
 * `Brocfile.js` now exports a tree, not a function
 
 # 0.8.0
