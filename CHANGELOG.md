@@ -1,5 +1,7 @@
 # master
 
+* Extract bowerTrees into broccoli-bower plugin ([sample diff](https://github.com/joliss/broccoli-sample-app/commit/829e869f795012c08f5643a047b3f46c61dd0168))
+
 # 0.7.2
 
 * Update dependencies
