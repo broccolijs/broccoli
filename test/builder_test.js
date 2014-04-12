@@ -42,7 +42,9 @@ test('Builder', function (t) {
     var builder = new Builder({
       read: function (readTree) {
         return readTree(subtree).then(function (dir) {
-          return readTree(subtree) // read subtree again
+          var dirPromise = readTree(subtree) // read subtree again
+          t.ok(dirPromise.then, 'is promise, not string')
+          return dirPromise
         })
       }
     })
