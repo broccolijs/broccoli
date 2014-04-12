@@ -21,9 +21,10 @@
     "broccoli-kitchen-sink-helpers": "^0.2.0"
   },
   "devDependencies": {
-    "jshint": "~2.3.0"
+    "jshint": "~2.3.0",
+    "tap": "^0.4.8"
   },
   "scripts": {
-    "test": "jshint lib/*.js"
+    "test": "jshint lib/*.js test/*.js && tap --stderr --timeout 2 ./test/*_test.js"
   }
 }
