@@ -21,7 +21,7 @@ Windows is not yet supported.
 ## Installation
 
 ```bash
-npm install --save broccoli
+npm install --save-dev broccoli
 npm install --global broccoli-cli
 ```
 
