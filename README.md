@@ -87,6 +87,7 @@ Shared code for writing plugins.
 * [broccoli-filter](https://github.com/joliss/broccoli-filter)
 * [broccoli-transform](https://github.com/joliss/broccoli-transform)
 * [broccoli-env](https://github.com/joliss/broccoli-env)
+* [broccoli-merge-trees](https://github.com/joliss/broccoli-merge-trees)
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
 ## Plugin API Specification
