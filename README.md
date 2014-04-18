@@ -86,7 +86,7 @@ keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 Shared code for writing plugins.
 
 * [broccoli-filter](https://github.com/joliss/broccoli-filter)
-* [broccoli-transform](https://github.com/joliss/broccoli-transform)
+* [broccoli-writer](https://github.com/joliss/broccoli-writer)
 * [broccoli-env](https://github.com/joliss/broccoli-env)
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
