@@ -72,6 +72,7 @@ Broccoli plugin.
 * [broccoli-es6-transpiler](https://github.com/sindresorhus/broccoli-es6-transpiler)
 * [broccoli-ember-script](https://github.com/aradabaugh/broccoli-ember-script)
 * [broccoli-bower](https://github.com/joliss/broccoli-bower)
+* [broccoli-absurd-filter] (https://github.com/Xulai/broccoli-absurd-filter)
 
 More plugins may be found under the [broccoli-plugin
 keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
