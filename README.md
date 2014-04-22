@@ -85,6 +85,8 @@ module.exports = pickFiles('app', {
 * [broccoli-bower](https://github.com/joliss/broccoli-bower)
 * [broccoli-file-mover](https://github.com/rjackson/broccoli-file-mover)
 * [broccoli-file-remover](https://github.com/rjackson/broccoli-file-remover)
+* [broccoli-file-creator](https://github.com/rjackson/broccoli-file-creator)
+* [broccoli-fixturify](https://github.com/rjackson/broccoli-fixturify)
 
 More plugins may be found under the [broccoli-plugin
 keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
