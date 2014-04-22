@@ -33,15 +33,26 @@ Check out
 ## Brocfile.js
 
 A `Brocfile.js` file in the project root contains the build specification. It
-has the following format:
+should export a tree which may simply be the directory path (as a string). To
+build more advanced output trees you may want to use some of the plugins listed
+below.
+
+The following would export the `app/` subdirectory as a tree:
 
 ```js
-module.exports = function (broccoli) {
-};
+module.exports = 'app'
 ```
 
-The function must return a tree object, which is typically created using a
-Broccoli plugin.
+Alternatively, the following would export the `app/` subdirectory as `appkit/`:
+
+```js
+var pickFiles = require('broccoli-static-compiler')
+
+module.exports = pickFiles('app', {
+  srcDir: '/',
+  destDir: 'appkit'
+})
+```
 
 ## Plugins
 
