@@ -68,6 +68,7 @@ module.exports = pickFiles('app', {
 * [broccoli-es6-concatenator](https://github.com/joliss/broccoli-es6-concatenator)
 * [broccoli-es6-module-filter](https://github.com/rpflorence/broccoli-es6-module-filter)
 * [broccoli-es6-transpiler](https://github.com/sindresorhus/broccoli-es6-transpiler)
+* [broccoli-export-tree](https://github.com/rjackson/broccoli-export-tree)
 * [broccoli-file-creator](https://github.com/rjackson/broccoli-file-creator)
 * [broccoli-file-mover](https://github.com/rjackson/broccoli-file-mover)
 * [broccoli-file-remover](https://github.com/rjackson/broccoli-file-remover)
