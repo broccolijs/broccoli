@@ -57,11 +57,13 @@ module.exports = pickFiles('app', {
 ## Plugins
 
 * [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
+* [broccoli-auto-generated](https://github.com/g13013/broccoli-auto-generated)
 * [broccoli-bake-handlebars](https://github.com/thomasboyt/broccoli-bake-handlebars)
 * [broccoli-bower](https://github.com/joliss/broccoli-bower)
 * [broccoli-closure-compiler](https://github.com/sindresorhus/broccoli-closure-compiler)
 * [broccoli-coffee](https://github.com/joliss/broccoli-coffee)
 * [broccoli-csso](https://github.com/sindresorhus/broccoli-csso)
+* [broccoli-compass](https://github.com/g13013/broccoli-compass)
 * [broccoli-defeatureify](https://github.com/sindresorhus/broccoli-defeatureify)
 * [broccoli-dust](https://github.com/sindresorhus/broccoli-dust)
 * [broccoli-ember-script](https://github.com/aradabaugh/broccoli-ember-script)
