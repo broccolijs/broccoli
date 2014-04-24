@@ -86,6 +86,7 @@ module.exports = pickFiles('app', {
 * [broccoli-sweetjs](https://github.com/sindresorhus/broccoli-sweetjs)
 * [broccoli-swig](https://github.com/shanielh/broccoli-swig)
 * [broccoli-template](https://github.com/joliss/broccoli-template)
+* [broccoli-timepiece](https://github.com/rjackson/broccoli-timepiece)
 * [broccoli-traceur](https://github.com/sindresorhus/broccoli-traceur)
 * [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
 * [broccoli-uncss](https://github.com/sindresorhus/broccoli-uncss)
