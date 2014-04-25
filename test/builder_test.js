@@ -37,6 +37,22 @@ test('Builder', function (t) {
         })
       })
 
+      test('can change starting tree with param', function (t) {
+        var builder = new Builder({
+          read: function (readTree) { return 'someDir' }
+        })
+        builder.build().then(function (dir) {
+          t.equal(dir, 'someDir')
+        })
+        .then(function() {
+          builder.build('someOther').then(function (dir) {
+            t.equal(dir, 'someOther')
+            t.equal(builder.tree, 'someOther')
+            t.end()
+          })
+        })
+      })
+
       t.end()
     })
 
