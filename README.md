@@ -59,6 +59,7 @@ module.exports = pickFiles('app', {
 * [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
 * [broccoli-bake-handlebars](https://github.com/thomasboyt/broccoli-bake-handlebars)
 * [broccoli-bower](https://github.com/joliss/broccoli-bower)
+* [broccoli-caching-writer](https://github.com/rjackson/broccoli-caching-writer)
 * [broccoli-closure-compiler](https://github.com/sindresorhus/broccoli-closure-compiler)
 * [broccoli-coffee](https://github.com/joliss/broccoli-coffee)
 * [broccoli-csso](https://github.com/sindresorhus/broccoli-csso)
