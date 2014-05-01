@@ -109,20 +109,31 @@ test('Builder', function (t) {
       })
     })
 
+    var timeEqual = function (a, b) {
+      t.equal(typeof a, 'number')
+      t.ok(a >= b - 5e6 && a <= b + 5e6, 'Wanted ' + b + ' +/- 5e6, found ' + a)
+    }
+
     var builder = new Builder(parent)
     builder.build().then(function (hash) {
       t.equal(hash.directory, 'parentTreeDir')
       var parentNode = hash.graph
       t.equal(parentNode.directory, 'parentTreeDir')
       t.equal(parentNode.tree, parent)
+      timeEqual(parentNode.totalTime, 50e6)
+      timeEqual(parentNode.selfTime, 30e6)
       t.equal(parentNode.subtrees.length, 1)
       var childNode = parentNode.subtrees[0]
       t.equal(childNode.directory, 'childTreeDir')
       t.equal(childNode.tree, child)
+      timeEqual(childNode.totalTime, 20e6)
+      timeEqual(childNode.selfTime, 20e6)
       t.equal(childNode.subtrees.length, 1)
       var leafNode = childNode.subtrees[0]
       t.equal(leafNode.directory, 'srcDir')
       t.equal(leafNode.tree, 'srcDir')
+      t.equal(leafNode.totalTime, 0)
+      t.equal(leafNode.selfTime, 0)
       t.equal(leafNode.subtrees.length, 0)
       t.end()
     })

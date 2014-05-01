@@ -1,8 +1,9 @@
 # master
 
 * Move process.exit listener out of builder into server
-* Change `Builder::build()` method to return `{ directory, graph }` hash
-  instead of the directory
+* Change `Builder::build()` method to return a `{ directory, graph }` hash
+  instead of only the directory, where `graph` contains the output directories
+  and timings for each tree
 
 # 0.9.0
 
