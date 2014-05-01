@@ -1,6 +1,8 @@
 # master
 
 * Move process.exit listener out of builder into server
+* Change `Builder::build()` method to return `{ directory, graph }` hash
+  instead of the directory
 
 # 0.9.0
 
