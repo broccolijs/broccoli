@@ -73,6 +73,7 @@ module.exports = pickFiles('app', {
 * [broccoli-file-remover](https://github.com/rjackson/broccoli-file-remover)
 * [broccoli-fixturify](https://github.com/rjackson/broccoli-fixturify)
 * [broccoli-htmlmin](https://github.com/sindresorhus/broccoli-htmlmin)
+* [broccoli-imagemin](https://github.com/Xulai/broccoli-imagemin)
 * [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
 * [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
 * [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
