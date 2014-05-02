@@ -89,6 +89,7 @@ module.exports = pickFiles('app', {
 * [broccoli-traceur](https://github.com/sindresorhus/broccoli-traceur)
 * [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
 * [broccoli-uncss](https://github.com/sindresorhus/broccoli-uncss)
+* [broccoli-jstransform](https://github.com/aexmachina/broccoli-jstransform)
 
 More plugins may be found under the [broccoli-plugin
 keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
