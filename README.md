@@ -75,6 +75,7 @@ module.exports = pickFiles('app', {
 * [broccoli-htmlmin](https://github.com/sindresorhus/broccoli-htmlmin)
 * [broccoli-imagemin](https://github.com/Xulai/broccoli-imagemin)
 * [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
+* [broccoli-jstransform](https://github.com/aexmachina/broccoli-jstransform)
 * [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
 * [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
@@ -89,13 +90,13 @@ module.exports = pickFiles('app', {
 * [broccoli-traceur](https://github.com/sindresorhus/broccoli-traceur)
 * [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
 * [broccoli-uncss](https://github.com/sindresorhus/broccoli-uncss)
-* [broccoli-jstransform](https://github.com/aexmachina/broccoli-jstransform)
 
 More plugins may be found under the [broccoli-plugin
 keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
-### Plugging Broccoli Into Other Tools
+### Running Broccoli, Directly or Through Other Tools
 
+* [broccoli-timepiece](https://github.com/rjackson/broccoli-timepiece)
 * [grunt-broccoli](https://github.com/quandl/grunt-broccoli)
 * [grunt-broccoli-build](https://github.com/ericf/grunt-broccoli-build)
 
@@ -103,7 +104,7 @@ keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
 Shared code for writing plugins.
 
-* [broccoli-env](https://github.com/joliss/broccoli-env)
+* [broccoli-caching-writer](https://github.com/rjackson/broccoli-caching-writer)
 * [broccoli-filter](https://github.com/joliss/broccoli-filter)
 * [broccoli-writer](https://github.com/joliss/broccoli-writer)
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
