@@ -1,5 +1,7 @@
 # master
 
+* Update `Watcher` and `Builder` interaction to prevent double builds.
+
 # 0.11.0
 
 * Change `Watcher`'s `change` event to provide the full build results (instead of just the directory).
