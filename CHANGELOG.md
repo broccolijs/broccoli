@@ -1,5 +1,7 @@
 # master
 
+# 0.11.0
+
 * Change `Watcher`'s `change` event to provide the full build results (instead of just the directory).
 * Add slow tree logging to `broccoli serve` output.
 * Add logo
