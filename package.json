@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joliss/broccoli"
+    "url": "https://github.com/broccolijs/broccoli"
   },
   "dependencies": {
     "broccoli-kitchen-sink-helpers": "^0.2.0",
