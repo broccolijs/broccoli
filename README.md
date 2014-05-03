@@ -1,10 +1,10 @@
 # Broccoli
 
-[![Build Status](https://travis-ci.org/joliss/broccoli.png?branch=master)](https://travis-ci.org/joliss/broccoli)
+[![Build Status](https://travis-ci.org/broccolijs/broccoli.png?branch=master)](https://travis-ci.org/broccolijs/broccoli)
 
 *Note April 7, 2014: There was a recent <strong>data loss</strong> issue on OS X in
 Broccoli and several plugins. [Check to see if you're
-affected.](https://github.com/joliss/broccoli/blob/master/docs/hardlink-issue.md)*
+affected.](https://github.com/broccolijs/broccoli/blob/master/docs/hardlink-issue.md)*
 
 A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
@@ -12,7 +12,7 @@ runs on Node and is backend-agnostic. For background and architecture, see the
 [introductory blog post](http://www.solitr.com/blog/2014/02/broccoli-first-release/).
 
 For the command line interface, see
-[broccoli-cli](https://github.com/joliss/broccoli-cli).
+[broccoli-cli](https://github.com/broccolijs/broccoli-cli).
 
 **This is 0.x beta software.**
 
@@ -26,7 +26,7 @@ npm install --global broccoli-cli
 ## Getting Started
 
 Check out
-[broccoli-sample-app](https://github.com/joliss/broccoli-sample-app).
+[broccoli-sample-app](https://github.com/broccolijs/broccoli-sample-app).
 
 ## Brocfile.js
 
@@ -103,8 +103,8 @@ keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 Shared code for writing plugins.
 
 * [broccoli-caching-writer](https://github.com/rjackson/broccoli-caching-writer)
-* [broccoli-filter](https://github.com/joliss/broccoli-filter)
-* [broccoli-writer](https://github.com/joliss/broccoli-writer)
+* [broccoli-filter](https://github.com/broccolijs/broccoli-filter)
+* [broccoli-writer](https://github.com/broccolijs/broccoli-writer)
 * [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
 ## Plugin API Specification
