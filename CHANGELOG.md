@@ -1,5 +1,7 @@
 # master
 
+* Change `Watcher`'s `change` event to provide the full build results (instead of just the directory).
+
 # 0.10.0
 
 * Move process.exit listener out of builder into server
