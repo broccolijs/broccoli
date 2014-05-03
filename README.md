@@ -1,5 +1,7 @@
 # Broccoli
 
+<img src="logo/broccoli-logo-small.generated.png" align="right" height="150">
+
 [![Build Status](https://travis-ci.org/broccolijs/broccoli.png?branch=master)](https://travis-ci.org/broccolijs/broccoli)
 
 *Note April 7, 2014: There was a recent <strong>data loss</strong> issue on OS X in
@@ -163,3 +165,7 @@ directories created by `.read`.
 
 Broccoli was originally written by [Jo Liss](http://www.solitr.com/) and is
 licensed under the [MIT license](LICENSE.md).
+
+The Broccoli logo was created by [Samantha Penner
+(Miric)](http://mirics.deviantart.com/) and is licensed under [CC0
+1.0](https://creativecommons.org/publicdomain/zero/1.0/).
