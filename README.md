@@ -16,8 +16,6 @@ For the command line interface, see
 
 **This is 0.x beta software.**
 
-Windows is not yet supported.
-
 ## Installation
 
 ```bash
