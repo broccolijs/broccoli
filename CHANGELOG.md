@@ -1,5 +1,7 @@
 # master
 
+# 0.10.0
+
 * Move process.exit listener out of builder into server
 * Change `Builder::build()` method to return a `{ directory, graph }` hash
   instead of only the directory, where `graph` contains the output directories
