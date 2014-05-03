@@ -111,7 +111,13 @@ test('Builder', function (t) {
 
     var timeEqual = function (a, b) {
       t.equal(typeof a, 'number')
-      t.ok(a >= b - 5e6 && a <= b + 5e6, 'Wanted ' + b + ' +/- 5e6, found ' + a)
+
+      // do not run timing assertions in Travis builds
+      // the actual results of process.hrtime() are not
+      // reliable
+      if (process.env.CI !== 'true') {
+        t.ok(a >= b - 5e6 && a <= b + 5e6, 'Wanted ' + b + ' +/- 5e6, found ' + a)
+      }
     }
 
     var builder = new Builder(parent)
