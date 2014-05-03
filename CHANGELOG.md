@@ -4,6 +4,7 @@
 * Change `Builder::build()` method to return a `{ directory, graph }` hash
   instead of only the directory, where `graph` contains the output directories
   and timings for each tree
+* Avoid keeping file streams open in server, to fix EBUSY issues on Windows
 
 # 0.9.0
 
