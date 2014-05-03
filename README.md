@@ -79,6 +79,7 @@ module.exports = pickFiles('app', {
 * [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
 * [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
+* [broccoli-rev](https://github.com/mjijackson/broccoli-rev)
 * [broccoli-sass](https://github.com/joliss/broccoli-sass)
 * [broccoli-static-compiler](https://github.com/joliss/broccoli-static-compiler)
 * [broccoli-strip-debug](https://github.com/sindresorhus/broccoli-strip-debug)
