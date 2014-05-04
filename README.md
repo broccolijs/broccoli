@@ -76,6 +76,7 @@ module.exports = pickFiles('app', {
 * [broccoli-imagemin](https://github.com/Xulai/broccoli-imagemin)
 * [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
 * [broccoli-jstransform](https://github.com/aexmachina/broccoli-jstransform)
+* [broccoli-merge-trees](https://github.com/joliss/broccoli-merge-trees)
 * [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
 * [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
