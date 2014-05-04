@@ -2,6 +2,9 @@
 
 *Posted April 7, 2014 by [Jo Liss](https://twitter.com/jo_liss)*
 
+**Update May 4, 2014: All affected package versions have been removed from
+npm. The original document is preserved below for posterity.**
+
 There is an issue in Broccoli and several helper libraries that can cause data
 loss on Mac OS X, stemming from their use of hardlinks.
 
