@@ -5,6 +5,7 @@
 * Update `Watcher` and `Builder` interaction to prevent double builds.
 * Avoid unhandled rejected promise
 * Fix trailing slash handling in server on Windows
+* Add `willBuild`, `didError`, and `didBuild` callbacks to `Watcher`. These will be called before (`willBuild`) and after (`didBuild`) building.
 
 # 0.11.0
 
