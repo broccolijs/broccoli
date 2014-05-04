@@ -56,6 +56,7 @@ module.exports = pickFiles('app', {
 
 ## Plugins
 
+* [broccoli-absurd-filter](https://github.com/Xulai/broccoli-absurd-filter)
 * [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
 * [broccoli-bake-handlebars](https://github.com/thomasboyt/broccoli-bake-handlebars)
 * [broccoli-bower](https://github.com/joliss/broccoli-bower)
@@ -76,7 +77,7 @@ module.exports = pickFiles('app', {
 * [broccoli-imagemin](https://github.com/Xulai/broccoli-imagemin)
 * [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
 * [broccoli-jstransform](https://github.com/aexmachina/broccoli-jstransform)
-* [broccoli-merge-trees](https://github.com/joliss/broccoli-merge-trees)
+* [broccoli-merge-trees](https://github.com/broccolijs/broccoli-merge-trees)
 * [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
 * [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
 * [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
