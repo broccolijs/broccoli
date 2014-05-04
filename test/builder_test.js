@@ -145,5 +145,13 @@ test('Builder', function (t) {
     })
   })
 
+  test('string tree callback', function (t) {
+    var builder = new Builder('fooDir')
+    builder.build(function willReadStringTree (dir) {
+      t.equal(dir, 'fooDir')
+      t.end()
+    })
+  })
+
   t.end()
 })
