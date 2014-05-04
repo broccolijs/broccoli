@@ -146,6 +146,25 @@ For every tree whose `.read` method was called one or more times, the
 follow `.cleanup`. The `.cleanup` method should remove all temporary
 directories created by `.read`.
 
+### Debugging
+
+
+#### Errors
+
+When it is know which file caused a given error, plugin authors can make errors
+easier to track down by setting the `.file` property on the generated error.
+
+This `.file` property is used by both the console logging, and the server middleware
+to display more helpful error messages.
+
+#### Descriptive Naming
+
+As of 0.11 Broccoli prints a log of any trees that took a significant amount of the total
+build time to assist in finding which trees are consuming the largest build times.
+
+To determine the name to be printed Broccoli will first look for a `.description`
+property on the plugin instance then fall back to using the plugin constructor's name.
+
 ## Security
 
 * Do not run `broccoli serve` on a production server. While this is
