@@ -3,6 +3,8 @@
 * Add `willReadStringTree` callback argument to `Builder::build` and retire
   `Builder::treesRead`
 * Update `Watcher` and `Builder` interaction to prevent double builds.
+* Avoid unhandled rejected promise
+* Fix trailing slash handling in server on Windows
 
 # 0.11.0
 
