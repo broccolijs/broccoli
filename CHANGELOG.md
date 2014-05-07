@@ -1,5 +1,7 @@
 # master
 
+# 0.12.0
+
 * Add `willReadStringTree` callback argument to `Builder::build` and retire
   `Builder::treesRead`
 * Update `Watcher` and `Builder` interaction to prevent double builds.
