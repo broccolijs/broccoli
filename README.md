@@ -176,7 +176,8 @@ property on the plugin instance then fall back to using the plugin constructor's
 
 ## Get Help
 
-* IRC: `#broccolijs` on Freenode
+* IRC: `#broccolijs` on Freenode. Ask your question and stick around for a few
+  hours. Someone will see your message eventually.
 * Twitter: mention @jo_liss with your question
 * GitHub: Open an issue on a specific plugin repository, or on this
   repository for general questions.
