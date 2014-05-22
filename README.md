@@ -153,7 +153,7 @@ directories created by `.read`.
 
 #### Errors
 
-When it is know which file caused a given error, plugin authors can make errors
+When it is known which file caused a given error, plugin authors can make errors
 easier to track down by setting the `.file` property on the generated error.
 
 This `.file` property is used by both the console logging, and the server middleware
