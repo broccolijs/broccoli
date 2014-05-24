@@ -129,18 +129,22 @@ test('Builder', function (t) {
       timeEqual(parentNode.totalTime, 50e6)
       timeEqual(parentNode.selfTime, 30e6)
       t.equal(parentNode.subtrees.length, 1)
+      t.equal(parentNode.deps.length, 1)
       var childNode = parentNode.subtrees[0]
       t.equal(childNode.directory, 'childTreeDir')
       t.equal(childNode.tree, child)
       timeEqual(childNode.totalTime, 20e6)
       timeEqual(childNode.selfTime, 20e6)
       t.equal(childNode.subtrees.length, 1)
+      // string tree are not added as deps
+      t.equal(childNode.deps.length, 0)
       var leafNode = childNode.subtrees[0]
       t.equal(leafNode.directory, 'srcDir')
       t.equal(leafNode.tree, 'srcDir')
       t.equal(leafNode.totalTime, 0)
       t.equal(leafNode.selfTime, 0)
       t.equal(leafNode.subtrees.length, 0)
+      t.equal(leafNode.deps.length, 0)
       t.end()
     })
   })
