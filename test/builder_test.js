@@ -156,6 +156,73 @@ test('Builder', function (t) {
       t.end()
     })
   })
+  test('hasUnchangedDeps', function (t) {
+    t.end()
+
+    test('tree is not read when isUnchanged returns true', function (t) {
+
+      var tree = new countingTree(function (readTree) { return 'foo' })
+
+      var unchangedResult = true;
+      tree.isUnchanged = function() {
+        return unchangedResult;
+      }
+
+      var builder = new Builder(tree)
+      builder.build().then(function (hash) {
+        t.equal(tree.readCount, 1)
+
+        unchangedResult = true;
+        builder.build().then(function (hash) {
+          t.equal(tree.readCount, 1)
+
+          unchangedResult = false;
+          builder.build().then(function (hash) {
+            t.equal(tree.readCount, 2)
+            t.end()
+          })
+        })
+      })
+
+    });
+
+    test('tree isUnchanged result depends on its node dependencies', function (t) {
+      // TODO: add test with multiple dependencies
+      var tree = countingTree(function (readTree) {
+        return readTree(child).then(function (dir) {
+          return 'foo'
+        })
+      })
+      tree.isUnchanged = function() {
+        throw new Error('should never be thrown');
+      }
+
+
+      var child = new countingTree(function (readTree) { return 'foo' })
+      var unchangedResult = true;
+      child.isUnchanged = function() {
+        return unchangedResult;
+      }
+
+      var builder = new Builder(tree)
+      builder.build().then(function (hash) {
+        t.equal(tree.readCount, 1)
+        unchangedResult = true;
+        builder.build().then(function (hash) {
+          t.equal(tree.readCount, 1)
+
+          unchangedResult = false;
+          builder.build().then(function (hash) {
+            t.equal(tree.readCount, 2)
+            t.end()
+          })
+        })
+      })
+
+    });
+
+  })
+
 
   t.end()
 })
