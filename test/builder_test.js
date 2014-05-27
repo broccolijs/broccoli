@@ -3,6 +3,9 @@ var broccoli = require('..')
 var Builder = broccoli.Builder
 var RSVP = require('rsvp')
 var Promise = RSVP.Promise
+var Middleware = require('../lib/middleware')
+var fs = require('fs')
+var mime = require('mime')
 
 RSVP.on('error', function(error) {
   throw error
@@ -20,6 +23,13 @@ function countingTree (readFn) {
   }
 }
 
+// middleware needs to stat a file to continue to deliver a resource
+function addTestFile(name, contents) {
+  fs.writeFileSync(__dirname + '/' + name, contents || 'bar')
+}
+function removeTestFile(name) {
+  fs.unlinkSync(__dirname + '/' + name)
+}
 
 test('Builder', function (t) {
   test('core functionality', function (t) {
@@ -149,6 +159,70 @@ test('Builder', function (t) {
     var builder = new Builder('fooDir')
     builder.build(function willReadStringTree (dir) {
       t.equal(dir, 'fooDir')
+      t.end()
+    })
+  })
+
+  t.end()
+})
+
+test('Middleware', function (t) {
+
+  var filename = 'foo'
+  var request = {
+    headers: {},
+    url: filename
+  }
+  var response = {
+    headers: {},
+    setHeader: function(key, value) {
+      this.headers[key] = value
+    },
+    writeHead: function(code) {
+      this.code = code
+    },
+    end: function() {}
+  }
+  var watcher = new Promise(function(resolve, reject){
+    resolve({directory: __dirname + '/'})
+  })
+
+  test('sets default headers', function (t) {
+    var middleware = new Middleware(watcher)
+
+    addTestFile(filename)
+    middleware(request, response)
+    watcher.then(function() {
+      t.equal(response.code, 200)
+
+      t.equal(response.headers['Last-Modified'], fs.statSync(filename).mtime.toUTCString())
+      t.equal(response.headers['Cache-Control'], 'private, max-age=0, must-revalidate')
+      t.equal(response.headers['Content-Length'], fs.statSync(filename).size)
+      t.equal(response.headers['Content-Type'], mime.lookup(filename))
+
+      // CORS unset by default
+      t.equal(response.headers['Access-Control-Allow-Origin'], undefined)
+      t.equal(response.headers['Access-Control-Allow-Methods'], undefined)
+      t.equal(response.headers['Access-Control-Request-Method'], undefined)
+      t.equal(response.headers['Access-Control-Allow-Headers'], undefined)
+
+      removeTestFile(filename)
+      t.end()
+    })
+  })
+
+  test('sets optional CORS headers', function (t) {
+    var middleware = new Middleware(watcher, { cors: true })
+
+    addTestFile(filename)
+    middleware(request, response)
+    watcher.then(function() {
+      t.equal(response.headers['Access-Control-Allow-Origin'], '*')
+      t.equal(response.headers['Access-Control-Allow-Methods'], 'GET')
+      t.equal(response.headers['Access-Control-Request-Method'], '*')
+      t.equal(response.headers['Access-Control-Allow-Headers'], 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+
+      removeTestFile(filename)
       t.end()
     })
   })
