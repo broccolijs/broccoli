@@ -1,5 +1,7 @@
 # master
 
+* Show directory listing with `broccoli serve` when there is no `index.html`
+
 # 0.12.0
 
 * Add `willReadStringTree` callback argument to `Builder::build` and retire
