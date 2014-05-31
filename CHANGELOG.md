@@ -1,5 +1,7 @@
 # master
 
+# 0.12.2
+
 * Fix directory handling in server on Windows
 
 # 0.12.1
