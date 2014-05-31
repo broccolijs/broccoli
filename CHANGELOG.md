@@ -1,5 +1,7 @@
 # master
 
+* Fix directory handling in server on Windows
+
 # 0.12.1
 
 * Show directory listing with `broccoli serve` when there is no `index.html`
