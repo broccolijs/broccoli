@@ -1,5 +1,7 @@
 # master
 
+* Exclude `logo` and `test` directories from npm distribution
+
 # 0.12.2
 
 * Fix directory handling in server on Windows
