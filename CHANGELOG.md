@@ -1,5 +1,7 @@
 # master
 
+# 0.12.3
+
 * Exclude `logo` and `test` directories from npm distribution
 
 # 0.12.2
