@@ -1,5 +1,6 @@
 # master
 
+* Update `ncp` to 0.6.0 so that symlinks can be resolved automatically.
 * Sort entries when browsing directories in middleware
 
 # 0.12.3
