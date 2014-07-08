@@ -1,5 +1,7 @@
 # master
 
+* Update `ncp` to 0.6.0 so that symlinks can be resolved automatically.
+
 # 0.12.3
 
 * Exclude `logo` and `test` directories from npm distribution
