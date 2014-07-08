@@ -1,5 +1,7 @@
 # master
 
+* Sort entries when browsing directories in middleware
+
 # 0.12.3
 
 * Exclude `logo` and `test` directories from npm distribution
