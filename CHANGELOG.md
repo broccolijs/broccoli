@@ -1,5 +1,20 @@
 # master
 
+* Update `ncp` to 0.6.0 so that symlinks can be resolved automatically.
+* Sort entries when browsing directories in middleware
+
+# 0.12.3
+
+* Exclude `logo` and `test` directories from npm distribution
+
+# 0.12.2
+
+* Fix directory handling in server on Windows
+
+# 0.12.1
+
+* Show directory listing with `broccoli serve` when there is no `index.html`
+
 # 0.12.0
 
 * Add `willReadStringTree` callback argument to `Builder::build` and retire
