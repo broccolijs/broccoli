@@ -1,4 +1,4 @@
-# Upcoming Broccoli API Change: Symlinks Behavior Is Now Defined
+# Symlink Behavior In Broccoli Plugins
 
 **Summary:** We will soon be changing the contract between Broccoli plugins to
 mandate that plugins follow symbolic links inside their input trees. This
