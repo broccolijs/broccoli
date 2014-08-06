@@ -14,6 +14,9 @@ For the command line interface, see
 
 **This is 0.x beta software.**
 
+Windows support appears to still be spotty. Reports (on GitHub or IRC) about
+specific failures are much appreciated -- we love collecting stack traces!
+
 ## Installation
 
 ```bash
