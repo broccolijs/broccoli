@@ -61,6 +61,7 @@ module.exports = pickFiles('app', {
 * [broccoli-bower](https://github.com/joliss/broccoli-bower)
 * [broccoli-closure-compiler](https://github.com/sindresorhus/broccoli-closure-compiler)
 * [broccoli-coffee](https://github.com/joliss/broccoli-coffee)
+* [broccoli-compass](https://github.com/g13013/broccoli-compass)
 * [broccoli-concat](https://github.com/rlivsey/broccoli-concat)
 * [broccoli-csso](https://github.com/sindresorhus/broccoli-csso)
 * [broccoli-defeatureify](https://github.com/sindresorhus/broccoli-defeatureify)
