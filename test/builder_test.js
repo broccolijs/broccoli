@@ -116,7 +116,7 @@ test('Builder', function (t) {
       // the actual results of process.hrtime() are not
       // reliable
       if (process.env.CI !== 'true') {
-        t.ok(a >= b - 5e6 && a <= b + 5e6, 'Wanted ' + b + ' +/- 5e6, found ' + a)
+        t.ok(a >= b - 5e6 && a <= b + 5e6, a + ' should be within ' + b + ' +/- 5e6')
       }
     }
 
