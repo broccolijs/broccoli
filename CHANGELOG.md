@@ -1,5 +1,9 @@
 # master
 
+# 0.13.0
+
+# 0.13
+
 * Dereference symlinks in `broccoli build` output by copying the files or
   directories they point to into place
 * Sort entries when browsing directories in middleware
