@@ -1,6 +1,7 @@
 # master
 
-* Update `ncp` to 0.6.0 so that symlinks can be resolved automatically.
+* Dereference symlinks in `broccoli build` output by copying the files or
+  directories they point to into place
 * Sort entries when browsing directories in middleware
 
 # 0.12.3
