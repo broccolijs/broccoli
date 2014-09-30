@@ -18,7 +18,8 @@
     "mime": "^1.2.11",
     "copy-dereference": "^1.0.0",
     "rsvp": "^3.0.6",
-    "tiny-lr": "0.0.5"
+    "tiny-lr": "0.0.5",
+    "chokidar": "~0.8.2"
   },
   "devDependencies": {
     "jshint": "~2.3.0",
