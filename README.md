@@ -163,6 +163,14 @@ easier to track down by setting the `.file` property on the generated error.
 This `.file` property is used by both the console logging, and the server middleware
 to display more helpful error messages.
 
+Due to the asynchronous architecture of Broccoli, stack traces may not reflect the
+original source of errors. To prevent this, the stack may be collected at the plugin's
+constructor with `new Error().stack` and then injected into the `.brocfileLocation`
+property on the thrown error object.
+
+When present, the `.brocfileLocation` property will replace the actual stack trace
+in the console logging.
+
 #### Descriptive Naming
 
 As of 0.11 Broccoli prints a log of any trees that took a significant amount of the total
