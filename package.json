@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "broccoli-kitchen-sink-helpers": "^0.2.0",
+    "broccoli-sane-watcher": "~0.0.3",
     "commander": "^2.0.0",
     "connect": "~2.14.1",
     "findup-sync": "^0.1.2",
