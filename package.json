@@ -22,7 +22,7 @@
     "tiny-lr": "^0.1.4"
   },
   "devDependencies": {
-    "jshint": "~2.3.0",
+    "jshint": "~2.5.6",
     "tap": "^0.4.8"
   },
   "scripts": {

@@ -2,7 +2,6 @@ var test = require('tap').test
 var broccoli = require('..')
 var Builder = broccoli.Builder
 var RSVP = require('rsvp')
-var Promise = RSVP.Promise
 
 RSVP.on('error', function(error) {
   throw error
@@ -95,7 +94,7 @@ test('Builder', function (t) {
   test('tree graph', function (t) {
     var parent = countingTree(function (readTree) {
       return readTree(child).then(function (dir) {
-        return new Promise(function (resolve, reject) {
+        return new RSVP.Promise(function (resolve, reject) {
           setTimeout(function() { resolve('parentTreeDir') }, 30)
         })
       })
@@ -103,7 +102,7 @@ test('Builder', function (t) {
 
     var child = countingTree(function (readTree) {
       return readTree('srcDir').then(function (dir) {
-        return new Promise(function (resolve, reject) {
+        return new RSVP.Promise(function (resolve, reject) {
           setTimeout(function() { resolve('childTreeDir') }, 20)
         })
       })
