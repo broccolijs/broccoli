@@ -157,11 +157,23 @@ directories created by `.read`.
 
 #### Errors
 
+Useful debugging information may be shown by setting the `.broccoli` property on
+the generated error with a metadata object.
+
 When it is known which file caused a given error, plugin authors can make errors
-easier to track down by setting the `.file` property on the generated error.
+easier to track down by setting the `.file` property on the metadata object.
+Setting the `.file` property directly on the error object is deprecated.
 
 This `.file` property is used by both the console logging, and the server middleware
 to display more helpful error messages.
+
+Due to the asynchronous architecture of Broccoli, stack traces may not reflect the
+original source of errors. To prevent this, the stack may be collected at the plugin's
+constructor with `new Error().stack` and then injected into the `.brocfileLocation`
+property on the metadata object.
+
+When present, the `.brocfileLocation` property will replace the actual stack trace
+in the console logging.
 
 #### Descriptive Naming
 
