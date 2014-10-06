@@ -1,5 +1,7 @@
 # master
 
+* Extract slow trees printout into broccoli-slow-trees package
+
 # 0.13.1
 
 * Update dependencies to fix
