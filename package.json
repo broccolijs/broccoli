@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "broccoli-kitchen-sink-helpers": "^0.2.0",
+    "broccoli-slow-trees": "^1.0.0",
     "commander": "^2.0.0",
     "connect": "^3.2.0",
     "findup-sync": "^0.1.2",
