@@ -31,6 +31,7 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "jshint lib/*.js test/*.js && tap --stderr --timeout 2 ./test/*_test.js"
+    "pretest": "jshint lib test",
+    "test": "tap --stderr --timeout 2 ./test/*_test.js"
   }
 }
