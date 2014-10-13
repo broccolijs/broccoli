@@ -1,6 +1,7 @@
 # master
 
 * Extract slow trees printout into broccoli-slow-trees package
+* Allow the tree `cleanup` method to be asynchronous (by returning a promise).
 
 # 0.13.1
 
