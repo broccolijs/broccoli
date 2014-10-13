@@ -14,7 +14,14 @@ function countingTree (readFn) {
       return readFn.call(this, readTree)
     },
     readCount: 0,
-    cleanup: function () { this.cleanupCount++ },
+    cleanup: function () {
+      var self = this;
+
+      RSVP.resolve()
+        .then(function() {
+          self.cleanupCount++
+        });
+    },
     cleanupCount: 0
   }
 }
@@ -78,7 +85,9 @@ test('Builder', function (t) {
           t.equal(hash.directory, 'foo')
           builder.build().catch(function (err) {
             t.equal(err.message, 'bar')
-            builder.cleanup()
+            return builder.cleanup()
+          })
+          .then(function() {
             t.equal(tree.cleanupCount, 1)
             t.equal(subtree1.cleanupCount, 1)
             t.equal(subtree2.cleanupCount, 1)
