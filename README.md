@@ -85,6 +85,7 @@ module.exports = pickFiles('app', {
 * [broccoli-rev](https://github.com/mjijackson/broccoli-rev)
 * [broccoli-sass](https://github.com/joliss/broccoli-sass)
 * [broccoli-select](https://github.com/mjijackson/broccoli-select)
+* [broccoli-sprite](https://github.com/bguiz/broccoli-sprite)
 * [broccoli-static-compiler](https://github.com/joliss/broccoli-static-compiler)
 * [broccoli-strip-debug](https://github.com/sindresorhus/broccoli-strip-debug)
 * [broccoli-strip-json-comments](https://github.com/sindresorhus/broccoli-strip-json-comments)
