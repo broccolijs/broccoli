@@ -1,5 +1,7 @@
 # master
 
+# 0.13.3
+
 * Fix SIGINT/SIGTERM (Ctrl+C) handling to avoid leaking tmp files
 
 # 0.13.2
