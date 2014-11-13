@@ -1,5 +1,7 @@
 # master
 
+* Fix SIGINT/SIGTERM (Ctrl+C) handling to avoid leaking tmp files
+
 # 0.13.2
 
 * Extract slow trees printout into broccoli-slow-trees package
