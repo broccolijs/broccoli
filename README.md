@@ -53,52 +53,6 @@ module.exports = pickFiles('app', {
 })
 ```
 
-## Plugins
-
-* [broccoli-absurd-filter](https://github.com/Xulai/broccoli-absurd-filter)
-* [broccoli-autoprefixer](https://github.com/sindresorhus/broccoli-autoprefixer)
-* [broccoli-bake-handlebars](https://github.com/thomasboyt/broccoli-bake-handlebars)
-* [broccoli-bower](https://github.com/joliss/broccoli-bower)
-* [broccoli-closure-compiler](https://github.com/sindresorhus/broccoli-closure-compiler)
-* [broccoli-coffee](https://github.com/joliss/broccoli-coffee)
-* [broccoli-concat](https://github.com/rlivsey/broccoli-concat)
-* [broccoli-csso](https://github.com/sindresorhus/broccoli-csso)
-* [broccoli-defeatureify](https://github.com/sindresorhus/broccoli-defeatureify)
-* [broccoli-dust](https://github.com/sindresorhus/broccoli-dust)
-* [broccoli-ember-script](https://github.com/aradabaugh/broccoli-ember-script)
-* [broccoli-es6-concatenator](https://github.com/joliss/broccoli-es6-concatenator)
-* [broccoli-es6-module-filter](https://github.com/rpflorence/broccoli-es6-module-filter)
-* [broccoli-es6-transpiler](https://github.com/sindresorhus/broccoli-es6-transpiler)
-* [broccoli-file-creator](https://github.com/rjackson/broccoli-file-creator)
-* [broccoli-file-mover](https://github.com/rjackson/broccoli-file-mover)
-* [broccoli-file-remover](https://github.com/rjackson/broccoli-file-remover)
-* [broccoli-fixturify](https://github.com/rjackson/broccoli-fixturify)
-* [broccoli-htmlmin](https://github.com/sindresorhus/broccoli-htmlmin)
-* [broccoli-imagemin](https://github.com/Xulai/broccoli-imagemin)
-* [broccoli-jade](https://github.com/sindresorhus/broccoli-jade)
-* [broccoli-jstransform](https://github.com/aexmachina/broccoli-jstransform)
-* [broccoli-merge-trees](https://github.com/broccolijs/broccoli-merge-trees)
-* [broccoli-nunjucks](https://github.com/sindresorhus/broccoli-nunjucks)
-* [broccoli-pages](https://github.com/quandl/broccoli-pages)
-* [broccoli-regenerator](https://github.com/sindresorhus/broccoli-regenerator)
-* [broccoli-replace](https://github.com/outaTiME/broccoli-replace)
-* [broccoli-rev](https://github.com/mjijackson/broccoli-rev)
-* [broccoli-sass](https://github.com/joliss/broccoli-sass)
-* [broccoli-select](https://github.com/mjijackson/broccoli-select)
-* [broccoli-static-compiler](https://github.com/joliss/broccoli-static-compiler)
-* [broccoli-strip-debug](https://github.com/sindresorhus/broccoli-strip-debug)
-* [broccoli-strip-json-comments](https://github.com/sindresorhus/broccoli-strip-json-comments)
-* [broccoli-svgo](https://github.com/sindresorhus/broccoli-svgo)
-* [broccoli-sweetjs](https://github.com/sindresorhus/broccoli-sweetjs)
-* [broccoli-swig](https://github.com/shanielh/broccoli-swig)
-* [broccoli-template](https://github.com/joliss/broccoli-template)
-* [broccoli-traceur](https://github.com/sindresorhus/broccoli-traceur)
-* [broccoli-uglify-js](https://github.com/joliss/broccoli-uglify-js)
-* [broccoli-uncss](https://github.com/sindresorhus/broccoli-uncss)
-
-More plugins may be found under the [broccoli-plugin
-keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
-
 ### Running Broccoli, Directly or Through Other Tools
 
 * [broccoli-timepiece](https://github.com/rjackson/broccoli-timepiece)
