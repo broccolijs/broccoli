@@ -29,6 +29,7 @@
     "mime": "^1.2.11",
     "promise-map-series": "^0.2.0",
     "rsvp": "^3.0.6",
+    "shelljs": "^0.3.0",
     "tiny-lr": "^0.1.4"
   },
   "devDependencies": {
