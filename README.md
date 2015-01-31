@@ -3,6 +3,7 @@
 <img src="logo/broccoli-logo-small.generated.png" align="right" height="150">
 
 [![Build Status](https://travis-ci.org/broccolijs/broccoli.png?branch=master)](https://travis-ci.org/broccolijs/broccoli)
+[![Build status](https://ci.appveyor.com/api/projects/status/jd3ts93gryjeqclf/branch/master?svg=true)](https://ci.appveyor.com/project/joliss/broccoli/branch/master)
 
 A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
