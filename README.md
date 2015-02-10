@@ -56,7 +56,7 @@ module.exports = pickFiles('app', {
 
 ## Plugins
 
-You can find plugins under the [broccoli-plugin-keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
+You can find plugins on [broccoliplugins.com](http://broccoliplugins.com) or under the [broccoli-plugin-keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
 ### Running Broccoli, Directly or Through Other Tools
 
