@@ -1,5 +1,8 @@
 # master
 
+* Throw helpful error when we encounter as-yet unsupported [`.rebuild`-based
+  plugins](https://github.com/broccolijs/broccoli/blob/master/docs/new-rebuild-api.md)
+
 # 0.13.5
 
 * Add missing `var`
