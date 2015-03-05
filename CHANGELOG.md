@@ -1,5 +1,6 @@
 # master
 
+* More detailed error message when a tree object is invalid
 * Watcher no longer rebuilds forever when a very early build error occurs
 
 # 0.13.3
