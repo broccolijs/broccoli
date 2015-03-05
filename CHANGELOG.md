@@ -1,5 +1,7 @@
 # master
 
+# 0.13.6
+
 * Throw helpful error when we encounter as-yet unsupported [`.rebuild`-based
   plugins](https://github.com/broccolijs/broccoli/blob/master/docs/new-rebuild-api.md)
 
