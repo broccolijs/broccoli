@@ -1,5 +1,7 @@
 # master
 
+* Watcher no longer rebuilds forever when a very early build error occurs
+
 # 0.13.3
 
 * Fix SIGINT/SIGTERM (Ctrl+C) handling to avoid leaking tmp files
