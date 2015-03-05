@@ -1,5 +1,7 @@
 # master
 
+* Add missing `var`
+
 # 0.13.4
 
 * More detailed error message when a tree object is invalid
