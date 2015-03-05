@@ -1,9 +1,9 @@
-# New `.rebuild` API
+# New `.rebuild` API for Broccoli Plugins
 
-**This is draft describing an upcoming change.**
+**This is a draft describing an upcoming change.**
 
-We are replacing the original, "`.read`-based", Broccoli API with a new,
-"`.rebuild`-based", API.
+We are replacing the original `.read`-based plugin API with a new
+`.rebuild`-based API.
 
 ## Compatibility
 
@@ -11,8 +11,8 @@ Note: To aid with the transition, some plugins may provide both the old
 `.read` API and the new `.rebuild` API at the same time.
 
 Broccoli up to 0.13.x supports only plugins that provide the old `.read` API.
-Broccoli 0.13.4 will additionally throw a descriptive error message if a
-plugin only provides the new `.rebuild` API.
+Broccoli 0.13.4 additionally throws a helpful error message if a plugin only
+provides the new `.rebuild` API.
 
 Broccoli 0.14.x supports plugins that provide the old `.read` API as well as
 plugins that provide the new `.rebuild` API. If a plugin provides both APIs,
