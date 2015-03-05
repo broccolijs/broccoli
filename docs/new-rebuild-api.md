@@ -27,10 +27,38 @@ throw an error.
 
 ## For Plugin Authors
 
-### Description of New API
+### Description of API Change
+
+(Expand me; perhaps move to main README.)
+
+* `tree.inputTrees` (set by constructor)
+* `tree.inputTree` (set by constructor; alternative for single input tree)
+
+* `tree.inputPaths` (set by Broccoli; static across builds)
+* `tree.inputPath` (set by Broccoli; alternative; static across builds)
+* `tree.outputPath` (set by Broccoli; static across builds)
+* `tree.cachePath` (set by Broccoli; static across builds)
+
+* `tree.rebuild()` (returns promise for null)
+* `tree.cleanup()` (returns promise for null; rarely needed)
+
+Broccoli clears outputPath.
+
+It's OK for plugins to rmdir outputPath on rebuild and symlink it to somewhere
+else.
+
+It's OK for plugins to rimraf cachePath and re-mkdir it. (Is it?)
 
 ### Using broccoli-writer
 
 ### Using broccoli-filter
 
 ## Motivation
+
+* Make DAG structure static (i.e. unchanging across builds) and
+  discoverable before the first build.
+
+* Make plugin API look more like broccoli-writer so that it's easier to
+  understand; get rid of readTree.
+
+* Centralize tmp dir handling.
