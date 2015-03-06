@@ -1,5 +1,7 @@
 # master
 
+* Print deprecation warnings for plugins only providing old `.read` API
+
 # 0.14.0
 
 * Add support for new [`.rebuild`
