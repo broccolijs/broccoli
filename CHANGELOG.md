@@ -1,5 +1,9 @@
 # master
 
+* Add support for new [`.rebuild`
+  API](https://github.com/broccolijs/broccoli/blob/master/docs/new-rebuild-api.md),
+  in addition to existing (now deprecated) `.read` API
+
 # 0.13.6
 
 * Throw helpful error when we encounter as-yet unsupported [`.rebuild`-based

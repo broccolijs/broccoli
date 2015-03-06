@@ -27,7 +27,9 @@
     "findup-sync": "^0.1.2",
     "handlebars": "^2.0.0",
     "mime": "^1.2.11",
-    "promise-map-series": "^0.2.0",
+    "promise-map-series": "^0.2.1",
+    "quick-temp": "^0.1.2",
+    "rimraf": "^2.2.8",
     "rsvp": "^3.0.6",
     "tiny-lr": "^0.1.4"
   },
