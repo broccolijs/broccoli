@@ -1,5 +1,7 @@
 # master
 
+# 0.15.0
+
 * Print deprecation warnings for plugins only providing old `.read` API
 
 # 0.14.0
