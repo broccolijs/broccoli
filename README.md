@@ -148,7 +148,7 @@ property on the plugin instance then fall back to using the plugin constructor's
 ## License
 
 Broccoli was originally written by [Jo Liss](http://www.solitr.com/) and is
-licensed under the [MIT license](LICENSE.md).
+licensed under the [MIT license](LICENSE).
 
 The Broccoli logo was created by [Samantha Penner
 (Miric)](http://mirics.deviantart.com/) and is licensed under [CC0
