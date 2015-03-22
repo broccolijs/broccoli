@@ -1,5 +1,7 @@
 # master
 
+* Fail fast if `build` output directory already exists
+
 # 0.15.0
 
 * Print deprecation warnings for plugins only providing old `.read` API
