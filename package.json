@@ -23,6 +23,7 @@
     "broccoli-slow-trees": "^1.0.0",
     "commander": "^2.0.0",
     "connect": "^3.2.0",
+    "connect-history-api-fallback": "0.0.5",
     "copy-dereference": "^1.0.0",
     "findup-sync": "^0.1.2",
     "handlebars": "^2.0.0",
