@@ -1,6 +1,6 @@
 # Broccoli
 
-<img src="logo/broccoli-logo-small.generated.png" align="right" height="150">
+<img src="logo/broccoli-logo.svg" align="right" height="150">
 
 [![Build Status](https://travis-ci.org/broccolijs/broccoli.svg?branch=master)](https://travis-ci.org/broccolijs/broccoli)
 [![Build status](https://ci.appveyor.com/api/projects/status/jd3ts93gryjeqclf/branch/master?svg=true)](https://ci.appveyor.com/project/joliss/broccoli/branch/master)
