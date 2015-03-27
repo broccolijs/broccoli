@@ -1,5 +1,7 @@
 # master
 
+# 0.15.2
+
 * Add ability to inject live-reload script into error messages
 
 # 0.15.1
