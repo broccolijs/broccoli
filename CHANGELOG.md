@@ -1,5 +1,7 @@
 # master
 
+* Add ability to inject live-reload script into error messages
+
 # 0.15.1
 
 * Hide API warnings behind $BROCCOLI_WARN_READ_API env flag
