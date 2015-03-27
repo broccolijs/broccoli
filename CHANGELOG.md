@@ -1,5 +1,7 @@
 # master
 
+# 0.15.1
+
 * Hide API warnings behind $BROCCOLI_WARN_READ_API env flag
 * Add support for new error API
 * Fail fast if `build` output directory already exists
