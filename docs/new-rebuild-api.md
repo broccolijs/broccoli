@@ -14,14 +14,14 @@ Broccoli up to 0.13.x supports only plugins that provide the old `.read` API.
 Broccoli 0.13.6 additionally throws a helpful error message if a plugin only
 provides the new `.rebuild` API.
 
-Broccoli 0.14.x supports plugins that provide the old `.read` API as well as
-plugins that provide the new `.rebuild` API. If a plugin provides both APIs,
-Broccoli will opt to call the new `.rebuild` API.
+Broccoli 0.14.x and 0.15.x supports plugins that provide the old `.read` API
+as well as plugins that provide the new `.rebuild` API. If a plugin provides
+both APIs, Broccoli will opt to call the new `.rebuild` API.
 
-Broccoli 0.15.x behaves the same as 0.14.x. Additionally, if a plugin provides
-only the old `.read` API, Broccoli will print a deprecation warning.
+To see deprecation warnings when plugins only support the old `.read` API, set
+the BROCCOLI_WARN_READ_API=y environment variable in Broccoli >0.15.1.
 
-Broccoli from 0.16.x onward supports only plugins that provide the new
+Future Broccolis will support only plugins that provide the new
 `.rebuild` API. If a plugin provides only the old `.read` API, Broccoli will
 throw an error.
 
