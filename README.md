@@ -15,8 +15,8 @@ For the command line interface, see
 
 **This is 0.x beta software.**
 
-Windows support appears to still be spotty. Reports (on GitHub or IRC) about
-specific failures are much appreciated -- we love collecting stack traces!
+Windows support is still spotty. Our biggest pain point is unreliable file
+deletion (see [rimraf#72](https://github.com/isaacs/rimraf/issues/72)).
 
 ## Installation
 
