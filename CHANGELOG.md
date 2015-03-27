@@ -1,5 +1,6 @@
 # master
 
+* Add support for new error API
 * Fail fast if `build` output directory already exists
 
 # 0.15.0
