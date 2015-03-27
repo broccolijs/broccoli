@@ -17,7 +17,7 @@ function countingTree (readFn) {
     cleanup: function () {
       var self = this;
 
-      RSVP.resolve()
+      return RSVP.resolve()
         .then(function() {
           self.cleanupCount++
         });
