@@ -1,5 +1,7 @@
 # master
 
+# 0.15.3
+
 * Correctly display multi-line error messages
 
 # 0.15.2
