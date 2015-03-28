@@ -24,8 +24,8 @@
     "commander": "^2.0.0",
     "connect": "^3.2.0",
     "copy-dereference": "^1.0.0",
-    "findup-sync": "^0.1.2",
-    "handlebars": "^2.0.0",
+    "findup-sync": "^0.2.1",
+    "handlebars": "^3.0.1",
     "mime": "^1.2.11",
     "promise-map-series": "^0.2.1",
     "quick-temp": "^0.1.2",
@@ -34,7 +34,7 @@
     "tiny-lr": "^0.1.4"
   },
   "devDependencies": {
-    "jshint": "~2.5.6",
+    "jshint": "~2.6.3",
     "tap": "^0.4.8"
   },
   "engines": {
