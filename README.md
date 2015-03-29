@@ -117,10 +117,13 @@ Shared code for writing plugins.
 ## Plugin API Specification
 
 Broccoli defines a single plugin API: a tree. A tree object represents a tree
-(directory hierarchy) of files that can be regenerated on each build.
+(directory hierarchy) of files that will be regenerated on each build.
 
 By convention, plugins will export a function that takes one or more input
-trees, and returns an output tree object.
+trees, and returns an output tree object. Usually your plugin will be
+implemented as a class representing a tree, but it is recommended to make the
+`new` operator optional
+([example](https://github.com/joliss/broccoli-coffee/blob/a55b3a6677f6d9da83334e9c916ae5e57895d1a6/index.js#L8)).
 
 A tree object must supply two methods that will be called by Broccoli:
 
