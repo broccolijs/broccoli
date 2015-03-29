@@ -25,12 +25,6 @@ npm install --save-dev broccoli
 npm install --global broccoli-cli
 ```
 
-## Getting Started
-
-Check out
-[broccoli-sample-app](https://github.com/broccolijs/broccoli-sample-app).
-Or read about how to write a `Brocfile.js` below.
-
 ## Brocfile.js
 
 A `Brocfile.js` file in the project root contains the build specification. It
@@ -98,7 +92,8 @@ running `broccoli build the-output` would generate the following folder:
 
 ### A larger example
 
-You can see a full-featured `Brocfile.js` [in `broccoli-sample-app`](https://github.com/broccolijs/broccoli-sample-app/blob/master/Brocfile.js).
+You can see a full-featured `Brocfile.js` in
+[broccoli-sample-app](https://github.com/broccolijs/broccoli-sample-app/blob/master/Brocfile.js).
 
 ## Plugins
 
