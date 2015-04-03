@@ -15,6 +15,9 @@
       </p>
     {{/if}}
     <pre><b>{{message}}</b></pre>
+    {{#if codeFrame}}
+      <pre>{{codeFrame}}</pre>
+    {{/if}}
     {{#if stack}}
       <hr>
       <pre style="color: #888">{{stack}}</pre>
