@@ -1,5 +1,7 @@
 # master
 
+* Add `autoIndex` middleware option to disable directory listings
+
 # 0.15.3
 
 * Correctly display multi-line error messages
