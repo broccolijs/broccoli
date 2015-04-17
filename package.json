@@ -30,8 +30,7 @@
     "promise-map-series": "^0.2.1",
     "quick-temp": "^0.1.2",
     "rimraf": "^2.2.8",
-    "rsvp": "^3.0.17",
-    "tiny-lr": "^0.1.4"
+    "rsvp": "^3.0.17"
   },
   "devDependencies": {
     "jshint": "~2.6.3",

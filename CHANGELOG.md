@@ -1,5 +1,7 @@
 # master
 
+* Remove built-in LiveReload server; tools like Ember CLI inject LiveReload scripts, which is generally preferable because it doesn't need a separate port
+
 # 0.15.4
 
 * Send `Cache-Control` header for directory listings and redirects
