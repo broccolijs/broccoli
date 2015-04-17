@@ -1,5 +1,7 @@
 # master
 
+* Add footer to directory listings, so people know where they come from
+
 # 0.16.0
 
 * Remove built-in LiveReload server; tools like Ember CLI inject LiveReload scripts, which is generally preferable because it doesn't need a separate port
