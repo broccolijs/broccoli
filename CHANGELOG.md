@@ -1,5 +1,7 @@
 # master
 
+# 0.16.0
+
 * Remove built-in LiveReload server; tools like Ember CLI inject LiveReload scripts, which is generally preferable because it doesn't need a separate port
 
 # 0.15.4
