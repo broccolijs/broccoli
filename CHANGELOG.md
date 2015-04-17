@@ -1,5 +1,7 @@
 # master
 
+# 0.15.4
+
 * Send `Cache-Control` header for directory listings and redirects
 * Honor `liveReloadPath` middleware option in directory listings as well
 * Add `autoIndex` middleware option to disable directory listings
