@@ -1,5 +1,6 @@
 # master
 
+* Honor `liveReloadPath` middleware option in directory listings as well
 * Add `autoIndex` middleware option to disable directory listings
 
 # 0.15.3

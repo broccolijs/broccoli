@@ -2,6 +2,9 @@
 <html>
   <head>
     <title>{{url}}</title>
+    {{#if liveReloadPath}}
+      <script src="{{liveReloadPath}}"></script>
+    {{/if}}
     <style>
       body {
         font-family: 'Helvetica Neue','Arial',sans-serif;
