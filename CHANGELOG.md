@@ -1,5 +1,7 @@
 # master
 
+* Add missing dependency
+
 # 0.16.1
 
 * Add Node interface to Builder, to enable building visualizations
