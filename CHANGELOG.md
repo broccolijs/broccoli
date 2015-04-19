@@ -1,5 +1,6 @@
 # master
 
+* Export `Builder.getDescription(tree)` helper function
 * Add footer to directory listings, so people know where they come from
 
 # 0.16.0
