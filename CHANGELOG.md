@@ -1,5 +1,7 @@
 # master
 
+# 0.16.2
+
 * Add missing dependency
 
 # 0.16.1
