@@ -1,5 +1,7 @@
 # master
 
+# 0.16.1
+
 * Add Node interface to Builder, to enable building visualizations
 * Export `Builder.getDescription(tree)` helper function
 * Add footer to directory listings, so people know where they come from
