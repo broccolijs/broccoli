@@ -1,5 +1,7 @@
 # master
 
+# 0.16.3
+
 * Do not silently swallow errors in change/error event handlers
 
 # 0.16.2
