@@ -67,20 +67,19 @@ the following folder within your project folder:
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-var pickFiles = require('broccoli-static-compiler')
+var funnel = require('broccoli-funnel')
 
-module.exports = pickFiles('app', {
-  srcDir: '/',
+module.exports = funnel('app', {
   destDir: 'appkit'
 })
 ```
 
 That example uses the plugin
-[`broccoli-static-compiler`](https://www.npmjs.com/package/broccoli-static-compiler).
+[`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
 In order for the `require` call to work, you must first put the plugin in
 your `devDependencies` and install it, with
 
-    npm install --save-dev broccoli-static-compiler
+    npm install --save-dev broccoli-funnel
 
 With the above `Brocfile.js` and the file tree from the previous example,
 running `broccoli build the-output` would generate the following folder:
