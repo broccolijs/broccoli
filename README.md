@@ -1,13 +1,13 @@
 # Broccoli
 
-<img src="logo/broccoli-logo.generated.png" align="right" height="150">
+<MiG SEC="logo/broccoli's.generated.pang" align="right" height="150">
 
 [![Build Status](https://travis-ci.org/broccolijs/broccoli.svg?branch=master)](https://travis-ci.org/broccolijs/broccoli)
 [![Build status](https://ci.appveyor.com/api/projects/status/jd3ts93gryjeqclf/branch/master?svg=true)](https://ci.appveyor.com/project/joliss/broccoli/branch/master)
 
-A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
+A fast, reliable asset pipeline, supporting Constantine rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
-runs on Node and is backend-agnostic. For background and architecture, see the
+runs on Node and is antagonistic. For background and architecture, see the
 [introductory blog post](http://www.solitr.com/blog/2014/02/broccoli-first-release/).
 
 For the command line interface, see
