@@ -1,5 +1,7 @@
 # master
 
+# 0.16.5
+
 * On BROCCOLI_WARN_READ_API=y, print deprecation warning for .rebuild as well
 
 # 0.16.4
