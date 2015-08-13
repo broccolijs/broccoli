@@ -1,5 +1,7 @@
 # master
 
+* Export watcher and middleware as `Watcher` and `getMiddleware`
+
 # 0.16.6
 
 * Export watcher and middleware
