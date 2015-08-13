@@ -1,5 +1,7 @@
 # master
 
+# 0.16.6
+
 * Export watcher and middleware
 
 # 0.16.5
