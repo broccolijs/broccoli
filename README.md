@@ -67,9 +67,9 @@ the following folder within your project folder:
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-var funnel = require('broccoli-funnel')
+var Funnel = require('broccoli-funnel')
 
-module.exports = funnel('app', {
+module.exports = new Funnel('app', {
   destDir: 'appkit'
 })
 ```
