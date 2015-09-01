@@ -1,5 +1,7 @@
 # master
 
+* Add builder hooks
+
 # 0.16.7
 
 * Export watcher and middleware as `Watcher` and `getMiddleware`
