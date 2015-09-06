@@ -161,5 +161,78 @@ test('Builder', function (t) {
     })
   })
 
+  test('set tmpRoot if plugin opts in', function (t) {
+    var tree = {
+      tmpRoot: null,
+      read: function() {
+        return '/foo'
+      },
+      cleanup: function() {
+
+      }
+    }
+
+    var builder = new Builder(tree, {tmpRoot: 'test'})
+    builder.build().then(function() {
+      t.equal('test', tree.tmpRoot)
+      t.end()
+    })
+  })
+
+  test('plugin can use tmpRoot and not opt in', function (t) {
+    var tree = {
+      tmpRoot: 'foo',
+      read: function() {
+        return '/foo'
+      },
+      cleanup: function() {
+
+      }
+    }
+
+    var builder = new Builder(tree, {tmpRoot: 'test'})
+    builder.build().then(function() {
+      t.equal('foo', tree.tmpRoot)
+      t.end()
+    })
+  })
+
+  test('plugin can opt in and tmp will be used if no root passed to builder', function (t) {
+    var tree = {
+      tmpRoot: null,
+      read: function() {
+        return '/foo'
+      },
+      cleanup: function() {
+
+      }
+    }
+
+    var builder = new Builder(tree)
+    console.log('TMPROOT: ======\n\n\n', tree.tmpRoot + '=========\n\n\n');
+    builder.build().then(function() {
+      t.equal('tmp', tree.tmpRoot)
+      t.end()
+    })
+  })
+
+  test('if plugin does not optIn tmpRoot will not be set', function (t) {
+    var tree = {
+      tmpRoot: undefined,
+      read: function() {
+        return '/foo'
+      },
+      cleanup: function() {
+
+      }
+    }
+
+    var builder = new Builder(tree, {tmpRoot: 'test'})
+    builder.build().then(function() {
+      t.equal(undefined, tree.tmpRoot)
+      t.end()
+    })
+  })
+
   t.end()
 })
