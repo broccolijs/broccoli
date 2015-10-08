@@ -33,14 +33,15 @@
     "rsvp": "^3.0.17"
   },
   "devDependencies": {
-    "jshint": "~2.6.3",
-    "tap": "^0.4.8"
+    "chai": "^3.3.0",
+    "chai-as-promised": "^5.1.0",
+    "mocha": "^2.3.3",
+    "mocha-jshint": "^2.2.3"
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "pretest": "jshint lib test",
-    "test": "tap --stderr --timeout 10 ./test/*_test.js"
+    "test": "mocha"
   }
 }
