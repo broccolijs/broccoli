@@ -209,8 +209,9 @@ describe('Builder', function() {
 
     it('fails when a source directory doesn\'t exist', function() {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/doesnotexist'))
+      // Note: `ENOENT:` or `ENOENT,` depending on Node version
       return expect(builder.build()).to.be.eventually.rejectedWith(Builder.BuildError,
-        /test\/fixtures\/doesnotexist: ENOENT: no such file or directory/)
+        /test\/fixtures\/doesnotexist: ENOENT. no such file or directory/)
     })
 
     it('fails when a source directory is a file', function() {

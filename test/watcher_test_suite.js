@@ -36,6 +36,12 @@ module.exports = function(Watcher, Builder, sleepDuration, tmpBaseDir) {
   }
 
   describe('Watcher', function() {
+    if (/^v0\.10\./.test(process.version)) {
+      // No subsecond mtime resolution on Node 0.10
+      sleepDuration = Math.max(1100, sleepDuration)
+      this.timeout(20000)
+    }
+
     var builder, buildSpy, watcher, watchPromise
 
     beforeEach(function() {
