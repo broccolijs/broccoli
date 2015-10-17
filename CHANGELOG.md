@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0-beta.2
+
 * Add `watcher.watch()` method. `Watcher` no longer automatically starts
   watching; instead, you must call this method explicitly. It returns a promise
   that is fulfilled if you later call `watcher.quit()`, or rejected if watching
