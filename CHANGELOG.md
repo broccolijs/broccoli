@@ -1,5 +1,13 @@
 # master
 
+* Add `watcher.watch()` method. `Watcher` no longer automatically starts
+  watching; instead, you must call this method explicitly. It returns a promise
+  that is fulfilled if you later call `watcher.quit()`, or rejected if watching
+  one of the source directories fails.
+
+    - `server` will call `watcher.watch()` for you.
+    - In contrast, `getMiddleware` expects a watcher that is already watching.
+
 # 1.0.0-beta.1
 
 * Drop support for plugins using the old `.read/.rebuild` API

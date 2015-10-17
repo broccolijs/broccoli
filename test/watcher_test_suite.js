@@ -14,13 +14,21 @@ var WatchedDir = require('broccoli-source').WatchedDir
 var plugins = require('./plugins')(Plugin)
 
 
-// Pass in the Watcher class you wish to test, as well as broccoli.Builder and
-// a sleepDuration in milliseconds. Your Watcher class should reliably pick up
-// changes within `sleepDuration` milliseconds.
+// Parameters:
+//
+// Watcher: The Watcher class you wish to test
+// Builder: The broccoli.Builder class
+// sleepDuration: Your Watcher class should reliably pick up
+//     changes to the file system within `sleepDuration` milliseconds.
+// tmpBaseDir: A watcher_test.tmp directory will be created and deleted
+//     underneath this directory; e.g. if you pass 'test', the directory
+//     will be test/watcher_test.tmp
 //
 // Requires mocha for describe/it syntax.
 
-module.exports = function(Watcher, Builder, sleepDuration) {
+module.exports = function(Watcher, Builder, sleepDuration, tmpBaseDir) {
+  var tmpDir = tmpBaseDir + '/watcher_test.tmp'
+
   function sleep() {
     return new RSVP.Promise(function(resolve, reject) {
       setTimeout(resolve, sleepDuration)
@@ -28,40 +36,39 @@ module.exports = function(Watcher, Builder, sleepDuration) {
   }
 
   describe('Watcher', function() {
-    var builder, buildSpy, watcher
+    var builder, buildSpy, watcher, watchPromise
 
     beforeEach(function() {
-      rimraf.sync('test/tmp')
-      fs.mkdirSync('test/tmp')
+      rimraf.sync(tmpDir)
+      fs.mkdirSync(tmpDir)
     })
 
     afterEach(function() {
       return RSVP.resolve()
         .then(function() {
           if (watcher) {
-            var promise = watcher.quit()
-            watcher = null
-            return promise.catch(function(err) {})
+            return watcher.quit()
           }
         })
         .then(function() {
+          watcher = null
           if (builder) {
             builder.cleanup()
             builder = null
           }
           buildSpy = null
-          rimraf.sync('test/tmp')
+          rimraf.sync(tmpDir)
         })
     })
 
     function makeNodeWithTwoWatchedDirectories() {
-      fs.mkdirSync('test/tmp/1')
-      fs.mkdirSync('test/tmp/1/subdir')
-      fs.writeFileSync('test/tmp/1/subdir/foo', 'x')
-      fs.mkdirSync('test/tmp/2')
+      fs.mkdirSync(tmpDir + '/1')
+      fs.mkdirSync(tmpDir + '/1/subdir')
+      fs.writeFileSync(tmpDir + '/1/subdir/foo', 'x')
+      fs.mkdirSync(tmpDir + '/2')
       return new plugins.NoopPlugin([
-        new WatchedDir('test/tmp/1'),
-        new WatchedDir('test/tmp/2')
+        new WatchedDir(tmpDir + '/1'),
+        new WatchedDir(tmpDir + '/2')
       ])
     }
 
@@ -69,6 +76,7 @@ module.exports = function(Watcher, Builder, sleepDuration) {
       builder = new Builder(node)
       buildSpy = sinon.spy(builder, 'build')
       watcher = new Watcher(builder)
+      watchPromise = watcher.watch()
     }
 
     function triggersRebuild(cb) {
@@ -96,39 +104,39 @@ module.exports = function(Watcher, Builder, sleepDuration) {
       it('triggers rebuild when adding files', function() {
         setUpBuilderAndWatcher(makeNodeWithTwoWatchedDirectories())
         return expect(triggersRebuild(function() {
-          fs.writeFileSync('test/tmp/1/subdir/bar', 'hello')
+          fs.writeFileSync(tmpDir + '/1/subdir/bar', 'hello')
         })).to.be.eventually.true
       })
 
       it('triggers rebuild when removing files', function() {
         setUpBuilderAndWatcher(makeNodeWithTwoWatchedDirectories())
         return expect(triggersRebuild(function() {
-          fs.unlinkSync('test/tmp/1/subdir/foo')
+          fs.unlinkSync(tmpDir + '/1/subdir/foo')
         })).to.be.eventually.true
       })
 
       it('triggers rebuild when changing files', function() {
         setUpBuilderAndWatcher(makeNodeWithTwoWatchedDirectories())
         return expect(triggersRebuild(function() {
-          fs.writeFileSync('test/tmp/1/subdir/foo', 'y')
+          fs.writeFileSync(tmpDir + '/1/subdir/foo', 'y')
         })).to.be.eventually.true
       })
 
       it('triggers rebuild when adding empty directories', function() {
         setUpBuilderAndWatcher(makeNodeWithTwoWatchedDirectories())
         return expect(triggersRebuild(function() {
-          fs.mkdirSync('test/tmp/1/another-subdir')
+          fs.mkdirSync(tmpDir + '/1/another-subdir')
         })).to.be.eventually.true
       })
     })
 
-    describe('Watcher.currentBuild', function() {
-      it ('is fulfilled when the build succeeds', function() {
+    describe('watcher.currentBuild', function() {
+      it('is fulfilled when the build succeeds', function() {
         setUpBuilderAndWatcher(new plugins.NoopPlugin)
         return expect(watcher.currentBuild).to.be.fulfilled
       })
 
-      it ('is rejected when the build fails', function() {
+      it('is rejected when the build fails', function() {
         setUpBuilderAndWatcher(new plugins.FailingPlugin(new Error('fail me')))
         return expect(watcher.currentBuild).to.be.rejected
       })
@@ -189,16 +197,35 @@ module.exports = function(Watcher, Builder, sleepDuration) {
       })
     })
 
+    describe('watcher.watch() promise', function() {
+      it('is fulfilled when watcher.quit() is called', function() {
+        setUpBuilderAndWatcher(new plugins.FailingPlugin) // even if build fails
+        watcher.quit()
+        return expect(watchPromise).to.be.fulfilled
+      })
+
+      // We could relax this in the future and turn missing source directories
+      // into transient build errors, by always watching the parent
+      // directories
+      it('is rejected when a watched source directory does not exist', function() {
+        setUpBuilderAndWatcher(new WatchedDir('doesnotexist'))
+        return expect(watchPromise).to.be.rejected
+      })
+    })
+
     describe('watcher.quit()', function() {
-      it('stops watching', function() {
+      it('if no build is in progress, just stops watching and fulfills watch() promise', function() {
         setUpBuilderAndWatcher(makeNodeWithTwoWatchedDirectories())
         return watcher.currentBuild
           .then(function() {
-            expect(buildSpy).to.have.been.calledOnce
-            return watcher.quit()
+            var quitPromise = watcher.quit()
+            // Must be a promise (that presumably fulfills immediately), even
+            // though no build is in progress
+            expect(quitPromise.then).to.be.a('function')
+            return quitPromise
           })
           .then(function() {
-            fs.writeFileSync('test/tmp/1/subdir/bar', 'hello')
+            fs.writeFileSync(tmpDir + '/1/subdir/bar', 'hello')
           })
           .then(sleep)
           .then(function() {
@@ -206,8 +233,8 @@ module.exports = function(Watcher, Builder, sleepDuration) {
           })
       })
 
-      it('returns a promise until the current rebuild has finished', function() {
-        var node = new plugins.AsyncPlugin
+      it('if a build is in progress, returns a promise until it finishes, then stops watching', function() {
+        var node = new plugins.AsyncPlugin([makeNodeWithTwoWatchedDirectories()])
         setUpBuilderAndWatcher(node)
 
         var quitPromise
@@ -215,15 +242,26 @@ module.exports = function(Watcher, Builder, sleepDuration) {
 
         return node.buildStarted
           .then(function() {
+            // Quit while node is being built
             quitPromise = watcher.quit().then(function() {
               quitPromiseHasBeenFulfilled = true
             })
           })
           .then(sleep)
           .then(function() {
+            // .quit() promise should not be fulfilled until build has finished
             expect(quitPromiseHasBeenFulfilled).to.be.false
             node.finishBuild()
             return quitPromise
+          })
+
+          .then(function() {
+            fs.writeFileSync(tmpDir + '/1/subdir/bar', 'hello')
+          })
+          .then(sleep)
+          .then(function() {
+            // No further rebuilds should happen, even if files change
+            expect(buildSpy).to.have.been.calledOnce
           })
       })
 
