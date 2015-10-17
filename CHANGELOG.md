@@ -1,5 +1,35 @@
 # master
 
+* Drop support for plugins using the old `.read/.rebuild` API
+* Fail build when a source node is a file rather than a directory
+* Fail build when a source node doesn't exist
+* Builder API changes:
+
+    - `new Builder` has a `tmpdir` option, which defaults to `os.tmpdir()`
+      (typically `/tmp`); pass `{ tmpdir: './tmp' }` to get the old behavior
+    - `.build()` no longer returns a promise to the output path; instead, the
+      output path stored at `builder.outputPath` and doesn't change between
+      builds
+    - `start`, `end`, `nodeStart`, `nodeEnd` events renamed to
+      `beginBuild`, `endBuild`, `beginNode`, `endNode`
+    - Nodes passed to `nodeBegin`/`nodeEnd` arguments are "node wrapper"
+      objects (also accessible at `builder.nodeWrappers`); timings now
+      reside at `nodeWrapper.buildState.selfTime/totalTime` and are in
+      milliseconds, not nanoseconds
+    - `build()` no longer takes a `willReadStringTree` callback argument;
+      instead, source directories are recorded at `builder.watchedPaths`
+
+* Watcher API changes:
+
+    - Add `watcher.quit()` method, which returns a promise until a running
+      build has finished (if any)
+    - Rename `watcher.current` to `watcher.currentBuild`, and remove
+      `watcher.then`
+    - Use `RSVP.EventTarget` instead of `EventEmitter` for events
+
+* Build error objects have been changed to `Builder.BuildError` objects, which
+  contain additional information at `err.broccoliPayload`
+
 # 0.16.8
 
 * Add builder hooks

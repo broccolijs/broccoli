@@ -19,29 +19,37 @@
   },
   "homepage": "https://github.com/broccolijs/broccoli",
   "dependencies": {
-    "broccoli-kitchen-sink-helpers": "^0.2.5",
-    "broccoli-slow-trees": "^1.0.0",
+    "broccoli-kitchen-sink-helpers": "^0.2.9",
+    "broccoli-slow-trees": "^2.0.0",
+    "broccoli-source": "^1.1.0",
     "commander": "^2.5.0",
     "connect": "^3.3.3",
     "copy-dereference": "^1.0.0",
     "findup-sync": "^0.2.1",
     "handlebars": "^3.0.1",
     "mime": "^1.2.11",
-    "promise-map-series": "^0.2.1",
-    "quick-temp": "^0.1.2",
-    "rimraf": "^2.2.8",
-    "rsvp": "^3.0.17"
+    "rimraf": "^2.4.3",
+    "rsvp": "^3.0.17",
+    "tmp": "0.0.28",
+    "underscore.string": "^3.2.2"
   },
   "devDependencies": {
+    "broccoli-plugin": "^1.2.0",
     "chai": "^3.3.0",
     "chai-as-promised": "^5.1.0",
+    "fixturify": "^0.2.0",
     "mocha": "^2.3.3",
-    "mocha-jshint": "^2.2.3"
+    "mocha-jshint": "^2.2.5",
+    "multidep": "^1.0.1",
+    "sinon": "^1.17.1",
+    "sinon-chai": "^2.8.0",
+    "symlink-or-copy": "^1.0.1"
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "scripts": {
+    "pretest": "multidep test/multidep.json",
     "test": "mocha"
   }
 }
