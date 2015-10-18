@@ -243,32 +243,32 @@ describe('Builder', function() {
       it('catches invalid root nodes', function() {
         expect(function() {
           new Builder(invalidNode)
-        }).to.throw(Builder.InvalidNodeError, /Expected Broccoli node, got \[object Object\] as output node$/)
+        }).to.throw(Builder.InvalidNodeError, /\[object Object\] is not a Broccoli node\nused as output node$/)
       })
 
       it('catches invalid input nodes', function() {
         expect(function() {
           new Builder(new plugins.MergePlugin([invalidNode], { annotation: 'some annotation' }))
-        }).to.throw(Builder.InvalidNodeError, /Expected Broccoli node, got \[object Object\]\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
+        }).to.throw(Builder.InvalidNodeError, /\[object Object\] is not a Broccoli node\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
       })
 
       it('catches undefined input nodes', function() {
         // Very common subcase of invalid input nodes
         expect(function() {
           new Builder(new plugins.MergePlugin([undefined], { annotation: 'some annotation' }))
-        }).to.throw(Builder.InvalidNodeError, /Expected Broccoli node, got undefined\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
+        }).to.throw(Builder.InvalidNodeError, /undefined is not a Broccoli node\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
       })
 
       it('catches .read/.rebuild-based root nodes', function() {
         expect(function() {
           new Builder(readBasedNode)
-        }).to.throw(Builder.InvalidNodeError, /\.read\/\.rebuild API[^\n]*"an old node" as output node/)
+        }).to.throw(Builder.InvalidNodeError, /an old node: The \.read\/\.rebuild API[^\n]*\nused as output node/)
       })
 
       it('catches .read/.rebuild-based input nodes', function() {
         expect(function() {
           new Builder(new plugins.MergePlugin([readBasedNode], { annotation: 'some annotation' }))
-        }).to.throw(Builder.InvalidNodeError, /\.read\/\.rebuild API[^\n]*"an old node"\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
+        }).to.throw(Builder.InvalidNodeError, /an old node: The \.read\/\.rebuild API[^\n]*\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
       })
     })
   })
@@ -408,7 +408,7 @@ describe('Builder', function() {
         })
 
         it('handles undefined errors', function() {
-          // Apparently this is a thing.
+          // Apparently that's a thing
           builder = new Builder(new plugins.FailingPlugin(undefined))
           return expect(builder.build()).to.be.rejectedWith(Builder.BuildError, /undefined/)
         })
@@ -461,9 +461,13 @@ describe('Builder', function() {
   })
 
   describe('node wrappers', function() {
+    // It would be easier to test the node wrappers if we could create them
+    // without instantiating a builder, but unfortunately this isn't easily
+    // possible right now.
+
     var watchedSourceNw, unwatchedSourceNw, transformNw
 
-    beforeEach(function() {
+    function setUpWatchedUnwatchedAndTransformNode() {
       var watchedSourceNode = new broccoliSource.WatchedDir('test/fixtures/basic')
       var unwatchedSourceNode = new broccoliSource.UnwatchedDir('test/fixtures/basic')
       var transformNode = new plugins.MergePlugin([watchedSourceNode, unwatchedSourceNode], { overwrite: true })
@@ -471,9 +475,10 @@ describe('Builder', function() {
       watchedSourceNw = builder.nodeWrappers[0]
       unwatchedSourceNw = builder.nodeWrappers[1]
       transformNw = builder.nodeWrappers[2]
-    })
+    }
 
     it('has .toString value useful for debugging', function() {
+      setUpWatchedUnwatchedAndTransformNode()
       expect(watchedSourceNw + '').to.equal('[NodeWrapper:0 test/fixtures/basic]')
       expect(unwatchedSourceNw + '').to.equal('[NodeWrapper:1 test/fixtures/basic (unwatched)]')
       expect(transformNw + '').to.match(/\[NodeWrapper:2 MergePlugin inputNodeWrappers:\[0,1\] at .+\]/)
@@ -498,6 +503,7 @@ describe('Builder', function() {
     })
 
     it('has .toJSON representation useful for exporting for visualization', function() {
+      setUpWatchedUnwatchedAndTransformNode()
       expect(watchedSourceNw.toJSON()).to.deep.equal({
         id: 0,
         nodeInfo: {
