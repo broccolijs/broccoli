@@ -1,3 +1,4 @@
 logo
 test/tmp
+test/watcher_test.tmp
 test/multidep

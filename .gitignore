@@ -1,4 +1,5 @@
 /node_modules
 /npm-debug.log
 /test/tmp
+/test/watcher_test.tmp
 /test/multidep
