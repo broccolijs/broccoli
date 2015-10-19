@@ -56,6 +56,10 @@ function buildToFixture(node) {
 
 
 describe('Builder', function() {
+  if (process.env.CI) {
+    this.timeout(120000)
+  }
+
   var builder
 
   afterEach(function() {

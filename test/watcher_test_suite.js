@@ -41,6 +41,9 @@ module.exports = function(Watcher, Builder, sleepDuration, tmpBaseDir) {
       sleepDuration = Math.max(1100, sleepDuration)
       this.timeout(20000)
     }
+    if (process.env.CI) {
+      this.timeout(120000)
+    }
 
     var builder, buildSpy, watcher, watchPromise
 
