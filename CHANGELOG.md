@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0-beta.4
+
 * Improve test suite
 
 # 1.0.0-beta.3
