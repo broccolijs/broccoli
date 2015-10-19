@@ -3,8 +3,8 @@
 var fs = require('fs')
 var os = require('os')
 var path = require('path')
-var rimraf = require('rimraf')
 var RSVP = require('rsvp')
+var tmp = require('tmp')
 var broccoli = require('..')
 var makePlugins = require('./plugins')
 var Builder = broccoli.Builder
@@ -18,6 +18,8 @@ var multidepPackages = require('multidep')('test/multidep.json')
 var Plugin = multidepPackages['broccoli-plugin']['1.2.0']()
 var broccoliSource = multidepPackages['broccoli-source']['1.1.0']()
 
+// Clean up left-over temporary directories on uncaught exception.
+tmp.setGracefulCleanup()
 
 
 RSVP.on('error', function(error) {
@@ -278,13 +280,19 @@ describe('Builder', function() {
   })
 
   describe('temporary directories', function() {
-    beforeEach(function() {
-      rimraf.sync('test/tmp')
-      fs.mkdirSync('test/tmp')
-    })
+    var tmpdir, tmpRemoveCallback
 
-    after(function() {
-      rimraf.sync('test/tmp')
+    beforeEach(function() {
+      var tmpObj = tmp.dirSync({ prefix: 'broccoli_builder_test-', unsafeCleanup: true })
+      tmpdir = tmpObj.name
+      tmpRemoveCallback = tmpObj.removeCallback
+    })
+    afterEach(function() {
+      if (builder) {
+        builder.cleanup()
+        builder = null
+      }
+      tmpRemoveCallback()
     })
 
     function hasBroccoliTmpDir(baseDir) {
@@ -305,16 +313,16 @@ describe('Builder', function() {
     })
 
     it('creates temporary directory in directory given by tmpdir options', function() {
-      builder = new Builder(new plugins.VeggiesPlugin, { tmpdir: 'test/tmp' })
-      expect(hasBroccoliTmpDir('test/tmp')).to.be.true
+      builder = new Builder(new plugins.VeggiesPlugin, { tmpdir: tmpdir })
+      expect(hasBroccoliTmpDir(tmpdir)).to.be.true
     })
 
     it('removes temporary directory when .cleanup() is called', function() {
-      builder = new Builder(new plugins.VeggiesPlugin, { tmpdir: 'test/tmp' })
-      expect(hasBroccoliTmpDir('test/tmp')).to.be.true
+      builder = new Builder(new plugins.VeggiesPlugin, { tmpdir: tmpdir })
+      expect(hasBroccoliTmpDir(tmpdir)).to.be.true
       builder.cleanup()
       builder = null
-      expect(hasBroccoliTmpDir('test/tmp')).to.be.false
+      expect(hasBroccoliTmpDir(tmpdir)).to.be.false
     })
 
     describe('failing node setup', function() {
@@ -333,17 +341,17 @@ describe('Builder', function() {
       it('reports failing node and instantiation stack, and cleans up temporary directory', function() {
         var node = new FailingSetupPlugin(new Error('foo error'))
         expect(function() {
-          new Builder(node, { tmpdir: 'test/tmp' })
+          new Builder(node, { tmpdir: tmpdir})
         }).to.throw(Builder.NodeSetupError, /foo error\s+at FailingSetupPlugin\n-~- created here: -~-/)
-        expect(hasBroccoliTmpDir('test/tmp')).to.be.false
+        expect(hasBroccoliTmpDir(tmpdir)).to.be.false
       })
 
       it('supports string errors, and cleans up temporary directory', function() {
         var node = new FailingSetupPlugin('bar error')
         expect(function() {
-          new Builder(node, { tmpdir: 'test/tmp' })
+          new Builder(node, { tmpdir: tmpdir})
         }).to.throw(Builder.NodeSetupError, /bar error\s+at FailingSetupPlugin\n-~- created here: -~-/)
-        expect(hasBroccoliTmpDir('test/tmp')).to.be.false
+        expect(hasBroccoliTmpDir(tmpdir)).to.be.false
       })
     })
   })

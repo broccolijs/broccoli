@@ -1,8 +1,8 @@
 'use strict'
 
 var fs = require('fs')
-var rimraf = require('rimraf')
 var RSVP = require('rsvp')
+var tmp = require('tmp')
 var sinon = require('sinon')
 var chai = require('chai'), expect = chai.expect
 var chaiAsPromised = require('chai-as-promised'); chai.use(chaiAsPromised)
@@ -13,6 +13,8 @@ var Plugin = require('broccoli-plugin')
 var WatchedDir = require('broccoli-source').WatchedDir
 var plugins = require('./plugins')(Plugin)
 
+// Clean up left-over temporary directories on uncaught exception.
+tmp.setGracefulCleanup()
 
 // Parameters:
 //
@@ -26,9 +28,7 @@ var plugins = require('./plugins')(Plugin)
 //
 // Requires mocha for describe/it syntax.
 
-module.exports = function(Watcher, Builder, sleepDuration, tmpBaseDir) {
-  var tmpDir = tmpBaseDir + '/watcher_test.tmp'
-
+module.exports = function(Watcher, Builder, sleepDuration) {
   function sleep() {
     return new RSVP.Promise(function(resolve, reject) {
       setTimeout(resolve, sleepDuration)
@@ -47,11 +47,6 @@ module.exports = function(Watcher, Builder, sleepDuration, tmpBaseDir) {
 
     var builder, buildSpy, watcher, watchPromise
 
-    beforeEach(function() {
-      rimraf.sync(tmpDir)
-      fs.mkdirSync(tmpDir)
-    })
-
     afterEach(function() {
       return RSVP.resolve()
         .then(function() {
@@ -66,8 +61,18 @@ module.exports = function(Watcher, Builder, sleepDuration, tmpBaseDir) {
             builder = null
           }
           buildSpy = null
-          rimraf.sync(tmpDir)
         })
+    })
+
+    var tmpDir, tmpRemoveCallback
+
+    beforeEach(function() {
+      var tmpObj = tmp.dirSync({ prefix: 'broccoli_watcher_test-', unsafeCleanup: true })
+      tmpDir = tmpObj.name
+      tmpRemoveCallback = tmpObj.removeCallback
+    })
+    afterEach(function() {
+      tmpRemoveCallback()
     })
 
     function makeNodeWithTwoWatchedDirectories() {

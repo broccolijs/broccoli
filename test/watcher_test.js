@@ -10,4 +10,4 @@ function FastWatcher(builder) {
   Watcher.call(this, builder, { interval: 5 })
 }
 
-require('./watcher_test_suite')(FastWatcher, Builder, 15, 'test')
+require('./watcher_test_suite')(FastWatcher, Builder, 15)
