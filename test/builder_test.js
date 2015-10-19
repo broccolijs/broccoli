@@ -517,10 +517,9 @@ describe('Builder', function() {
         inputNodeWrappers: [],
         cachePath: null,
         outputPath: 'test/fixtures/basic',
-        buildState: null
+        buildState: {}
       })
 
-      expect(transformNw.toJSON().buildState).to.be.null
       return builder.build().then(function() {
         var transformNwJSON = transformNw.toJSON()
 
