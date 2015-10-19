@@ -1,5 +1,7 @@
 # master
 
+* Minor cosmetic changes
+
 # 1.0.0-beta.2
 
 * Add `watcher.watch()` method. `Watcher` no longer automatically starts
