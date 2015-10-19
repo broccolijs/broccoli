@@ -12,7 +12,7 @@
 
 # 1.0.0-beta.1
 
-* Drop support for plugins using the old `.read/.rebuild` API
+* Drop support for plugins that implement only the old `.read/.rebuild` API
 * Fail build when a source node is a file rather than a directory
 * Fail build when a source node doesn't exist
 * Builder API changes:
