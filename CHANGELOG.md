@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0-beta.3
+
 * Minor cosmetic changes
 
 # 1.0.0-beta.2
