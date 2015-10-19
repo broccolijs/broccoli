@@ -115,6 +115,10 @@ Shared code for writing plugins.
 
 ## Plugin API Specification
 
+*This section needs to be updated. For now, see
+[docs/broccoli-1-0-plugin-api.md](docs/broccoli-1-0-plugin-api.md) and the
+[broccoli-plugin README](https://github.com/broccolijs/broccoli-plugin).*
+
 Broccoli defines a single plugin API: a tree. A tree object represents a tree
 (directory hierarchy) of files that will be regenerated on each build.
 
