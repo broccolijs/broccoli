@@ -92,7 +92,7 @@ If your plugin subclasses
 [broccoli-filter](https://github.com/broccolijs/broccoli-filter), upgrade to
 broccoli-filter 1.0.0 or newer. Be sure to call the base class constructor as
 detailed [in the README](https://github.com/broccolijs/broccoli-filter/blob/master/README.md#upgrading-from-01x-to-1x);
-other than that, no changes should be necessary.
+other than that, no changes are needed.
 
 ### broccoli-caching-writer
 
@@ -103,10 +103,10 @@ upgrade to broccoli-caching-writer 2.0.0.
 With version 2.0.0, broccoli-caching-writer's API is a drop-in replacement for
 broccoli-plugin. As a result, its API is completely different from
 broccoli-caching-writer 0.x/1.x, and your plugin's code will need to be
-updated. To do so, it's best to consult read the README for
-[broccoli-plugin](https://github.com/broccolijs/broccoli-plugin) to
-familiarize yourself with the new API, and replace all instances of `Plugin`
-with `CachingWriter`.
+updated. To do so, it's best to read the
+[broccoli-plugin README](https://github.com/broccolijs/broccoli-plugin) to
+familiarize yourself with the new API, while replacing all instances of
+`Plugin` with `CachingWriter` in your plugin code.
 
 As a guide, where you previously implemented
 
