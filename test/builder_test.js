@@ -433,8 +433,6 @@ describe('Builder', function() {
 
     function setupEventHandlers() {
       events = []
-      builder.on('beginBuild', function() { events.push('beginBuild') })
-      builder.on('endBuild', function() { events.push('endBuild') })
       builder.on('beginNode', function(nw) { events.push('beginNode:' + nw.id) })
       builder.on('endNode', function(nw) { events.push('endNode:' + nw.id) })
     }
@@ -445,14 +443,12 @@ describe('Builder', function() {
       return builder.build()
         .then(function() {
           expect(events).to.deep.equal([
-            'beginBuild',
             'beginNode:0',
             'endNode:0',
             'beginNode:1',
             'endNode:1',
             'beginNode:2',
             'endNode:2',
-            'endBuild'
           ])
         })
     })
@@ -463,10 +459,8 @@ describe('Builder', function() {
       return expect(builder.build()).to.be.rejected
         .then(function() {
           expect(events).to.deep.equal([
-            'beginBuild',
             'beginNode:0',
             'endNode:0',
-            'endBuild'
           ])
         })
     })
