@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0-beta.5
+
 * Remove redundant `beginBuild`/`endBuild` (formerly `start`/`end`) events on builder
 
 # 1.0.0-beta.4
