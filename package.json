@@ -26,7 +26,7 @@
     "connect": "^3.3.3",
     "copy-dereference": "^1.0.0",
     "findup-sync": "^0.2.1",
-    "handlebars": "^3.0.1",
+    "handlebars": "^4.0.4",
     "mime": "^1.2.11",
     "rimraf": "^2.4.3",
     "rsvp": "^3.0.17",
