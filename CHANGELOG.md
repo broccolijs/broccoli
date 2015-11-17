@@ -1,5 +1,7 @@
 # master
 
+# 0.16.9
+
 * Update handlebars dependency
 
 # 0.16.8
