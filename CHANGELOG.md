@@ -1,5 +1,7 @@
 # master
 
+* Update handlebars dependency
+
 # 0.16.8
 
 * Add builder hooks
