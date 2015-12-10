@@ -13,10 +13,10 @@ var sinon = require('sinon')
 var chai = require('chai'), expect = chai.expect
 var chaiAsPromised = require('chai-as-promised'); chai.use(chaiAsPromised)
 var sinonChai = require('sinon-chai'); chai.use(sinonChai)
-var multidepPackages = require('multidep')('test/multidep.json')
+var multidepRequire = require('multidep')('test/multidep.json')
 
-var Plugin = multidepPackages['broccoli-plugin']['1.2.0']()
-var broccoliSource = multidepPackages['broccoli-source']['1.1.0']()
+var Plugin = multidepRequire('broccoli-plugin', '1.2.0')
+var broccoliSource = multidepRequire('broccoli-source', '1.1.0')
 
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup()
@@ -72,7 +72,7 @@ describe('Builder', function() {
   })
 
   describe('broccoli-plugin nodes (nodeType: "transform")', function() {
-    multidepPackages['broccoli-plugin'].forEachVersion(function(version, Plugin) {
+    multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
       var plugins = makePlugins(Plugin)
 
       describe('broccoli-plugin ' + version, function() {
@@ -137,7 +137,7 @@ describe('Builder', function() {
     })
 
     describe('persistentOutput flag', function() {
-      multidepPackages['broccoli-plugin'].forEachVersion(function(version, Plugin) {
+      multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
         if (version === '1.0.0') return // continue
 
         BuildOncePlugin.prototype = Object.create(Plugin.prototype)
@@ -179,7 +179,7 @@ describe('Builder', function() {
   })
 
   describe('broccoli-source nodes (nodeType: "source") and strings', function() {
-    multidepPackages['broccoli-source'].forEachVersion(function(version, broccoliSource) {
+    multidepRequire.forEachVersion('broccoli-source', function(version, broccoliSource) {
       describe('broccoli-source ' + version, function() {
         it('records unwatched source directories', function() {
           builder = new FixtureBuilder(new broccoliSource.UnwatchedDir('test/fixtures/basic'))
@@ -357,7 +357,7 @@ describe('Builder', function() {
   })
 
   describe('failing node build', function() {
-    multidepPackages['broccoli-plugin'].forEachVersion(function(version, Plugin) {
+    multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
       var plugins = makePlugins(Plugin)
 
       describe('broccoli-plugin ' + version, function() {
