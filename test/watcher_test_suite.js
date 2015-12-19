@@ -169,14 +169,20 @@ module.exports = function(Watcher, Builder, sleepDuration) {
     })
 
     describe('events', function() {
-      var changeEventHasTriggered, errorEventHasTriggered
+      var buildEventHasTriggered, changeEventHasTriggered, errorEventHasTriggered
 
       function buildAndRecordEvents(errOrNull) {
-        changeEventHasTriggered = errorEventHasTriggered = false
+        buildEventHasTriggered = false
+        changeEventHasTriggered = false
+        errorEventHasTriggered = false
 
         var node = new plugins.AsyncPlugin
-        setUpBuilderAndWatcher(node)
+        builder = new Builder(node)
+        watcher = new Watcher(builder)
 
+        watcher.on('build', function() {
+          buildEventHasTriggered = true
+        })
         watcher.on('change', function() {
           changeEventHasTriggered = true
         })
@@ -184,9 +190,12 @@ module.exports = function(Watcher, Builder, sleepDuration) {
           errorEventHasTriggered = err
         })
 
+        watcher.watch()
+
         return node.buildStarted
           .then(sleep)
           .then(function() {
+            expect(buildEventHasTriggered).to.be.true
             expect(changeEventHasTriggered).to.be.false
             expect(errorEventHasTriggered).to.be.false
             node.finishBuild(errOrNull)
