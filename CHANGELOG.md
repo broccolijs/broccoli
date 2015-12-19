@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0-beta.6
+
 * Add `build` event to watcher
 
 # 1.0.0-beta.5
