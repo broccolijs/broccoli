@@ -15,7 +15,7 @@ describe('Options Customization', function() {
     var tmpObj = tmp.dirSync({ prefix: 'broccoli_static_options_test-', unsafeCleanup: true });
     tmpdir = tmpObj.name;
     tmpRemoveCallback = tmpObj.removeCallback;
-    defaultOptions = {port: 4200, host: 'localhost', disableLogging: true};
+    defaultOptions = {port: 4200, host: 'localhost', disableLogging: true, serverListen: false};
   });
 
   afterEach(function() {
@@ -43,7 +43,15 @@ describe('Options Customization', function() {
   describe('customizing http headers', function() {
 
     var node = path.join(process.cwd(), 'test/fixtures/basic');
-    var builder = new broccoli.Builder(node);
+    var builder;
+
+    beforeEach(function() {
+      builder = new broccoli.Builder(node);
+    });
+
+    afterEach(function() {
+      builder.cleanup();
+    });
 
     it('uses default options when option.headers is omitted', function() {
 
