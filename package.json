@@ -49,7 +49,7 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "postinstall": "multidep test/multidep.json",
+    "pretest": "multidep test/multidep.json",
     "test": "mocha"
   }
 }
