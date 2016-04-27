@@ -1,5 +1,8 @@
 # master
 
+* Remove wrong `postinstall` hook. This removes a spurious dependency on
+  `multidep`.
+
 # 1.0.0-beta.6
 
 * Add `build` event to watcher
