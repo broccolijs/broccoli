@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0-beta.7
+
 * Remove wrong `postinstall` hook. This removes a spurious dependency on
   `multidep`.
 
