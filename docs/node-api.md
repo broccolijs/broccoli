@@ -97,11 +97,11 @@ easier and less error-prone.
 
 To this end, we provide the
 [broccoli-plugin](https://github.com/broccolijs/broccoli-plugin) base class,
-from which nearly all plugins derive. It includes compatibility code to work
-with old Broccoli versions. A given broccoli-plugin version exposes a fixed
-interface to plugin authors regardless of which Broccoli version the plugin
-ends up running on. For example, here is how a hypothetical
-"broccoli-fooscript" plugin would communicate with Broccoli:
+from which nearly all plugins derive. The broccoli-plugin base class includes
+compatibility code to work with old Broccoli versions. A given broccoli-plugin
+version exposes a fixed interface to plugin authors regardless of which
+Broccoli version the plugin ends up running on. For example, here is how a
+hypothetical "broccoli-fooscript" plugin would communicate with Broccoli:
 
 ```
                             +------------------------+
@@ -110,8 +110,8 @@ ends up running on. For example, here is how a hypothetical
                        +----+                        |
                        |    +-----------+------------+
                        |                |
-npm dependency:        |                | broccoli-plugin base class interface (simple),
-broccoli-plugin ^1.2.3 |                | described in the broccoli-plugin README
+npm dependency:        |                | broccoli-plugin base class interface (easy to
+broccoli-plugin ^1.2.3 |                | use), described in the broccoli-plugin README
                        |                |
                        |    +-----------+------------+
                        +---->                        |
@@ -129,19 +129,18 @@ broccoli-plugin ^1.2.3 |                | described in the broccoli-plugin READM
                             +------------------------+
 ```
 
-So why do we go through broccoli-plugin as a layer of indirection, rather than
-exposing its API directly from Broccoli? There's two reasons:
+As discussed, this setup allows us to make changes to the node API without
+causing breakage. As we make changes, we add compatibility code to the
+Broccoli `Builder` and to broccoli-plugin, which will get invoked depending on
+the API version in use.
 
-First, recall that broccoli-plugin contains a bunch of compatibility code that
-gets activated depending on the Broccoli version.
-
-Second, having a broccoli-plugin base class allows us to make incompatible
-changes to the broccoli-plugin interface: If we change our mind about some
-part of the interface, we can simply redo it and release broccoli-plugin 2.0.
-If broccoli-fooscript uses broccoli-plugin 1.2.3, and a newer plugin
-broccoli-barscript uses broccoli-plugin 2.0.0, they can both coexist in a
-single application. Both will, under the hood, use the same node API to
-communicate with Broccoli. In other words, we are now playing to npm's
+Furthermore, this setup allows us to make *incompatible* changes to the
+broccoli-plugin base class interface without causing breakage: If we change
+our mind about some part of the interface, we can simply redo it and release
+broccoli-plugin 2.0.0. If broccoli-fooscript uses broccoli-plugin 1.2.3, and a
+newer plugin broccoli-barscript uses broccoli-plugin 2.0.0, they can both
+coexist in a single application. Both will, under the hood, use the same node
+API to communicate with Broccoli. In other words, we are now playing to npm's
 strengths:
 
 ```
