@@ -131,7 +131,7 @@ broccoli-plugin ^1.2.3 |                | use), described in the broccoli-plugin
 
 As discussed, this setup allows us to make changes to the node API without
 causing breakage. As we make changes, we add compatibility code to the
-Broccoli `Builder` and to broccoli-plugin, which will get invoked depending on
+Broccoli Builder and to broccoli-plugin, which will get invoked depending on
 the API version in use.
 
 Furthermore, this setup allows us to make *incompatible* changes to the
@@ -166,12 +166,13 @@ Every node must have two special properties:
 * `node.__broccoliFeatures__`: the node's feature set, indicating the API version
 
 * `node.__broccoliGetInfo__: function(builderFeatures) { /* return nodeInfo */ }`:
-  a function to be called by the `Builder`, taking the builder's feature set
-  as an argument and returning a `nodeInfo` object, described below
+  a function to be called by the Builder, taking the Builder's feature set as
+  an argument and returning a `nodeInfo` object, described below
 
-The double underscores are meant to indicate magicness, not privateness. In
-fact, these two properties are a node's *only* public API that you should rely
-on.
+Aside: The double underscores are meant to indicate magicness, not
+privateness. In fact, these two properties are a node's *only* public API.
+However, you usually still shouldn't access them directly, but rather use
+[broccoli-node-info](https://github.com/broccolijs/broccoli-node-info).
 
 The Builder must check every node's feature set (`node.__broccoliFeatures__`).
 If the node's feature set is older than the Builder's feature set, the Builder
@@ -183,7 +184,7 @@ The node, conversely, must check the Builder's feature set
 feature set, the node shall return a `nodeInfo` object according to the
 Builder's older API specification.
 
-The `node.__broccoliGetInfo__` function may be called multiple times, so it
+The `node.__broccoliGetInfo__()` function may be called multiple times, so it
 should be side-effect free.
 
 The next section describes the `nodeInfo` object returned by
@@ -191,17 +192,32 @@ The next section describes the `nodeInfo` object returned by
 
 ### The `nodeInfo` object
 
-Every `nodeInfo` has a `nodeInfo.nodeType` property, which must be either
-`'transform'` or `'source'`. This property determines what other properties
-are present:
+* `nodeInfo.name` {string}:
+  The name of the plugin that this node is an instance of. Example:
+  `'BroccoliMergeTrees'`
+
+* `nodeInfo.annotation` {string or null/undefined}:
+  A description of this particular node. Useful to tell multiple instances of
+  the same plugin apart during debugging. Example: `'vendor directories'`
+
+* `nodeInfo.instantiationStack` {string}:
+  A stack trace generated when the node constructor ran. Useful for telling
+  where a given node was instantiated during debugging. This is `(new
+  Error).stack` without the first line.
+
+* `nodeInfo.nodeType` {string}:
+  Either `'transform'` or `'source'`, indicating the node type.
+
+  Properties specific to either `nodeType` are discussed in the following two
+  sections:
 
 #### Transform nodes
 
-"Transform" nodes are used to transform a set of zero or more input
-directories (often exactly one) into an output directory, for example by a
-compiler. Their `nodeInfo` objects have the following properties:
-
-* `nodeInfo.nodeType` {string}: `'transform'`
+Nodes with `nodeType: "transform"` are used to transform a set of zero or more
+input directories (often exactly one) into an output directory, for example by
+a compiler. They are typically instances of a
+[broccoli-plugin](https://github.com/broccolijs/broccoli-plugin) subclass. The
+following `nodeInfo` properties are specific to "transform" nodes:
 
 * `nodeInfo.inputNodes` {Array}:
   Zero or more Broccoli nodes to be used as input to this node.
@@ -255,25 +271,13 @@ compiler. Their `nodeInfo` objects have the following properties:
   between Broccoli server restarts or `broccoli build` invocations even if
   `persistentOutput` is true.
 
-* `nodeInfo.name` {string}:
-  The name of the plugin that this node is an instance of. Example:
-  `'BroccoliMergeTrees'`
-
-* `nodeInfo.annotation` {string or null/undefined}:
-  A description of this particular node. Useful to tell multiple instances of
-  the same plugin apart during debugging. Example: `'vendor directories'`
-
-* `nodeInfo.instantiationStack` {string}:
-  A stack trace generated when the node constructor ran. Useful for telling
-  where a given node was instantiated during debugging. This is `(new
-  Error).stack` without the first line.
 
 #### Source nodes
 
-"Source" nodes describe source directories on disk. Their `nodeInfo` objects
-have the following properties:
-
-* `nodeInfo.nodeType` {string}: `'source'`
+Nodes with `nodeType: "source"` describe source directories on disk. They are
+typically instances of a
+[broccoli-source](https://github.com/broccolijs/broccoli-source) class. The
+following `nodeInfo` properties are specific to "source" nodes:
 
 * `nodeInfo.sourceDirectory` {string}:
   A path to an existing directory on disk, relative to the current working
@@ -287,15 +291,6 @@ have the following properties:
 
   Setting this to `false` is useful to improve performance for large vendor
   directories that are unlikely to change.
-
-* `nodeInfo.name` {string}:
-  The name of the plugin that this node is an instance of.
-
-* `nodeInfo.annotation` {string or null/undefined}:
-  A description to help with debugging.
-
-* `nodeInfo.instantiationStack` {string}:
-  A stack trace generated when the node constructor ran.
 
 ### Older API versions
 
