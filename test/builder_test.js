@@ -138,8 +138,6 @@ describe('Builder', function() {
 
     describe('persistentOutput flag', function() {
       multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
-        if (version === '1.0.0') return // continue
-
         BuildOncePlugin.prototype = Object.create(Plugin.prototype)
         BuildOncePlugin.prototype.constructor = BuildOncePlugin
         function BuildOncePlugin(options) {
@@ -170,9 +168,11 @@ describe('Builder', function() {
             return expect(isPersistent({})).to.be.eventually.false
           })
 
-          it('is persistent with persistentOutput: true', function() {
-            return expect(isPersistent({ persistentOutput: true })).to.be.eventually.true
-          })
+          if (version !== '1.0.0') {
+            it('is persistent with persistentOutput: true', function() {
+              return expect(isPersistent({ persistentOutput: true })).to.be.eventually.true
+            })
+          }
         })
       })
     })
@@ -586,6 +586,12 @@ describe('Builder', function() {
           )
         })
       })
+    })
+  })
+
+  describe('Builder interface', function() {
+    it('has a features hash', function() {
+      expect(Builder.prototype).to.have.deep.property('features.persistentOutputFlag', true)
     })
   })
 })

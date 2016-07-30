@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/broccolijs/broccoli",
   "dependencies": {
+    "broccoli-node-info": "1.0.0",
     "broccoli-kitchen-sink-helpers": "^0.3.0",
     "broccoli-slow-trees": "^2.0.0",
     "broccoli-source": "^1.1.0",
