@@ -186,9 +186,121 @@ Builder's older API specification.
 The `node.__broccoliGetInfo__` function may be called multiple times, so it
 should be side-effect free.
 
-### Version 3 (current)
+The next section describes the `nodeInfo` object returned by
+`node.__broccoliFeatures__` in the most recent version of the API:
 
-Feature set (`node.__broccoliFeatures__` and `builderFeatures`):
+### The `nodeInfo` object
+
+Every `nodeInfo` has a `nodeInfo.nodeType` property, which must be either
+`'transform'` or `'source'`. This property determines what other properties
+are present:
+
+#### Transform nodes
+
+"Transform" nodes are used to transform a set of zero or more input
+directories (often exactly one) into an output directory, for example by a
+compiler. Their `nodeInfo` objects have the following properties:
+
+* `nodeInfo.nodeType` {string}: `'transform'`
+
+* `nodeInfo.inputNodes` {Array}:
+  Zero or more Broccoli nodes to be used as input to this node.
+
+* `nodeInfo.setup` {`function(inputPaths, outputPath, cachePath)`, no
+  return value}:
+  The `Builder` will call this function once before the first build. This
+  function will not be called more than once throughout the lifetime of the
+  node.
+
+    * `inputPath` {Array}:
+      An array of paths corresponding to `nodeInfo.inputNodes`. When building,
+      the node may read from these paths, but must never write to them.
+
+    * `outputPath` {string}:
+      A path to an empty directory for the node to write its output to when
+      building.
+
+    * `cachePath` {string}:
+      A path to an empty directory for the node to store files it wants to
+      keep around between builds. This directory will only be deleted when the
+      Broccoli process terminates (for example, when the Broccoli server is
+      restarted).
+
+* `nodeInfo.getCallbackObject` {`function()`, returns an object}:
+  The Builder will call this function once after it has called `setup`. This
+  function will not be called more than once throughout the lifetime of the
+  node. The object returned must have a `build` property, which is the
+  function that the builder will call on each rebuild:
+
+  ```js
+  var callbackObject = nodeInfo.getCallbackObject()
+  // For each rebuild:
+  callbackObject.build() // => promise
+  ```
+
+  Properties other than `.build` will be ignored.
+
+  The `build` function is responsible for performing the node's main work. It
+  may throw an exception, which will be reported as a build error by Broccoli.
+  If the `build` function performs asynchronous work, it must return a promise
+  that is resolved on completion of the asynchronous work, or rejected if
+  there is an error. Return values other than promises are ignored.
+
+* `nodeInfo.persistentOutput` {boolean}:
+  If `false`, then between rebuilds, the Builder will delete the `outputPath`
+  directory recursively and recreate it as an empty directory. If `true`, the
+  Builder will do nothing.
+
+  Note that just like `cachePath`, the `outputPath` directory will not persist
+  between Broccoli server restarts or `broccoli build` invocations even if
+  `persistentOutput` is true.
+
+* `nodeInfo.name` {string}:
+  The name of the plugin that this node is an instance of. Example:
+  `'BroccoliMergeTrees'`
+
+* `nodeInfo.annotation` {string or null/undefined}:
+  A description of this particular node. Useful to tell multiple instances of
+  the same plugin apart during debugging. Example: `'vendor directories'`
+
+* `nodeInfo.instantiationStack` {string}:
+  A stack trace generated when the node constructor ran. Useful for telling
+  where a given node was instantiated during debugging. This is `(new
+  Error).stack` without the first line.
+
+#### Source nodes
+
+"Source" nodes describe source directories on disk. Their `nodeInfo` objects
+have the following properties:
+
+* `nodeInfo.nodeType` {string}: `'source'`
+
+* `nodeInfo.sourceDirectory` {string}:
+  A path to an existing directory on disk, relative to the current working
+  directory.
+
+* `nodeInfo.watched` {boolean}:
+  If `false`, changed files in the `sourceDirectory` will not trigger rebuilds
+  (though they might still be picked up by subsequent rebuilds). If `true`,
+  instructs the Broccoli file system watcher to watch the `sourceDirectory`
+  recursively and trigger a rebuild whenever a file changes.
+
+  Setting this to `false` is useful to improve performance for large vendor
+  directories that are unlikely to change.
+
+* `nodeInfo.name` {string}:
+  The name of the plugin that this node is an instance of.
+
+* `nodeInfo.annotation` {string or null/undefined}:
+  A description to help with debugging.
+
+* `nodeInfo.instantiationStack` {string}:
+  A stack trace generated when the node constructor ran.
+
+### Older API versions
+
+In the current API version, the feature set (`node.__broccoliFeatures__` and
+`builderFeatures`) is the following object:
 
 ```js
 {
@@ -197,142 +309,30 @@ Feature set (`node.__broccoliFeatures__` and `builderFeatures`):
 }
 ```
 
-The `nodeInfo` object returned by `node.__broccoliGetInfo__` has a
-`nodeInfo.nodeType` property, which must be either `'transform'` or
-`'source'`. This property determines what other properties are present:
+We will now describe all older API versions in reverse chronological order by
+removing the feature flags one by one:
 
-* "Transform" nodes are used to transform a set of zero or more input
-  directories (often exactly one) into an output directory, for example
-  by a compiler. Their `nodeInfo` objects have the following properties:
+<!-- Add new feature flags to the top of the list. -->
 
-    * `nodeInfo.nodeType` {string}:
-      `'transform'`
+#### No `sourceDirectories` feature flag
 
-    * `nodeInfo.inputNodes` {Array}:
-      Zero or more Broccoli nodes to be used as input to this node.
+The `nodeInfo.nodeType` property is absent. "Source" nodes are not allowed;
+all nodes are implicitly of type "transform".
 
-    * `nodeInfo.setup` {`function(inputPaths, outputPath, cachePath)`, no
-      return value}:
-      The Builder will call this function once before the first build. This
-      function will not be called more than once throughout the lifetime of
-      the node.
+#### No `persistentOutputFlag` feature flag
 
-        * `inputPath` {Array}:
-          An array of paths corresponding to `nodeInfo.inputNodes`. When
-          building, the node may read from these paths, but most never write
-          to them.
-        * `outputPath` {string}:
-          A path to an empty directory for the node to write its output to
-          when building.
+The `nodeInfo.persistentOutput` flag is absent. It is always treated as
+`false`.
 
-        * `cachePath` {string}:
-          A path to an empty directory for the node to store files it wants to
-          keep around between builds. This directory will only be deleted when
-          the Broccoli process terminates (for example, when the Broccoli
-          server is restarted).
-
-    * `nodeInfo.getCallbackObject` {`function()`, returns an object}:
-      The Builder will call this function once after it has called `setup`.
-      This function will not be called more than once throughout the lifetime
-      of the node. The object returned must have a `build` property, which is
-      the function that the builder will call on each rebuild:
-
-      ```js
-      var callbackObject = nodeInfo.getCallbackObject()
-      // For each rebuild:
-      callbackObject.build() // => promise
-      ```
-
-      Properties other than `.build` will be ignored.
-
-      The `build` function is responsible for performing the node's main work.
-      It may throw an exception, which will be reported as a build error by
-      Broccoli. If the `build` function performs asynchronous work, it must
-      return a promise that is resolved on completion of the asynchronous
-      work, or rejected if there is an error. Return values other than
-      promises are ignored.
-
-    * `nodeInfo.persistentOutput` {boolean}:
-      If `false`, then between rebuilds, the Builder will delete the
-      `outputPath` directory recursively and recreate it as an empty
-      directory. If `true`, the Builder will do nothing.
-
-      Note that just like `cachePath`, the `outputPath` directory will not
-      persist between Broccoli server restarts or `broccoli build` invocations
-      even if `persistentOutput` is true.
-
-    * `nodeInfo.name` {string}:
-      The name of the plugin that this node is an instance of. Example:
-      `'BroccoliMergeTrees'`
-
-    * `nodeInfo.annotation` {string or null/undefined}:
-      A description of this particular node. Useful to tell multiple instances
-      of the same plugin apart during debugging. Example: `'vendor
-      directories'`
-
-    * `nodeInfo.instantiationStack` {string}:
-      A stack trace generated when the node constructor ran. Useful for
-      telling where a given node was instantiated during debugging.
-      This is `(new Error).stack` without the first line.
-
-* "Source" nodes describe source directories on disk. Their `nodeInfo`
-  objects have the following properties:
-
-    * `nodeInfo.nodeType` {string}:
-      `'source'`
-
-    * `nodeInfo.sourceDirectory` {string}:
-      A path to an existing directory on disk, relative to the current working
-      directory.
-
-    * `nodeInfo.watched` {boolean}:
-      If `false`, changed files in the `sourceDirectory` will not trigger
-      rebuilds (though they might still be picked up by subsequent rebuilds).
-      If `true`, instructs the Broccoli file system watcher to watch the
-      `sourceDirectory` recursively and trigger a rebuild whenever a file
-      changes.
-
-      Setting this to `false` is useful to improve performance for large
-      vendor directories that are unlikely to change.
-
-    * `nodeInfo.name` {string}:
-      The name of the plugin that this node is an instance of.
-
-    * `nodeInfo.annotation` {string or null/undefined}:
-      A description to help with debugging.
-
-    * `nodeInfo.instantiationStack` {string}:
-      A stack trace generated when the node constructor ran.
-
-### Version 2
-
-Feature set (`node.__broccoliFeatures__` and `builderFeatures`):
-
-```js
-{
-  persistentOutputFlag: true
-}
-```
-
-Differences to version 3: The `nodeInfo.nodeType` property is absent. "Source"
-nodes are not allowed; all nodes are implicitly of type "transform".
-
-### Version 1
-
-Feature set (`node.__broccoliFeatures__` and `builderFeatures`):
-
-```js
-{
-}
-```
-
-Differences to version 2: The `nodeInfo.persistentOutput` property is absent.
-It is always treated as `false`.
+This is the first version of the modern Broccoli node API. Its feature set is
+empty (`{}`).
 
 ### Special case: string nodes
 
 For historical reasons, we support plain strings as nodes. These act like
-watched "source" nodes. For new projects, we recommend that you use
+watched "source" nodes.
+
+Plain string nodes are deprecated. For new projects, we recommend that you use
 [broccoli-source](https://github.com/broccolijs/broccoli-source) instead, as
 it greatly improves the debugging experience.
 
