@@ -101,7 +101,7 @@ You can find plugins under the [broccoli-plugin keyword](https://www.npmjs.org/b
 ### Running Broccoli, Directly or Through Other Tools
 
 * [broccoli-timepiece](https://github.com/rjackson/broccoli-timepiece)
-* [grunt-broccoli](https://github.com/quandl/grunt-broccoli)
+* [grunt-broccoli](https://github.com/embersherpa/grunt-broccoli)
 * [grunt-broccoli-build](https://github.com/ericf/grunt-broccoli-build)
 
 ### Helpers
