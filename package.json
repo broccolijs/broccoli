@@ -44,6 +44,7 @@
     "multidep": "^2.0.0",
     "sinon": "^1.17.1",
     "sinon-chai": "^2.8.0",
+    "supertest": "^1.1.0",
     "symlink-or-copy": "^1.0.1"
   },
   "engines": {
