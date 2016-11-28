@@ -15,7 +15,7 @@ var chaiAsPromised = require('chai-as-promised'); chai.use(chaiAsPromised)
 var sinonChai = require('sinon-chai'); chai.use(sinonChai)
 var multidepRequire = require('multidep')('test/multidep.json')
 
-var Plugin = multidepRequire('broccoli-plugin', '1.2.0')
+var Plugin = multidepRequire('broccoli-plugin', '1.2.2')
 var broccoliSource = multidepRequire('broccoli-source', '1.1.0')
 
 // Clean up left-over temporary directories on uncaught exception.
@@ -274,7 +274,7 @@ describe('Builder', function() {
         // Very common subcase of invalid input nodes
         expect(function() {
           new Builder(new plugins.MergePlugin([undefined], { annotation: 'some annotation' }))
-        }).to.throw(Builder.InvalidNodeError, /undefined is not a Broccoli node\nused as input node to MergePlugin \(some annotation\)\n-~- created here: -~-/)
+        }).to.throw(/MergePlugin \(some annotation\): Expected Broccoli node, got undefined for inputNodes\[0\]/)
       })
 
       it('catches .read/.rebuild-based root nodes', function() {
