@@ -14,8 +14,9 @@ var chai = require('chai'), expect = chai.expect
 var chaiAsPromised = require('chai-as-promised'); chai.use(chaiAsPromised)
 var sinonChai = require('sinon-chai'); chai.use(sinonChai)
 var multidepRequire = require('multidep')('test/multidep.json')
+var semver = require('semver')
 
-var Plugin = multidepRequire('broccoli-plugin', '1.2.2')
+var Plugin = multidepRequire('broccoli-plugin', '1.3.0')
 var broccoliSource = multidepRequire('broccoli-source', '1.1.0')
 
 // Clean up left-over temporary directories on uncaught exception.
@@ -117,7 +118,7 @@ describe('Builder', function() {
           })
         })
 
-        it('supplies a cachePath', function() {
+        it('supplies a cachePath by default', function() {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
@@ -133,7 +134,47 @@ describe('Builder', function() {
           builder = new Builder(new CacheTestPlugin)
           return builder.build()
         })
+
+        it('supplies a cachePath when requested', function() {
+          // inputPath and outputPath are tested implicitly by the other tests,
+          // but cachePath isn't, so we have this test case
+
+          CacheTestPlugin.prototype = Object.create(Plugin.prototype)
+          CacheTestPlugin.prototype.constructor = CacheTestPlugin
+          function CacheTestPlugin() {
+            Plugin.call(this, [], {
+              needsCache: true
+            })
+          }
+          CacheTestPlugin.prototype.build = function() {
+            expect(fs.existsSync(this.cachePath)).to.be.true
+          }
+
+          builder = new Builder(new CacheTestPlugin)
+          return builder.build()
+        })
       })
+
+      if (version === 'master' || semver.gt(version, '1.3.0')) {
+        it('does not create a cachePath when opt-ed out', function() {
+          // inputPath and outputPath are tested implicitly by the other tests,
+          // but cachePath isn't, so we have this test case
+
+          CacheTestPlugin.prototype = Object.create(Plugin.prototype)
+          CacheTestPlugin.prototype.constructor = CacheTestPlugin
+          function CacheTestPlugin() {
+            Plugin.call(this, [], {
+              needsCache: false
+            })
+          }
+          CacheTestPlugin.prototype.build = function() {
+            expect(this.cachePath).to.equal(undefined)
+          }
+
+          builder = new Builder(new CacheTestPlugin)
+          return builder.build()
+        })
+      }
     })
 
     describe('persistentOutput flag', function() {
@@ -557,7 +598,8 @@ describe('Builder', function() {
             nodeType: 'transform',
             name: 'MergePlugin',
             annotation: null,
-            persistentOutput: false
+            persistentOutput: false,
+            needsCache: true
           },
           buildState: {
             selfTime: 1,
