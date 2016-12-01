@@ -1,2 +1,8 @@
-logo
-test/multidep
+/.jshint*
+/.gitignore
+/.npmignore
+/.travis.yml
+/logo
+/test
+/docs
+/appveyor.yml
