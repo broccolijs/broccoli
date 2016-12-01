@@ -1,5 +1,6 @@
 # master
 
+* Builder throws an error when a watched input directory is missing
 * Rework watcher
 * Pull broccoli-sane-watcher functionality into core
 * Update findup-sync dependency

@@ -213,14 +213,26 @@ describe('Builder', function() {
       expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic'])
     })
 
-    it('fails when a source directory doesn\'t exist', function() {
+    it('fails construction when a watched source directory doesn\'t exist', function() {
+      expect(function() {
+        new Builder(new broccoliSource.WatchedDir('test/fixtures/doesnotexist'))
+      }).to.throw(Builder.BuilderError, 'Directory not found: test/fixtures/doesnotexist')
+    })
+
+    it('fails construction when a watched source directory is a file', function() {
+      expect(function() {
+        new Builder(new broccoliSource.WatchedDir('test/fixtures/basic/foo.txt'))
+      }).to.throw(Builder.BuilderError, 'Not a directory: test/fixtures/basic/foo.txt')
+    })
+
+    it('fails when an unwatched source directory doesn\'t exist', function() {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/doesnotexist'))
       // Note: `ENOENT:` or `ENOENT,` depending on Node version
       return expect(builder.build()).to.be.eventually.rejectedWith(Builder.BuildError,
         /test\/fixtures\/doesnotexist: ENOENT. no such file or directory/)
     })
 
-    it('fails when a source directory is a file', function() {
+    it('fails when an unwatched source directory is a file', function() {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/basic/foo.txt'))
       return expect(builder.build()).to.be.eventually.rejectedWith(Builder.BuildError,
         /test\/fixtures\/basic\/foo\.txt: Not a directory/)
