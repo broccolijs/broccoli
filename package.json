@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/broccolijs/broccoli",
   "dependencies": {
-    "broccoli-kitchen-sink-helpers": "^0.3.0",
     "broccoli-node-info": "1.0.0",
     "broccoli-slow-trees": "^2.0.0",
     "broccoli-source": "^1.1.0",
@@ -28,9 +27,11 @@
     "copy-dereference": "^1.0.0",
     "findup-sync": "^0.4.2",
     "handlebars": "^4.0.4",
+    "heimdalljs-logger": "^0.1.7",
     "mime": "^1.2.11",
     "rimraf": "^2.4.3",
     "rsvp": "^3.0.17",
+    "sane": "^1.4.1",
     "tmp": "0.0.28",
     "underscore.string": "^3.2.2"
   },

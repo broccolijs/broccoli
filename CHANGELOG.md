@@ -1,5 +1,7 @@
 # master
 
+* Rework watcher
+* Pull broccoli-sane-watcher functionality into core
 * Update findup-sync dependency
 
 # 1.0.0-beta.7
