@@ -61,7 +61,7 @@ If you depend on the "broccoli" package directly, then bump the version spec
 in your `package.json` like so:
 
 ```json
-"broccoli": "^1.0.0-beta.2"
+"broccoli": "^1.0.0"
 ```
 
 The command-line interface (`broccoli serve` and `broccoli build`) is still
@@ -76,7 +76,7 @@ if you still want to give Broccoli 1.0 a spin right now, try using the
 following hack:
 
 ```bash
-npm install broccoli@^1.0.0-beta.2
+npm install broccoli@latest
 echo "module.exports = require('./ember-cli-build')();" > Brocfile.js
 broccoli serve
 ```
