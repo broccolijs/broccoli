@@ -1,5 +1,7 @@
 # master
 
+# 1.0.0
+
 * Release without change
 
 # 1.0.0-beta.8
