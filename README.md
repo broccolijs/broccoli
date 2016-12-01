@@ -13,11 +13,6 @@ runs on Node and is backend-agnostic. For background and architecture, see the
 For the command line interface, see
 [broccoli-cli](https://github.com/broccolijs/broccoli-cli).
 
-**This is 0.x beta software.**
-
-Windows support is still spotty. Our biggest pain point is unreliable file
-deletion (see [rimraf#72](https://github.com/isaacs/rimraf/issues/72)).
-
 ## Installation
 
 ```bash
@@ -89,11 +84,6 @@ running `broccoli build the-output` would generate the following folder:
        ├─ main.js
        └─ helper.js
 
-### A larger example
-
-You can see a full-featured `Brocfile.js` in
-[broccoli-sample-app](https://github.com/broccolijs/broccoli-sample-app/blob/master/Brocfile.js).
-
 ## Plugins
 
 You can find plugins under the [broccoli-plugin keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
@@ -108,74 +98,16 @@ You can find plugins under the [broccoli-plugin keyword](https://www.npmjs.org/b
 
 Shared code for writing plugins.
 
+* [broccoli-plugin](https://github.com/broccolijs/broccoli-plugin)
 * [broccoli-caching-writer](https://github.com/rjackson/broccoli-caching-writer)
 * [broccoli-filter](https://github.com/broccolijs/broccoli-filter)
-* [broccoli-writer](https://github.com/broccolijs/broccoli-writer)
-* [node-quick-temp](https://github.com/joliss/node-quick-temp)
 
 ## Plugin API Specification
 
-*This section needs to be updated. For now, see
-[docs/broccoli-1-0-plugin-api.md](docs/broccoli-1-0-plugin-api.md) and the
-[broccoli-plugin README](https://github.com/broccolijs/broccoli-plugin).*
+See [docs/node-api.md](docs/node-api.md).
 
-Broccoli defines a single plugin API: a tree. A tree object represents a tree
-(directory hierarchy) of files that will be regenerated on each build.
-
-By convention, plugins will export a function that takes one or more input
-trees, and returns an output tree object. Usually your plugin will be
-implemented as a class representing a tree, but it is recommended to make the
-`new` operator optional
-([example](https://github.com/joliss/broccoli-coffee/blob/a55b3a6677f6d9da83334e9c916ae5e57895d1a6/index.js#L8)).
-
-A tree object must supply two methods that will be called by Broccoli:
-
-### `tree.read(readTree)`
-
-The `.read` method must return a path or a promise for a path, containing the
-tree contents.
-
-It receives a `readTree` function argument from Broccoli. If `.read` needs to
-read other trees, it must not call `otherTree.read` directly. Instead, it must
-call `readTree(otherTree)`, which returns a promise for the path containing
-`otherTree`'s contents. It must not call `readTree` again until the promise
-has resolved; that is, it cannot call `readTree` on multiple trees in
-parallel.
-
-Broccoli will call the `.read` method repeatedly to rebuild the tree, but at
-most once per rebuild; that is, if a tree is used multiple times in a build
-definition, Broccoli will reuse the path returned instead of calling `.read`
-again.
-
-The `.read` method is responsible for creating a new temporary directory to
-store the tree contents in. Subsequent invocations of `.read` should remove
-temporary directories created in previous invocations.
-
-### `tree.cleanup()`
-
-For every tree whose `.read` method was called one or more times, the
-`.cleanup` method will be called exactly once. No further `.read` calls will
-follow `.cleanup`. The `.cleanup` method should remove all temporary
-directories created by `.read`.
-
-### Debugging
-
-
-#### Errors
-
-When it is known which file caused a given error, plugin authors can make errors
-easier to track down by setting the `.file` property on the generated error.
-
-This `.file` property is used by both the console logging, and the server middleware
-to display more helpful error messages.
-
-#### Descriptive Naming
-
-As of 0.11 Broccoli prints a log of any trees that took a significant amount of the total
-build time to assist in finding which trees are consuming the largest build times.
-
-To determine the name to be printed Broccoli will first look for a `.description`
-property on the plugin instance then fall back to using the plugin constructor's name.
+Also see [docs/broccoli-1-0-plugin-api.md](docs/broccoli-1-0-plugin-api.md) on
+how to upgrade from Broccoli 0.x to the Broccoli 1.x API.
 
 ## Security
 
