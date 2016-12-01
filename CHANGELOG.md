@@ -1,5 +1,7 @@
 # master
 
+* Release without change
+
 # 1.0.0-beta.8
 
 * Builder throws an error when a watched input directory is missing
