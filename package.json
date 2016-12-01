@@ -36,7 +36,6 @@
     "underscore.string": "^3.2.2"
   },
   "devDependencies": {
-    "broccoli-plugin": "^1.2.0",
     "chai": "^3.3.0",
     "chai-as-promised": "^5.1.0",
     "fixturify": "^0.2.0",
