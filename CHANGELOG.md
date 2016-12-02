@@ -1,5 +1,10 @@
 # master
 
+# 1.1.0
+
+* Add `needsCache` to `pluginInterface`. Allows opting out of cache directory
+  creation.
+
 # 1.0.0
 
 * Release without change
