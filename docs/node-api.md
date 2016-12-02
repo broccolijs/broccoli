@@ -108,21 +108,21 @@ hypothetical "broccoli-fooscript" plugin would communicate with Broccoli:
                             |                        |
                             |   broccoli-fooscript   |
                        +----+                        |
-                       |    +-----------+------------+
+                       |    +-----------|------------+
                        |                |
 npm dependency:        |                | broccoli-plugin base class interface (easy to
 broccoli-plugin ^1.2.3 |                | use), described in the broccoli-plugin README
                        |                |
-                       |    +-----------+------------+
+                       |    +-----------|------------+
                        +---->                        |
                             | broccoli-plugin 1.2.3  |
                             |                        |
-                            +-----------+------------+
+                            +-----------|------------+
                                         |
 (no npm dependency here)                | Broccoli node API (versioned, complex),
                                         | described in this document
                                         |
-                            +-----------+------------+
+                            +-----------|------------+
                             |                        |
                             |   broccoli (Builder)   |
                             |                        |
@@ -242,6 +242,9 @@ following `nodeInfo` properties are specific to "transform" nodes:
       Broccoli process terminates (for example, when the Broccoli server is
       restarted).
 
+      If a `cachePath` is not needed/desired, a plugin can opt-out of its creation
+      via the `needsCache` flag metioned below.
+
 * `nodeInfo.getCallbackObject` {`function()`, returns an object}:
   The Builder will call this function once after it has called `setup`. This
   function will not be called more than once throughout the lifetime of the
@@ -271,6 +274,9 @@ following `nodeInfo` properties are specific to "transform" nodes:
   between Broccoli server restarts or `broccoli build` invocations even if
   `persistentOutput` is true.
 
+* `nodeInfo.needsCache` {boolean}:
+  If `false`, a cache directory will not be created. If `true`, a cache directory
+  will be created and its path will be available as `this.cachePath`.
 
 #### Source nodes
 
