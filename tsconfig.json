@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "noEmitOnError": true,
+    "noEmit": true
+  },
+  "files": [
+    "test/types_test.ts"
+  ]
+}

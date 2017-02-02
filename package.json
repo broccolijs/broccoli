@@ -4,6 +4,7 @@
   "version": "1.1.0",
   "author": "Jo Liss <joliss42@gmail.com>",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "license": "MIT",
   "keywords": [
     "builder",
@@ -19,6 +20,8 @@
   },
   "homepage": "https://github.com/broccolijs/broccoli",
   "dependencies": {
+    "@types/node": ">4",
+    "@types/rsvp": "^3.0.0",
     "broccoli-node-info": "1.1.0",
     "broccoli-slow-trees": "^2.0.0",
     "broccoli-source": "^1.1.0",
@@ -45,13 +48,14 @@
     "semver": "^5.3.0",
     "sinon": "^1.17.1",
     "sinon-chai": "^2.8.0",
-    "symlink-or-copy": "^1.0.1"
+    "symlink-or-copy": "^1.0.1",
+    "typescript": "^2.1.5"
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "scripts": {
     "pretest": "multidep test/multidep.json",
-    "test": "mocha"
+    "test": "mocha && tsc"
   }
 }
