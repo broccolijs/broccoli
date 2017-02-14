@@ -1,5 +1,7 @@
 # master
 
+# 1.1.1
+
 * Fix option parsing for `--port`
 
 # 1.1.0
