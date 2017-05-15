@@ -1,5 +1,7 @@
 # master
 
+* Update findup-sync dependency
+
 # 1.1.1
 
 * Fix option parsing for `--port`

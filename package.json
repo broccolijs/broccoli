@@ -25,7 +25,7 @@
     "commander": "^2.5.0",
     "connect": "^3.3.3",
     "copy-dereference": "^1.0.0",
-    "findup-sync": "^0.4.2",
+    "findup-sync": "^1.0.0",
     "handlebars": "^4.0.4",
     "heimdalljs-logger": "^0.1.7",
     "mime": "^1.2.11",
