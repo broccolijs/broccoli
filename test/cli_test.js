@@ -9,21 +9,17 @@ chai.use(sinonChai)
 
 describe('cli', function() {
     var mock = null
+    var oldCwd = null
     beforeEach(function() {
+        oldCwd = process.cwd()
+        process.chdir('test/fixtures/project/subdir')
         cli = require('../lib/cli')
         mock = sinon.mock(broccoli.server)
-        sinon.stub(broccoli, 'loadBrocfile', function() {
-            return new broccoli.Builder('test/fixtures')
-        })
-        sinon.stub(broccoli, 'Builder', function() {
-            return { watchedPaths: [], build: function() { return new global.Promise(function() {}) }, cleanup: function() {} }
-        })
     })
 
     afterEach(function() {
+        process.chdir(oldCwd)
         mock.restore()
-        broccoli.loadBrocfile.restore()
-        broccoli.Builder.restore()
         delete require.cache[require.resolve('commander')]
         delete require.cache[require.resolve('../lib/cli')]
     })
