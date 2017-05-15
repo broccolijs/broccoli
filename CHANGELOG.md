@@ -1,5 +1,7 @@
 # master
 
+# 1.1.2
+
 * Update findup-sync dependency
 
 # 1.1.1
