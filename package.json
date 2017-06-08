@@ -20,7 +20,7 @@
   "homepage": "https://github.com/broccolijs/broccoli",
   "dependencies": {
     "broccoli-node-info": "1.1.0",
-    "broccoli-slow-trees": "^2.0.0",
+    "broccoli-slow-trees": "3.0.1",
     "broccoli-source": "^1.1.0",
     "commander": "^2.5.0",
     "connect": "^3.3.3",
@@ -30,9 +30,9 @@
     "heimdalljs-logger": "^0.1.7",
     "mime": "^1.2.11",
     "rimraf": "^2.4.3",
-    "rsvp": "^3.0.17",
+    "rsvp": "^3.5.0",
     "sane": "^1.4.1",
-    "tmp": "0.0.28",
+    "tmp": "0.0.31",
     "underscore.string": "^3.2.2"
   },
   "devDependencies": {
