@@ -20,7 +20,7 @@
   "homepage": "https://github.com/broccolijs/broccoli",
   "dependencies": {
     "broccoli-node-info": "1.1.0",
-    "broccoli-slow-trees": "3.0.1",
+    "broccoli-slow-trees": "2.0.0",
     "broccoli-source": "^1.1.0",
     "commander": "^2.5.0",
     "connect": "^3.3.3",
