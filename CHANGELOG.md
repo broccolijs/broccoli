@@ -1,5 +1,7 @@
 # master
 
+* Roll back broccoli-slow-trees dependency
+
 # 1.1.3
 
 * Update dependencies
