@@ -3,13 +3,15 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 6,
   },
-  extends: 'eslint:recommended',
+  plugins: ['node'],
+  extends: ['eslint:recommended', 'plugin:node/recommended'],
   env: {
     node: true
   },
   rules: {
     'no-unused-vars': 'off',
     'no-console': 'off',
+    'no-process-exit': 'off',
   },
   overrides: [
     {
