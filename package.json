@@ -52,6 +52,7 @@
   },
   "scripts": {
     "pretest": "multidep test/multidep.json",
-    "test": "mocha"
+    "test": "mocha",
+    "test:debug": "mocha --inspect-brk"
   }
 }
