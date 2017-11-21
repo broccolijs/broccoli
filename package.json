@@ -48,7 +48,7 @@
     "symlink-or-copy": "^1.0.1"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 4"
   },
   "scripts": {
     "pretest": "multidep test/multidep.json",
