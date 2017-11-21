@@ -645,7 +645,7 @@ describe('Builder', function() {
 
   describe('Builder interface', function() {
     it('has a features hash', function() {
-      expect(Builder.prototype).to.have.deep.property('features.persistentOutputFlag', true)
+      expect(Builder.prototype).to.have.nested.property('features.persistentOutputFlag', true)
     })
   })
 })
