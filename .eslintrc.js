@@ -16,8 +16,13 @@ module.exports = {
   overrides: [
     {
       files: ['test/**/*.js'],
+      plugins: ['mocha'],
       env: {
         mocha: true,
+      },
+      rules: {
+        'mocha/no-exclusive-tests': 'error',
+        'mocha/handle-done-callback': 'error',
       }
     }
   ],
