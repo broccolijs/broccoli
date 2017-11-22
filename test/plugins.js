@@ -83,9 +83,7 @@ module.exports = function(Plugin) {
     Plugin.call(this, inputNodes || []);
   }
   SleepingPlugin.prototype.build = function() {
-    return new RSVP.Promise(function(resolve) {
-      setTimeout(resolve, 10);
-    });
+    return new RSVP.Promise(resolve => setTimeout(resolve, 10));
   };
 
   return plugins;

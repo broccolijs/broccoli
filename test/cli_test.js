@@ -11,6 +11,7 @@ describe('cli', function() {
   let mock = null;
   let oldCwd = null;
   let cli;
+
   beforeEach(function() {
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');

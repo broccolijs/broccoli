@@ -25,7 +25,7 @@ const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup();
 
-RSVP.on('error', function(error) {
+RSVP.on('error', error => {
   throw error;
 });
 
@@ -34,9 +34,7 @@ RSVP.on('error', function(error) {
 const plugins = makePlugins(Plugin);
 
 function sleep() {
-  return new RSVP.Promise(function(resolve) {
-    setTimeout(resolve, 10);
-  });
+  return new RSVP.Promise(resolve => setTimeout(resolve, 10));
 }
 
 // Builder subclass that returns fixturify objects from .build()
@@ -47,9 +45,8 @@ function FixtureBuilder(/* ... */) {
 }
 
 FixtureBuilder.prototype.build = function() {
-  const self = this;
-  return Builder.prototype.build.call(this).then(function() {
-    return fixturify.readSync(self.outputPath);
+  return Builder.prototype.build.call(this).then(() => {
+    return fixturify.readSync(this.outputPath);
   });
 };
 
@@ -80,13 +77,15 @@ describe('Builder', function() {
         it('builds a single node, repeatedly', function() {
           const node = new plugins.VeggiesPlugin();
           const buildSpy = sinon.spy(node, 'build');
+
           builder = new FixtureBuilder(node);
+
           return expect(builder.build())
             .to.eventually.deep.equal({ 'veggies.txt': 'tasty' })
-            .then(function() {
+            .then(() => {
               return expect(builder.build()).to.eventually.deep.equal({ 'veggies.txt': 'tasty' });
             })
-            .then(function() {
+            .then(() => {
               expect(buildSpy).to.have.been.calledTwice;
             });
         });
@@ -95,18 +94,19 @@ describe('Builder', function() {
           const asyncNode = new plugins.AsyncPlugin();
           const outputNode = new plugins.MergePlugin([asyncNode]);
           const buildSpy = sinon.spy(outputNode, 'build');
+
           builder = new Builder(outputNode);
+
           const buildPromise = builder.build();
+
           return asyncNode.buildStarted
             .then(sleep)
-            .then(function() {
+            .then(() => {
               expect(buildSpy).not.to.have.been.called;
               asyncNode.finishBuild();
             })
-            .then(function() {
-              return buildPromise;
-            })
-            .then(function() {
+            .then(() => buildPromise)
+            .then(() => {
               expect(buildSpy).to.have.been.called;
             });
         });
@@ -115,12 +115,13 @@ describe('Builder', function() {
           const src = new plugins.VeggiesPlugin();
           const buildSpy = sinon.spy(src, 'build');
           const outputNode = new plugins.MergePlugin([src, src], { overwrite: true });
+
           return expect(buildToFixture(outputNode))
             .to.eventually.deep.equal({
               '0': { 'veggies.txt': 'tasty' },
               '1': { 'veggies.txt': 'tasty' },
             })
-            .then(function() {
+            .then(() => {
               expect(buildSpy).to.have.been.calledOnce;
             });
         });
@@ -185,9 +186,10 @@ describe('Builder', function() {
     });
 
     describe('persistentOutput flag', function() {
-      multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
+      multidepRequire.forEachVersion('broccoli-plugin', (version, Plugin) => {
         BuildOncePlugin.prototype = Object.create(Plugin.prototype);
         BuildOncePlugin.prototype.constructor = BuildOncePlugin;
+
         function BuildOncePlugin(options) {
           Plugin.call(this, [], options);
         }
@@ -201,17 +203,12 @@ describe('Builder', function() {
 
         function isPersistent(options) {
           const builder = new FixtureBuilder(new BuildOncePlugin(options));
+
           return builder
             .build()
-            .then(function() {
-              return builder.build();
-            })
-            .then(function(obj) {
-              return obj['foo.txt'] === 'test';
-            })
-            .finally(function() {
-              return builder.cleanup();
-            });
+            .then(() => builder.build())
+            .then(obj => obj['foo.txt'] === 'test')
+            .finally(() => builder.cleanup());
         }
 
         describe('broccoli-plugin ' + version, function() {
@@ -234,15 +231,19 @@ describe('Builder', function() {
       describe('broccoli-source ' + version, function() {
         it('records unwatched source directories', function() {
           builder = new FixtureBuilder(new broccoliSource.UnwatchedDir('test/fixtures/basic'));
+
           expect(builder.watchedPaths).to.deep.equal([]);
           expect(builder.unwatchedPaths).to.deep.equal(['test/fixtures/basic']);
+
           return expect(builder.build()).to.eventually.deep.equal({ 'foo.txt': 'OK' });
         });
 
         it('records watched source directories', function() {
           builder = new FixtureBuilder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+
           expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
           expect(builder.unwatchedPaths).to.deep.equal([]);
+
           return expect(builder.build()).to.eventually.deep.equal({ 'foo.txt': 'OK' });
         });
       });
@@ -250,31 +251,36 @@ describe('Builder', function() {
 
     it('records string (watched) source directories', function() {
       builder = new FixtureBuilder('test/fixtures/basic');
+
       expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
       expect(builder.unwatchedPaths).to.deep.equal([]);
+
       return expect(builder.build()).to.eventually.deep.equal({ 'foo.txt': 'OK' });
     });
 
     it('records source directories only once', function() {
       const src = 'test/fixtures/basic';
+
       builder = new FixtureBuilder(new plugins.MergePlugin([src, src]));
+
       expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
     });
 
     it("fails construction when a watched source directory doesn't exist", function() {
-      expect(function() {
+      expect(() => {
         new Builder(new broccoliSource.WatchedDir('test/fixtures/doesnotexist'));
       }).to.throw(Builder.BuilderError, 'Directory not found: test/fixtures/doesnotexist');
     });
 
     it('fails construction when a watched source directory is a file', function() {
-      expect(function() {
+      expect(() => {
         new Builder(new broccoliSource.WatchedDir('test/fixtures/basic/foo.txt'));
       }).to.throw(Builder.BuilderError, 'Not a directory: test/fixtures/basic/foo.txt');
     });
 
     it("fails when an unwatched source directory doesn't exist", function() {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/doesnotexist'));
+
       // Note: `ENOENT:` or `ENOENT,` depending on Node version
       return expect(builder.build()).to.be.eventually.rejectedWith(
         Builder.BuildError,
@@ -284,6 +290,7 @@ describe('Builder', function() {
 
     it('fails when an unwatched source directory is a file', function() {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/basic/foo.txt'));
+
       return expect(builder.build()).to.be.eventually.rejectedWith(
         Builder.BuildError,
         /test\/fixtures\/basic\/foo\.txt: Not a directory/
@@ -301,7 +308,7 @@ describe('Builder', function() {
       }
       CyclicalPlugin.prototype.build = function() {};
 
-      expect(function() {
+      expect(() => {
         new Builder(new CyclicalPlugin());
       }).to.throw(Builder.BuilderError, 'Cycle in node graph: CyclicalPlugin -> CyclicalPlugin');
     });
@@ -309,13 +316,13 @@ describe('Builder', function() {
     describe('invalid nodes', function() {
       const invalidNode = { 'not a node': true };
       const readBasedNode = {
-        read: function() {},
-        cleanup: function() {},
+        read() {},
+        cleanup() {},
         description: 'an old node',
       };
 
       it('catches invalid root nodes', function() {
-        expect(function() {
+        expect(() => {
           new Builder(invalidNode);
         }).to.throw(
           Builder.InvalidNodeError,
@@ -324,7 +331,7 @@ describe('Builder', function() {
       });
 
       it('catches invalid input nodes', function() {
-        expect(function() {
+        expect(() => {
           new Builder(new plugins.MergePlugin([invalidNode], { annotation: 'some annotation' }));
         }).to.throw(
           Builder.InvalidNodeError,
@@ -334,7 +341,7 @@ describe('Builder', function() {
 
       it('catches undefined input nodes', function() {
         // Very common subcase of invalid input nodes
-        expect(function() {
+        expect(() => {
           new Builder(new plugins.MergePlugin([undefined], { annotation: 'some annotation' }));
         }).to.throw(
           /MergePlugin \(some annotation\): Expected Broccoli node, got undefined for inputNodes\[0\]/
@@ -342,7 +349,7 @@ describe('Builder', function() {
       });
 
       it('catches .read/.rebuild-based root nodes', function() {
-        expect(function() {
+        expect(() => {
           new Builder(readBasedNode);
         }).to.throw(
           Builder.InvalidNodeError,
@@ -351,7 +358,7 @@ describe('Builder', function() {
       });
 
       it('catches .read/.rebuild-based input nodes', function() {
-        expect(function() {
+        expect(() => {
           new Builder(new plugins.MergePlugin([readBasedNode], { annotation: 'some annotation' }));
         }).to.throw(
           Builder.InvalidNodeError,
@@ -364,12 +371,12 @@ describe('Builder', function() {
   describe('temporary directories', function() {
     let tmpdir, tmpRemoveCallback;
 
-    beforeEach(function() {
+    beforeEach(() => {
       const tmpObj = tmp.dirSync({ prefix: 'broccoli_builder_test-', unsafeCleanup: true });
       tmpdir = tmpObj.name;
       tmpRemoveCallback = tmpObj.removeCallback;
     });
-    afterEach(function() {
+    afterEach(() => {
       if (builder) {
         builder.cleanup();
         builder = null;
@@ -395,12 +402,12 @@ describe('Builder', function() {
     });
 
     it('creates temporary directory in directory given by tmpdir options', function() {
-      builder = new Builder(new plugins.VeggiesPlugin(), { tmpdir: tmpdir });
+      builder = new Builder(new plugins.VeggiesPlugin(), { tmpdir });
       expect(hasBroccoliTmpDir(tmpdir)).to.be.true;
     });
 
     it('removes temporary directory when .cleanup() is called', function() {
-      builder = new Builder(new plugins.VeggiesPlugin(), { tmpdir: tmpdir });
+      builder = new Builder(new plugins.VeggiesPlugin(), { tmpdir });
       expect(hasBroccoliTmpDir(tmpdir)).to.be.true;
       builder.cleanup();
       builder = null;
@@ -422,8 +429,9 @@ describe('Builder', function() {
 
       it('reports failing node and instantiation stack, and cleans up temporary directory', function() {
         const node = new FailingSetupPlugin(new Error('foo error'));
-        expect(function() {
-          new Builder(node, { tmpdir: tmpdir });
+
+        expect(() => {
+          new Builder(node, { tmpdir });
         }).to.throw(
           Builder.NodeSetupError,
           /foo error\s+at FailingSetupPlugin\n-~- created here: -~-/
@@ -433,8 +441,9 @@ describe('Builder', function() {
 
       it('supports string errors, and cleans up temporary directory', function() {
         const node = new FailingSetupPlugin('bar error');
-        expect(function() {
-          new Builder(node, { tmpdir: tmpdir });
+
+        expect(() => {
+          new Builder(node, { tmpdir });
         }).to.throw(
           Builder.NodeSetupError,
           /bar error\s+at FailingSetupPlugin\n-~- created here: -~-/
@@ -465,10 +474,10 @@ describe('Builder', function() {
           builder = new Builder(node);
 
           return builder.build().then(
-            function() {
+            () => {
               throw new Error('Expected an error');
             },
-            function(err) {
+            err => {
               expect(err).to.be.an.instanceof(Builder.BuildError);
               expect(err.stack).to.equal(originalError.stack, 'preserves original stack');
 
@@ -530,20 +539,16 @@ describe('Builder', function() {
 
     function setupEventHandlers() {
       events = [];
-      builder.on('beginNode', function(nw) {
-        events.push('beginNode:' + nw.id);
-      });
-      builder.on('endNode', function(nw) {
-        events.push('endNode:' + nw.id);
-      });
+      builder.on('beginNode', nw => events.push('beginNode:' + nw.id));
+      builder.on('endNode', nw => events.push('endNode:' + nw.id));
     }
 
-    it('triggers RSVP events', function() {
+    it('triggers RSVP events', () => {
       builder = new Builder(
         new plugins.MergePlugin([new plugins.VeggiesPlugin(), 'test/fixtures/basic'])
       );
       setupEventHandlers();
-      return builder.build().then(function() {
+      return builder.build().then(() => {
         expect(events).to.deep.equal([
           'beginNode:0',
           'endNode:0',
@@ -560,7 +565,7 @@ describe('Builder', function() {
         new plugins.MergePlugin([new plugins.FailingPlugin(new Error('whoops'))])
       );
       setupEventHandlers();
-      return expect(builder.build()).to.be.rejected.then(function() {
+      return expect(builder.build()).to.be.rejected.then(() => {
         expect(events).to.deep.equal(['beginNode:0', 'endNode:0']);
       });
     });
@@ -595,7 +600,7 @@ describe('Builder', function() {
 
       // Reports timing after first build
       expect(transformNw + '').not.to.match(/\([0-9]+ ms\)/);
-      return builder.build().then(function() {
+      return builder.build().then(() => {
         expect(transformNw + '').to.match(/\([0-9]+ ms\)/);
       });
     });
@@ -632,7 +637,7 @@ describe('Builder', function() {
         buildState: {},
       });
 
-      return builder.build().then(function() {
+      return builder.build().then(() => {
         const transformNwJSON = transformNw.toJSON();
 
         // Fuzzy matches first
@@ -671,8 +676,10 @@ describe('Builder', function() {
         const node1 = new plugins.SleepingPlugin(['test/fixtures/basic']);
         const node2 = new plugins.SleepingPlugin();
         const outputNode = new plugins.SleepingPlugin([node1, node2]);
+
         builder = new Builder(outputNode);
-        return builder.build().then(function() {
+
+        return builder.build().then(() => {
           const sourceNw = builder.nodeWrappers[0];
           const nw1 = builder.nodeWrappers[1];
           const nw2 = builder.nodeWrappers[2];

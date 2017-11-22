@@ -13,6 +13,7 @@ module.exports = {
     'no-var': 'error',
     'no-console': 'off',
     'no-process-exit': 'off',
+    'object-shorthand': 'error',
     'prettier/prettier': [
       'error',
       {
