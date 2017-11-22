@@ -3,15 +3,23 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 6,
   },
-  plugins: ['node'],
+  plugins: ['node', 'prettier'],
   extends: ['eslint:recommended', 'plugin:node/recommended'],
   env: {
-    node: true
+    node: true,
   },
   rules: {
     'no-unused-vars': 'off',
     'no-console': 'off',
     'no-process-exit': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        singleQuote: true,
+        trailingComma: 'es5',
+        printWidth: 100,
+      },
+    ],
   },
   overrides: [
     {
@@ -23,7 +31,7 @@ module.exports = {
       rules: {
         'mocha/no-exclusive-tests': 'error',
         'mocha/handle-done-callback': 'error',
-      }
-    }
+      },
+    },
   ],
 };
