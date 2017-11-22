@@ -59,7 +59,7 @@
     "lint": "eslint lib test",
     "lint:fix": "eslint --fix lib test",
     "pretest": "multidep test/multidep.json",
-    "test": "mocha --exit",
+    "test": "mocha",
     "test:debug": "mocha --inspect-brk"
   }
 }
