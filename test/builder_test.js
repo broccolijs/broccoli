@@ -37,18 +37,13 @@ function sleep() {
   return new RSVP.Promise(resolve => setTimeout(resolve, 10));
 }
 
-// Builder subclass that returns fixturify objects from .build()
-FixtureBuilder.prototype = Object.create(Builder.prototype);
-FixtureBuilder.prototype.constructor = FixtureBuilder;
-function FixtureBuilder(/* ... */) {
-  Builder.apply(this, arguments);
+class FixtureBuilder extends Builder {
+  build() {
+    return super.build().then(() => {
+      return fixturify.readSync(this.outputPath);
+    });
+  }
 }
-
-FixtureBuilder.prototype.build = function() {
-  return Builder.prototype.build.call(this).then(() => {
-    return fixturify.readSync(this.outputPath);
-  });
-};
 
 function buildToFixture(node) {
   const fixtureBuilder = new FixtureBuilder(node);
