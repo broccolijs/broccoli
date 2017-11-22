@@ -9,21 +9,26 @@ environment:
   matrix:
     - nodejs_version: "4"
     - nodejs_version: "6"
+    - nodejs_version: "8"
+    - nodejs_version: "9"
 
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node 0.STABLE.latest
   - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version)
   - set CI=true
-  # Typical npm stuff.
-  - npm install
+  - yarn --no-lockfile --non-interactive
+
+cache:
+  - '%LOCALAPPDATA%\Yarn'
 
 # Post-install test scripts.
 test_script:
   # Output useful info for debugging.
+  - yarn --version
   - node --version
-  - npm --version
-  - npm test
+  - git rev-parse HEAD
+  - cmd: yarn test
 
 # Don't actually build.
 build: off
