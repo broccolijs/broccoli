@@ -9,7 +9,8 @@ module.exports = {
     node: true,
   },
   rules: {
-    'no-unused-vars': 'off',
+    'strict': 'error',
+    'no-var': 'error',
     'no-console': 'off',
     'no-process-exit': 'off',
     'prettier/prettier': [
