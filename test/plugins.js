@@ -1,11 +1,13 @@
-var fs = require('fs');
-var RSVP = require('rsvp');
-var symlinkOrCopySync = require('symlink-or-copy').sync;
+'use strict';
+
+const fs = require('fs');
+const RSVP = require('rsvp');
+const symlinkOrCopySync = require('symlink-or-copy').sync;
 
 // Create various test plugins subclassing from Plugin. Wrapped in a function
 // to allow for testing against different Plugin versions.
 module.exports = function(Plugin) {
-  var plugins = {};
+  const plugins = {};
 
   plugins.NoopPlugin = NoopPlugin;
   NoopPlugin.prototype = Object.create(Plugin.prototype);
@@ -33,7 +35,7 @@ module.exports = function(Plugin) {
     Plugin.call(this, inputNodes, options);
   }
   MergePlugin.prototype.build = function() {
-    for (var i = 0; i < this.inputPaths.length; i++) {
+    for (let i = 0; i < this.inputPaths.length; i++) {
       symlinkOrCopySync(this.inputPaths[i], this.outputPath + '/' + i);
     }
   };
@@ -81,9 +83,7 @@ module.exports = function(Plugin) {
     Plugin.call(this, inputNodes || []);
   }
   SleepingPlugin.prototype.build = function() {
-    return new RSVP.Promise(function(resolve, reject) {
-      setTimeout(resolve, 10);
-    });
+    return new RSVP.Promise(resolve => setTimeout(resolve, 10));
   };
 
   return plugins;

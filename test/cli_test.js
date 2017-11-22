@@ -1,15 +1,17 @@
 'use strict';
 
-var cli = require('../lib/cli');
-var broccoli = require('../lib/index');
-var chai = require('chai');
-var sinon = require('sinon');
-var sinonChai = require('sinon-chai');
+const broccoli = require('../lib/index');
+const chai = require('chai');
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
+
 chai.use(sinonChai);
 
 describe('cli', function() {
-  var mock = null;
-  var oldCwd = null;
+  let mock = null;
+  let oldCwd = null;
+  let cli;
+
   beforeEach(function() {
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
