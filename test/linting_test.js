@@ -1,1 +1,3 @@
-require('mocha-eslint')(['lib', 'test']);
+require('mocha-eslint')(['lib', 'test'], {
+  timeout: 5000,
+});
