@@ -6,6 +6,7 @@ const Builder = require('../lib/builder');
 const expect = require('chai').expect;
 const multidepRequire = require('multidep')('test/multidep.json');
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
+const RSVP = require('rsvp');
 
 describe('server', function() {
   it('throws if first argument is not an instance of Watcher', function() {
@@ -24,18 +25,21 @@ describe('server', function() {
     expect(() => Server.serve(new Watcher(), '0.0.0.0', parseInt('port'))).to.throw(/port/);
   });
 
-  it('buildSuccess is handled', function(done) {
+  it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
     const server = Server.serve(watcher, '0.0.0.0', 4200);
     const onBuildSuccessful = server.onBuildSuccessful;
-    server.onBuildSuccessful = function() {
-      try {
-        onBuildSuccessful();
-        done();
-      } catch (e) {
-        done(e);
-      }
-    };
+
+    return new RSVP.Promise((resolve, reject) => {
+      server.onBuildSuccessful = function() {
+        try {
+          onBuildSuccessful();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      };
+    }).finally(() => server.cleanupAndExit());
   });
 });
