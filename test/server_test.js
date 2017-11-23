@@ -25,10 +25,17 @@ describe('server', function() {
     expect(() => Server.serve(new Watcher(), '0.0.0.0', parseInt('port'))).to.throw(/port/);
   });
 
+  let server;
+  afterEach(function() {
+    if (server) {
+      return server.cleanupAndExit();
+    }
+  });
+
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
-    const server = Server.serve(watcher, '0.0.0.0', 4200);
+    server = Server.serve(watcher, '0.0.0.0', 4200);
     const onBuildSuccessful = server.onBuildSuccessful;
 
     return new RSVP.Promise((resolve, reject) => {
@@ -40,6 +47,36 @@ describe('server', function() {
           reject(e);
         }
       };
-    }).finally(() => server.cleanupAndExit());
+    });
+  });
+
+  it('supports being provided a custom connect middleware root', function() {
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+    const watcher = new Watcher(builder);
+    let altConnectWasUsed = false;
+
+    function altConnect() {
+      return {
+        use() {
+          altConnectWasUsed = true;
+          return function listener() {};
+        },
+      };
+    }
+
+    expect(altConnectWasUsed).to.eql(false);
+    server = Server.serve(watcher, '0.0.0.0', 4200, altConnect);
+    expect(altConnectWasUsed).to.eql(true);
+    const onBuildSuccessful = server.onBuildSuccessful;
+    return new RSVP.Promise((resolve, reject) => {
+      server.onBuildSuccessful = function() {
+        try {
+          onBuildSuccessful();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      };
+    });
   });
 });
