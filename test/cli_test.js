@@ -37,6 +37,15 @@ describe('cli', function() {
       server.verify();
     });
 
+    it('supports `s` alias', function() {
+      server
+        .expects('serve')
+        .once()
+        .withArgs(sinon.match.any, sinon.match.string, sinon.match.number);
+      cli(['node', 'broccoli', 's']);
+      server.verify();
+    });
+
     it('starts server with given ip adress', function() {
       server.expects('serve').withArgs(sinon.match.any, '192.168.2.123', sinon.match.number);
       cli(['node', 'broccoli', 'serve', '--host', '192.168.2.123']);
