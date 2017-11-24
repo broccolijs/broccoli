@@ -22,8 +22,6 @@ describe('cli', function() {
   afterEach(function() {
     sinon.restore();
     process.chdir(oldCwd);
-    delete require.cache[require.resolve('commander')];
-    delete require.cache[require.resolve('../lib/cli')];
   });
 
   it('should start a server with default values', function() {
