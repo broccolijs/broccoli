@@ -4,18 +4,17 @@ const broccoli = require('../lib/index');
 const chai = require('chai');
 const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
+const cli = require('../lib/cli');
 
 chai.use(sinonChai);
 
 describe('cli', function() {
   let mock = null;
   let oldCwd = null;
-  let cli;
 
   beforeEach(function() {
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
-    cli = require('../lib/cli');
     mock = sinon.mock(broccoli.server);
   });
 
