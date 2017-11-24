@@ -2,7 +2,7 @@
 
 const broccoli = require('../lib/index');
 const chai = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
 
 chai.use(sinonChai);
@@ -20,8 +20,8 @@ describe('cli', function() {
   });
 
   afterEach(function() {
+    sinon.restore();
     process.chdir(oldCwd);
-    mock.restore();
     delete require.cache[require.resolve('commander')];
     delete require.cache[require.resolve('../lib/cli')];
   });
