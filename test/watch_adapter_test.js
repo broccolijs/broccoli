@@ -8,9 +8,13 @@ const chai = require('chai');
 const expect = chai.expect;
 const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 describe('WatcherAdapter', function() {
+  afterEach(function() {
+    sinon.restore();
+  });
+
   describe('bindFileEvent', function() {
     const adapter = {
       trigger() {},

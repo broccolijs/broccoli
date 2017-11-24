@@ -9,7 +9,7 @@ const broccoli = require('..');
 const makePlugins = require('./plugins');
 const Builder = broccoli.Builder;
 const fixturify = require('fixturify');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const chai = require('chai'),
   expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
@@ -58,6 +58,8 @@ describe('Builder', function() {
   let builder;
 
   afterEach(function() {
+    sinon.restore();
+
     if (builder) {
       builder.cleanup();
       builder = null;
