@@ -1,10 +1,12 @@
 'use strict';
 
+const Builder = require('../lib/builder');
 const broccoli = require('../lib/index');
 const chai = require('chai');
+const cli = require('../lib/cli');
+const rimraf = require('rimraf');
 const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
-const cli = require('../lib/cli');
 
 chai.use(sinonChai);
 
@@ -19,6 +21,40 @@ describe('cli', function() {
   afterEach(function() {
     sinon.restore();
     process.chdir(oldCwd);
+  });
+
+  describe('build', function() {
+    let exitStub;
+
+    beforeEach(function() {
+      exitStub = sinon.stub(process, 'exit');
+    });
+
+    afterEach(function() {
+      rimraf.sync('dist');
+    });
+
+    context('on successful build', function() {
+      it('cleanups tmp files', function(done) {
+        const cleanup = sinon.spy(Builder.prototype, 'cleanup');
+
+        cli(['node', 'broccoli', 'build', 'dist']);
+
+        process.nextTick(() => {
+          chai.expect(cleanup).to.be.calledOnce;
+          done();
+        });
+      });
+
+      it('closes process on completion', function(done) {
+        cli(['node', 'broccoli', 'build', 'dist']);
+
+        process.nextTick(() => {
+          chai.expect(exitStub).to.be.calledWith(0);
+          done();
+        });
+      });
+    });
   });
 
   describe('serve', function() {
