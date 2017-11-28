@@ -4,6 +4,7 @@ const Builder = require('../lib/builder');
 const broccoli = require('../lib/index');
 const chai = require('chai');
 const cli = require('../lib/cli');
+const loadBrocfile = require('../lib/load_brocfile');
 const rimraf = require('rimraf');
 const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
@@ -55,6 +56,24 @@ describe('cli', function() {
         });
       });
     });
+
+    context('param --brocfile-path', function() {
+      it('closes process on completion', function(done) {
+        cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
+
+        process.nextTick(() => {
+          chai.expect(exitStub).to.be.calledWith(0);
+          done();
+        });
+      });
+
+      it('loads brocfile from a path', function() {
+        const spy = sinon.spy(loadBrocfile);
+        sinon.stub(broccoli, 'loadBrocfile').value(spy);
+        cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
+        chai.expect(spy).to.be.calledWith('../Brocfile.js');
+      });
+    });
   });
 
   describe('serve', function() {
@@ -104,6 +123,25 @@ describe('cli', function() {
         .withArgs(sinon.match.any, '192.168.2.123', 1234);
       cli(['node', 'broccoli', 'serve', '--port=1234', '--host=192.168.2.123']);
       server.verify();
+    });
+
+    context('param --brocfile-path', function() {
+      it('starts serve', function() {
+        server
+          .expects('serve')
+          .once()
+          .withArgs(sinon.match.any, sinon.match.string, sinon.match.number);
+        cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
+        server.verify();
+      });
+
+      it('loads brocfile from a path', function() {
+        const spy = sinon.spy(loadBrocfile);
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(spy);
+        cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
+        chai.expect(spy).to.be.calledWith('../Brocfile.js');
+      });
     });
   });
 });
