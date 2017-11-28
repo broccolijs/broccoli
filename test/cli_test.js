@@ -209,6 +209,7 @@ describe('cli', function() {
         cli(['node', 'broccoli', 'serve', '--output-path', 'dist']);
         watcher.on('buildSuccess', function() {
           chai.expect(fs.existsSync('dist')).to.be.true;
+          watcher.quit();
           done();
         });
       });
