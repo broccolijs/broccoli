@@ -14,8 +14,10 @@ chai.use(sinonChai);
 
 describe('cli', function() {
   let oldCwd = null;
+  let exitStub;
 
   beforeEach(function() {
+    exitStub = sinon.stub(process, 'exit');
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
   });
@@ -26,12 +28,6 @@ describe('cli', function() {
   });
 
   describe('build', function() {
-    let exitStub;
-
-    beforeEach(function() {
-      exitStub = sinon.stub(process, 'exit');
-    });
-
     afterEach(function() {
       rimraf.sync('dist');
     });
@@ -178,7 +174,7 @@ describe('cli', function() {
       server.verify();
     });
 
-    context('param --brocfile-path', function() {
+    context('with param --brocfile-path', function() {
       it('starts serve', function() {
         server
           .expects('serve')
@@ -194,6 +190,54 @@ describe('cli', function() {
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
         cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
         chai.expect(spy).to.be.calledWith('../Brocfile.js');
+      });
+    });
+
+    context('with param --output-path', function() {
+      afterEach(function() {
+        rimraf.sync('dist');
+      });
+
+      it('creates output folder', function(done) {
+        let watcher;
+        sinon.stub(broccoli, 'server').value({
+          serve(_watcher) {
+            watcher = _watcher;
+            _watcher.start();
+          },
+        });
+        cli(['node', 'broccoli', 'serve', '--output-path', 'dist']);
+        watcher.on('buildSuccess', function() {
+          chai.expect(fs.existsSync('dist')).to.be.true;
+          done();
+        });
+      });
+
+      context('and with folder already existing', function() {
+        it('exits with error', function(done) {
+          sinon.stub(broccoli, 'server').value({ serve() {} });
+          cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
+          process.nextTick(() => {
+            chai.expect(exitStub).to.be.calledWith(1);
+            done();
+          });
+        });
+
+        it('outputs error reason to console', function(done) {
+          const consoleMock = sinon.mock(console);
+          consoleMock
+            .expects('error')
+            .once()
+            .withArgs('subdir/ already exists; we cannot build into an existing directory');
+
+          sinon.stub(broccoli, 'server').value({ serve() {} });
+          cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
+
+          process.nextTick(() => {
+            consoleMock.verify();
+            done();
+          });
+        });
       });
     });
   });
