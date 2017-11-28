@@ -4,6 +4,7 @@ const Builder = require('../lib/builder');
 const broccoli = require('../lib/index');
 const chai = require('chai');
 const cli = require('../lib/cli');
+const fs = require('fs');
 const loadBrocfile = require('../lib/load_brocfile');
 const rimraf = require('rimraf');
 const sinon = require('sinon').createSandbox();
@@ -55,9 +56,17 @@ describe('cli', function() {
           done();
         });
       });
+
+      it('creates output folder', function(done) {
+        cli(['node', 'broccoli', 'build', 'dist']);
+        process.nextTick(() => {
+          chai.expect(fs.existsSync('dist')).to.be.true;
+          done();
+        });
+      });
     });
 
-    context('param --brocfile-path', function() {
+    context('with param --brocfile-path', function() {
       it('closes process on completion', function(done) {
         cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
 
@@ -72,6 +81,50 @@ describe('cli', function() {
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
         cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
         chai.expect(spy).to.be.calledWith('../Brocfile.js');
+      });
+    });
+
+    context('with param --output-path', function() {
+      it('closes process on completion', function(done) {
+        cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
+
+        process.nextTick(() => {
+          chai.expect(exitStub).to.be.calledWith(0);
+          done();
+        });
+      });
+
+      it('creates output folder', function(done) {
+        cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
+        process.nextTick(() => {
+          chai.expect(fs.existsSync('dist')).to.be.true;
+          done();
+        });
+      });
+
+      context('and with [target]', function() {
+        it('exits with error', function(done) {
+          cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
+          process.nextTick(() => {
+            chai.expect(exitStub).to.be.calledWith(1);
+            done();
+          });
+        });
+
+        it('outputs error reason to console', function(done) {
+          const consoleMock = sinon.mock(console);
+          consoleMock
+            .expects('error')
+            .once()
+            .withArgs('option --output-path and [target] cannot be passed at same time');
+
+          cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
+
+          process.nextTick(() => {
+            consoleMock.verify();
+            done();
+          });
+        });
       });
     });
   });
