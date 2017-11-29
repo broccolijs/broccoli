@@ -34,93 +34,77 @@ describe('cli', function() {
     });
 
     context('on successful build', function() {
-      it('cleanups tmp files', function(done) {
+      it('cleanups tmp files', function() {
         const cleanup = sinon.spy(Builder.prototype, 'cleanup');
-
-        cli(['node', 'broccoli', 'build', 'dist']);
-
-        process.nextTick(() => {
+        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
           chai.expect(cleanup).to.be.calledOnce;
-          done();
         });
       });
 
-      it('closes process on completion', function(done) {
-        cli(['node', 'broccoli', 'build', 'dist']);
-
-        process.nextTick(() => {
+      it('closes process on completion', function() {
+        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
           chai.expect(exitStub).to.be.calledWith(0);
-          done();
         });
       });
 
-      it('creates output folder', function(done) {
-        cli(['node', 'broccoli', 'build', 'dist']);
-        process.nextTick(() => {
+      it('creates output folder', function() {
+        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
           chai.expect(fs.existsSync('dist')).to.be.true;
-          done();
         });
       });
     });
 
-    context('with param --brocfile-path', function() {
-      it('closes process on completion', function(done) {
-        cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
+    context('with param --watch', function() {
+      it('starts watcher', function(done) {
+        sinon.stub(broccoli.Watcher.prototype, 'start').value(() => done());
+        cli(['node', 'broccoli', 'build', 'dist', '--watch']);
+      });
+    });
 
-        process.nextTick(() => {
-          chai.expect(exitStub).to.be.calledWith(0);
-          done();
-        });
+    context('with param --brocfile-path', function() {
+      it('closes process on completion', function() {
+        return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
+          () => chai.expect(exitStub).to.be.calledWith(0)
+        );
       });
 
       it('loads brocfile from a path', function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
-        cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
-        chai.expect(spy).to.be.calledWith('../Brocfile.js');
+        return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
+          () => chai.expect(spy).to.be.calledWith('../Brocfile.js')
+        );
       });
     });
 
     context('with param --output-path', function() {
-      it('closes process on completion', function(done) {
-        cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
-
-        process.nextTick(() => {
+      it('closes process on completion', function() {
+        return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
           chai.expect(exitStub).to.be.calledWith(0);
-          done();
         });
       });
 
-      it('creates output folder', function(done) {
-        cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
-        process.nextTick(() => {
+      it('creates output folder', function() {
+        return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
           chai.expect(fs.existsSync('dist')).to.be.true;
-          done();
         });
       });
 
       context('and with [target]', function() {
-        it('exits with error', function(done) {
-          cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
-          process.nextTick(() => {
+        it('exits with error', function() {
+          return cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']).then(() => {
             chai.expect(exitStub).to.be.calledWith(1);
-            done();
           });
         });
 
-        it('outputs error reason to console', function(done) {
+        it('outputs error reason to console', function() {
           const consoleMock = sinon.mock(console);
           consoleMock
             .expects('error')
             .once()
             .withArgs('option --output-path and [target] cannot be passed at same time');
-
           cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
-
-          process.nextTick(() => {
-            consoleMock.verify();
-            done();
-          });
+          consoleMock.verify();
         });
       });
     });
@@ -167,14 +151,11 @@ describe('cli', function() {
     });
 
     context('on terminated watcher', function() {
-      it('by SIGTERM exits without error', function(done) {
-        cli(['node', 'broccoli', 'serve']);
-        process.nextTick(() => {
-          process.kill(process.pid, 'SIGTERM');
-          setTimeout(() => {
-            chai.expect(exitStub).to.be.calledWith(0);
-            done();
-          }, 200);
+      it('by SIGTERM exits without error', function() {
+        const returnPromise = cli(['node', 'broccoli', 'serve']);
+        process.kill(process.pid, 'SIGTERM');
+        return returnPromise.then(() => {
+          chai.expect(exitStub).to.be.calledWith(0);
         });
       });
     });
@@ -229,16 +210,14 @@ describe('cli', function() {
       });
 
       context('and with folder already existing', function() {
-        it('exits with error', function(done) {
+        it('exits with error', function() {
           sinon.stub(broccoli, 'server').value({ serve() {} });
-          cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
-          process.nextTick(() => {
+          return cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']).then(() => {
             chai.expect(exitStub).to.be.calledWith(1);
-            done();
           });
         });
 
-        it('outputs error reason to console', function(done) {
+        it('outputs error reason to console', function() {
           const consoleMock = sinon.mock(console);
           consoleMock
             .expects('error')
@@ -246,11 +225,8 @@ describe('cli', function() {
             .withArgs('subdir/ already exists; we cannot build into an existing directory');
 
           sinon.stub(broccoli, 'server').value({ serve() {} });
-          cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
-
-          process.nextTick(() => {
+          return cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']).then(() => {
             consoleMock.verify();
-            done();
           });
         });
       });
