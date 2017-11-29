@@ -1,14 +1,15 @@
 'use strict';
 
-const Builder = require('../lib/builder');
-const broccoli = require('../lib/index');
 const chai = require('chai');
-const cli = require('../lib/cli');
 const fs = require('fs');
-const loadBrocfile = require('../lib/load_brocfile');
 const rimraf = require('rimraf');
 const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
+
+const Builder = require('../lib/builder');
+const broccoli = require('../lib/index');
+const cli = require('../lib/cli');
+const loadBrocfile = require('../lib/load_brocfile');
 
 chai.use(sinonChai);
 
@@ -136,7 +137,7 @@ describe('cli', function() {
       server
         .expects('serve')
         .once()
-        .withArgs(sinon.match.any, sinon.match.string, sinon.match.number);
+        .withArgs(sinon.match.instanceOf(broccoli.Watcher), sinon.match.string, sinon.match.number);
       cli(['node', 'broccoli', 'serve']);
       server.verify();
     });
@@ -163,6 +164,19 @@ describe('cli', function() {
         .withArgs(sinon.match.any, sinon.match.string, 1234);
       cli(['node', 'broccoli', 'serve', '--port', '1234']);
       server.verify();
+    });
+
+    context('on terminated watcher', function() {
+      it('by SIGTERM exits without error', function(done) {
+        cli(['node', 'broccoli', 'serve']);
+        process.nextTick(() => {
+          process.kill(process.pid, 'SIGTERM');
+          setTimeout(() => {
+            chai.expect(exitStub).to.be.calledWith(0);
+            done();
+          }, 200);
+        });
+      });
     });
 
     it('converts port to a number and starts the server at given port and host', function() {
@@ -239,6 +253,21 @@ describe('cli', function() {
             done();
           });
         });
+      });
+    });
+
+    context('with param --no-watch', function() {
+      it('should start a server with default values', function() {
+        server
+          .expects('serve')
+          .once()
+          .withArgs(
+            sinon.match.instanceOf(broccoli.DummyWatcher),
+            sinon.match.string,
+            sinon.match.number
+          );
+        cli(['node', 'broccoli', 'serve', '--no-watch']);
+        server.verify();
       });
     });
   });
