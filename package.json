@@ -33,6 +33,7 @@
     "rsvp": "^4.7.0",
     "sane": "^2.2.0",
     "tmp": "0.0.33",
+    "tree-sync": "^1.2.2",
     "underscore.string": "^3.2.2"
   },
   "devDependencies": {
