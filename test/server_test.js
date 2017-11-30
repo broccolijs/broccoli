@@ -64,8 +64,9 @@ describe('server', function() {
         } catch (e) {
           reject(e);
         }
+        watcher.quit();
       };
-    });
+    }).then(() => server.closingPromise);
   });
 
   it('supports being provided a custom connect middleware root', function() {
@@ -94,7 +95,8 @@ describe('server', function() {
         } catch (e) {
           reject(e);
         }
+        watcher.quit();
       };
-    });
+    }).then(() => server.closingPromise);
   });
 });

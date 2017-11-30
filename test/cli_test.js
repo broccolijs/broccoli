@@ -153,16 +153,6 @@ describe('cli', function() {
       server.verify();
     });
 
-    context('on terminated watcher', function() {
-      it('by SIGTERM exits without error', function() {
-        const returnPromise = cli(['node', 'broccoli', 'serve']);
-        process.kill(process.pid, 'SIGTERM');
-        return returnPromise.then(() => {
-          chai.expect(exitStub).to.be.calledWith(0);
-        });
-      });
-    });
-
     it('converts port to a number and starts the server at given port and host', function() {
       server
         .expects('serve')
