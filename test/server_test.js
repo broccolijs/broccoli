@@ -19,6 +19,9 @@ describe('server', function() {
   });
 
   afterEach(function() {
+    process.removeAllListeners('SIGTERM');
+    process.removeAllListeners('SIGINT');
+
     let closingPromise = Promise.resolve();
 
     if (server) {

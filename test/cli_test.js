@@ -26,6 +26,8 @@ describe('cli', function() {
   afterEach(function() {
     sinon.restore();
     process.chdir(oldCwd);
+    process.removeAllListeners('SIGTERM');
+    process.removeAllListeners('SIGINT');
   });
 
   describe('build', function() {
