@@ -7,6 +7,7 @@ const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
 
 const Builder = require('../lib/builder');
+const DummyWatcher = require('../lib/dummy-watcher');
 const broccoli = require('../lib/index');
 const cli = require('../lib/cli');
 const loadBrocfile = require('../lib/load_brocfile');
@@ -239,11 +240,7 @@ describe('cli', function() {
         server
           .expects('serve')
           .once()
-          .withArgs(
-            sinon.match.instanceOf(broccoli.DummyWatcher),
-            sinon.match.string,
-            sinon.match.number
-          );
+          .withArgs(sinon.match.instanceOf(DummyWatcher), sinon.match.string, sinon.match.number);
         cli(['node', 'broccoli', 'serve', '--no-watch']);
         server.verify();
       });
