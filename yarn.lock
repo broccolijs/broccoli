@@ -457,10 +457,6 @@ console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
 
-copy-dereference@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/copy-dereference/-/copy-dereference-1.0.0.tgz#6b131865420fd81b413ba994b44d3655311152b6"
-
 copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
@@ -591,6 +587,10 @@ ee-first@1.1.1:
 encodeurl@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.1.tgz#79e3d58655346909fe6f0f45a5de68103b294d20"
+
+ensure-posix-path@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ensure-posix-path/-/ensure-posix-path-1.0.2.tgz#a65b3e42d0b71cfc585eb774f9943c8d9b91b0c2"
 
 escape-html@~1.0.3:
   version "1.0.3"
@@ -931,6 +931,15 @@ fs-extra@^0.30.0:
     path-is-absolute "^1.0.0"
     rimraf "^2.2.8"
 
+fs-tree-diff@^0.5.6:
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/fs-tree-diff/-/fs-tree-diff-0.5.7.tgz#315e2b098d5fe7f622880ac965b1b051868ac871"
+  dependencies:
+    heimdalljs-logger "^0.1.7"
+    object-assign "^4.1.0"
+    path-posix "^1.0.0"
+    symlink-or-copy "^1.1.8"
+
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
@@ -1141,7 +1150,7 @@ he@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
-heimdalljs-logger@^0.1.9:
+heimdalljs-logger@^0.1.7, heimdalljs-logger@^0.1.9:
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/heimdalljs-logger/-/heimdalljs-logger-0.1.9.tgz#d76ada4e45b7bb6f786fc9c010a68eb2e2faf176"
   dependencies:
@@ -1542,7 +1551,7 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-matcher-collection@^1.0.4:
+matcher-collection@^1.0.0, matcher-collection@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/matcher-collection/-/matcher-collection-1.0.5.tgz#2ee095438372cb8884f058234138c05c644ec339"
   dependencies:
@@ -1640,6 +1649,10 @@ mkdirp@0.5.1, "mkdirp@>=0.5 0", mkdirp@^0.5.1:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+mktemp@~0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/mktemp/-/mktemp-0.4.0.tgz#6d0515611c8a8c84e484aa2000129b98e981ff0b"
 
 mocha-eslint@^4.1.0:
   version "4.1.0"
@@ -1880,6 +1893,10 @@ path-parse@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.5.tgz#3c1adf871ea9cd6c9431b6ea2bd74a0ff055c4c1"
 
+path-posix@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/path-posix/-/path-posix-1.0.0.tgz#06b26113f56beab042545a23bfa88003ccac260f"
+
 path-to-regexp@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-1.7.0.tgz#59fde0f435badacba103a84e9d3bc64e96b9937d"
@@ -1947,6 +1964,14 @@ punycode@^1.4.1:
 qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
+
+quick-temp@^0.1.5:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/quick-temp/-/quick-temp-0.1.8.tgz#bab02a242ab8fb0dd758a3c9776b32f9a5d94408"
+  dependencies:
+    mktemp "~0.4.0"
+    rimraf "^2.5.4"
+    underscore.string "~3.3.4"
 
 ramda@^0.24.1:
   version "0.24.1"
@@ -2076,7 +2101,7 @@ right-align@^0.1.1:
   dependencies:
     align-text "^0.1.1"
 
-rimraf@2, rimraf@^2.2.8, rimraf@^2.4.3, rimraf@^2.5.1, rimraf@^2.6.1, rimraf@^2.6.2:
+rimraf@2, rimraf@^2.2.8, rimraf@^2.4.3, rimraf@^2.5.1, rimraf@^2.5.4, rimraf@^2.6.1, rimraf@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.2.tgz#2ed8150d24a16ea8651e6d6ef0f47c4158ce7a36"
   dependencies:
@@ -2446,6 +2471,16 @@ tough-cookie@~2.3.0:
   dependencies:
     punycode "^1.4.1"
 
+tree-sync@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/tree-sync/-/tree-sync-1.2.2.tgz#2cf76b8589f59ffedb58db5a3ac7cb013d0158b7"
+  dependencies:
+    debug "^2.2.0"
+    fs-tree-diff "^0.5.6"
+    mkdirp "^0.5.1"
+    quick-temp "^0.1.5"
+    walk-sync "^0.2.7"
+
 tryit@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tryit/-/tryit-1.0.3.tgz#393be730a9446fd1ead6da59a014308f36c289cb"
@@ -2491,7 +2526,7 @@ uid-number@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/uid-number/-/uid-number-0.0.6.tgz#0ea10e8035e8eb5b8e4449f06da1c730663baa81"
 
-underscore.string@^3.2.2:
+underscore.string@^3.2.2, underscore.string@~3.3.4:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/underscore.string/-/underscore.string-3.3.4.tgz#2c2a3f9f83e64762fdc45e6ceac65142864213db"
   dependencies:
@@ -2549,6 +2584,13 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+walk-sync@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/walk-sync/-/walk-sync-0.2.7.tgz#b49be4ee6867657aeb736978b56a29d10fa39969"
+  dependencies:
+    ensure-posix-path "^1.0.0"
+    matcher-collection "^1.0.0"
 
 walker@~1.0.5:
   version "1.0.7"
