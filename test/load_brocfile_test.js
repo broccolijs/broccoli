@@ -49,12 +49,14 @@ describe('loadBrocfile', function() {
 
   context('with path', function() {
     it('return tree definition', function() {
-      chai.expect(loadBrocfile(projectPath + '/Brocfile.js')).to.equal(brocfileFixture);
+      chai
+        .expect(loadBrocfile({ brocfilePath: projectPath + '/Brocfile.js' }))
+        .to.equal(brocfileFixture);
     });
 
     it('throws error on invalid path', function() {
       const brocfilePath = projectPath + '/missing-brocfile.js';
-      chai.expect(() => loadBrocfile(brocfilePath)).to.throw(Error, /missing-brocfile.js/);
+      chai.expect(() => loadBrocfile({ brocfilePath })).to.throw(Error, /missing-brocfile.js/);
     });
   });
 });
