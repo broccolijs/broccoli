@@ -1,14 +1,39 @@
 'use strict';
 
+const RSVP = require('rsvp');
+const expect = require('chai').expect;
+const multidepRequire = require('multidep')('test/multidep.json');
+const sinon = require('sinon').createSandbox();
+
 const Server = require('../lib/server');
 const Watcher = require('../lib/watcher');
 const Builder = require('../lib/builder');
-const expect = require('chai').expect;
-const multidepRequire = require('multidep')('test/multidep.json');
+
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
-const RSVP = require('rsvp');
 
 describe('server', function() {
+  let server;
+
+  beforeEach(function() {
+    sinon.stub(process, 'exit');
+  });
+
+  afterEach(function() {
+    process.removeAllListeners('SIGTERM');
+    process.removeAllListeners('SIGINT');
+
+    let closingPromise = Promise.resolve();
+
+    if (server) {
+      server.cleanupAndExit();
+      if (server.closingPromise) {
+        closingPromise = server.closingPromise;
+      }
+    }
+
+    return closingPromise.then(() => sinon.restore());
+  });
+
   it('throws if first argument is not an instance of Watcher', function() {
     expect(() => Server.serve({}, 123, 1234)).to.throw(/Watcher/);
   });
@@ -25,13 +50,6 @@ describe('server', function() {
     expect(() => Server.serve(new Watcher(), '0.0.0.0', parseInt('port'))).to.throw(/port/);
   });
 
-  let server;
-  afterEach(function() {
-    if (server) {
-      return server.cleanupAndExit();
-    }
-  });
-
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
@@ -46,8 +64,9 @@ describe('server', function() {
         } catch (e) {
           reject(e);
         }
+        watcher.quit();
       };
-    });
+    }).then(() => server.closingPromise);
   });
 
   it('supports being provided a custom connect middleware root', function() {
@@ -76,7 +95,8 @@ describe('server', function() {
         } catch (e) {
           reject(e);
         }
+        watcher.quit();
       };
-    });
+    }).then(() => server.closingPromise);
   });
 });
