@@ -1,5 +1,6 @@
 'use strict';
 
+const RSVP = require('rsvp');
 const chai = require('chai');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -36,6 +37,24 @@ describe('cli', function() {
       rimraf.sync('dist');
     });
 
+    it('creates watcher with sane options', function() {
+      const spy = createWatcherSpy();
+      // --watch is passed so Watcher spy can be used
+      return cli(['node', 'broccoli', 'build', 'dist', '--watch']).then(() =>
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: false,
+              watchman: false,
+              node: true,
+            })
+          )
+        )
+      );
+    });
+
     context('on successful build', function() {
       it('cleanups tmp files', function() {
         const cleanup = sinon.spy(Builder.prototype, 'cleanup');
@@ -61,6 +80,67 @@ describe('cli', function() {
       it('starts watcher', function(done) {
         sinon.stub(broccoli.Watcher.prototype, 'start').value(() => done());
         cli(['node', 'broccoli', 'build', 'dist', '--watch']);
+      });
+    });
+
+    context('with param --watcher', function() {
+      it('closes process on completion', function() {
+        return cli(['node', 'broccoli', 'build', 'dist', '--watcher', 'polling']).then(() =>
+          chai.expect(exitStub).to.be.calledWith(0)
+        );
+      });
+
+      it('creates watcher with sane options for polling', function() {
+        const spy = createWatcherSpy();
+        return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'polling']).then(
+          () =>
+            chai.expect(spy).to.have.been.calledWith(
+              sinon.match.instanceOf(Builder),
+              sinon.match.has(
+                'saneOptions',
+                sinon.match({
+                  poll: true,
+                  watchman: false,
+                  node: false,
+                })
+              )
+            )
+        );
+      });
+
+      it('creates watcher with sane options for watching', function() {
+        const spy = createWatcherSpy();
+        return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'watchman']).then(
+          () =>
+            chai.expect(spy).to.have.been.calledWith(
+              sinon.match.instanceOf(Builder),
+              sinon.match.has(
+                'saneOptions',
+                sinon.match({
+                  poll: false,
+                  watchman: true,
+                  node: false,
+                })
+              )
+            )
+        );
+      });
+
+      it('creates watcher with sane options for node', function() {
+        const spy = createWatcherSpy();
+        return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']).then(() =>
+          chai.expect(spy).to.have.been.calledWith(
+            sinon.match.instanceOf(Builder),
+            sinon.match.has(
+              'saneOptions',
+              sinon.match({
+                poll: false,
+                watchman: false,
+                node: true,
+              })
+            )
+          )
+        );
       });
     });
 
@@ -118,6 +198,25 @@ describe('cli', function() {
 
     beforeEach(function() {
       server = sinon.mock(broccoli.server);
+    });
+
+    it('creates watcher with sane options', function() {
+      sinon.stub(broccoli, 'server').value({ serve() {} });
+      const spy = createWatcherSpy();
+      // --watch is passed so Watcher spy can be used
+      return cli(['node', 'broccoli', 'serve']).then(() =>
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: false,
+              watchman: false,
+              node: true,
+            })
+          )
+        )
+      );
     });
 
     it('should start a server with default values', function() {
@@ -236,4 +335,77 @@ describe('cli', function() {
       });
     });
   });
+
+  context('with param --watcher', function() {
+    it('creates watcher with sane options for polling', function() {
+      sinon.stub(broccoli, 'server').value({ serve() {} });
+      const spy = createWatcherSpy();
+      return cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']).then(() =>
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: false,
+              watchman: true,
+              node: false,
+            })
+          )
+        )
+      );
+    });
+
+    it('creates watcher with sane options for polling', function() {
+      sinon.stub(broccoli, 'server').value({ serve() {} });
+      const spy = createWatcherSpy();
+      return cli(['node', 'broccoli', 'serve', '--watcher', 'node']).then(() =>
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: false,
+              watchman: false,
+              node: true,
+            })
+          )
+        )
+      );
+    });
+
+    it('creates watcher with sane options for polling', function() {
+      sinon.stub(broccoli, 'server').value({ serve() {} });
+      const spy = createWatcherSpy();
+      return cli(['node', 'broccoli', 'serve', '--watcher', 'polling']).then(() =>
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: true,
+              watchman: false,
+              node: false,
+            })
+          )
+        )
+      );
+    });
+  });
 });
+
+function createWatcherSpy() {
+  const spy = sinon.spy();
+  sinon.stub(broccoli, 'Watcher').value(
+    class Watcher extends DummyWatcher {
+      constructor(builder, options) {
+        super(builder, options);
+        spy.call(null, builder, options);
+      }
+
+      start() {
+        return RSVP.resolve();
+      }
+    }
+  );
+  return spy;
+}
