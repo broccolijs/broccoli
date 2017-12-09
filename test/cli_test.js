@@ -2,6 +2,7 @@
 
 const RSVP = require('rsvp');
 const chai = require('chai');
+const childProcess = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const sinon = require('sinon').createSandbox();
@@ -18,8 +19,11 @@ chai.use(sinonChai);
 describe('cli', function() {
   let oldCwd = null;
   let exitStub;
+  let execSyncStub;
 
   beforeEach(function() {
+    execSyncStub = sinon.stub(childProcess, 'execSync');
+    execSyncStub.throws();
     exitStub = sinon.stub(process, 'exit');
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
@@ -200,23 +204,45 @@ describe('cli', function() {
       server = sinon.mock(broccoli.server);
     });
 
-    it('creates watcher with sane options', function() {
-      sinon.stub(broccoli, 'server').value({ serve() {} });
-      const spy = createWatcherSpy();
-      // --watch is passed so Watcher spy can be used
-      return cli(['node', 'broccoli', 'serve']).then(() =>
-        chai.expect(spy).to.have.been.calledWith(
-          sinon.match.instanceOf(Builder),
-          sinon.match.has(
-            'saneOptions',
-            sinon.match({
-              poll: false,
-              watchman: false,
-              node: true,
-            })
+    context('creates Watcher with sane options', function() {
+      it('without watchman installed it defaults to node', function() {
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        const spy = createWatcherSpy();
+        // --watch is passed so Watcher spy can be used
+        return cli(['node', 'broccoli', 'serve']).then(() =>
+          chai.expect(spy).to.have.been.calledWith(
+            sinon.match.instanceOf(Builder),
+            sinon.match.has(
+              'saneOptions',
+              sinon.match({
+                poll: false,
+                watchman: false,
+                node: true,
+              })
+            )
           )
-        )
-      );
+        );
+      });
+
+      it('with watchman installed it defaults to watchman', function() {
+        execSyncStub.returns(JSON.stringify({ version: '4.7.0' }));
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        const spy = createWatcherSpy();
+        // --watch is passed so Watcher spy can be used
+        return cli(['node', 'broccoli', 'serve']).then(() =>
+          chai.expect(spy).to.have.been.calledWith(
+            sinon.match.instanceOf(Builder),
+            sinon.match.has(
+              'saneOptions',
+              sinon.match({
+                poll: false,
+                watchman: true,
+                node: false,
+              })
+            )
+          )
+        );
+      });
     });
 
     it('should start a server with default values', function() {
