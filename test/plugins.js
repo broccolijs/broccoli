@@ -9,12 +9,12 @@ const symlinkOrCopySync = require('symlink-or-copy').sync;
 module.exports = function(Plugin) {
   const plugins = {};
 
-  plugins.NoopPlugin = class NoopPlugin extends Plugin {
+  plugins.Noop = class NoopPlugin extends Plugin {
     build() {}
   };
 
   // This plugin writes foo.js into its outputPath
-  plugins.VeggiesPlugin = class VeggiesPlugin extends Plugin {
+  plugins.Veggies = class VeggiesPlugin extends Plugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
     }
@@ -24,7 +24,7 @@ module.exports = function(Plugin) {
     }
   };
 
-  plugins.MergePlugin = class MergePlugin extends Plugin {
+  plugins.Merge = class MergePlugin extends Plugin {
     build() {
       for (let i = 0; i < this.inputPaths.length; i++) {
         symlinkOrCopySync(this.inputPaths[i], this.outputPath + '/' + i);
@@ -32,7 +32,7 @@ module.exports = function(Plugin) {
     }
   };
 
-  plugins.FailingPlugin = class FailingPlugin extends Plugin {
+  plugins.Failing = class FailingPlugin extends Plugin {
     constructor(errorObject, options) {
       super([], options);
       this.errorObject = errorObject;
@@ -47,7 +47,7 @@ module.exports = function(Plugin) {
   // The build will stall until you call node.finishBuild().
   // To wait until the build starts, chain on node.buildStarted.
   // Don't build more than once.
-  plugins.AsyncPlugin = class AsyncPlugin extends Plugin {
+  plugins.Async = class AsyncPlugin extends Plugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
       this.buildFinishedDeferred = RSVP.defer();
@@ -69,7 +69,7 @@ module.exports = function(Plugin) {
     }
   };
 
-  plugins.SleepingPlugin = class SleepingPlugin extends Plugin {
+  plugins.Sleeping = class SleepingPlugin extends Plugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
     }
