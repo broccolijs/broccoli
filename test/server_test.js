@@ -13,9 +13,16 @@ const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 
 describe('server', function() {
   let server;
+  let PORT;
 
   beforeEach(function() {
     sinon.stub(process, 'exit');
+  });
+
+  before(function() {
+    return require('portfinder')
+      .getPortPromise({ port: 65529 })
+      .then(port => (PORT = port));
   });
 
   afterEach(function() {
@@ -53,7 +60,7 @@ describe('server', function() {
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
-    server = Server.serve(watcher, '0.0.0.0', 4200);
+    server = Server.serve(watcher, '0.0.0.0', PORT);
     const onBuildSuccessful = server.onBuildSuccessful;
 
     return new RSVP.Promise((resolve, reject) => {
@@ -84,7 +91,7 @@ describe('server', function() {
     }
 
     expect(altConnectWasUsed).to.eql(false);
-    server = Server.serve(watcher, '0.0.0.0', 4200, altConnect);
+    server = Server.serve(watcher, '0.0.0.0', PORT, altConnect);
     expect(altConnectWasUsed).to.eql(true);
     const onBuildSuccessful = server.onBuildSuccessful;
     return new RSVP.Promise((resolve, reject) => {

@@ -46,6 +46,7 @@
     "mocha": "^4.0.1",
     "mocha-eslint": "^4.1.0",
     "multidep": "^2.0.2",
+    "portfinder": "^1.0.13",
     "prettier": "^1.8.2",
     "semver": "^5.4.1",
     "sinon": "^4.1.2",
