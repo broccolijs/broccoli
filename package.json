@@ -31,6 +31,7 @@
     "rimraf": "^2.6.2",
     "rsvp": "^4.7.0",
     "sane": "^2.2.0",
+    "semver": "^5.4.1",
     "tmp": "0.0.33",
     "tree-sync": "^1.2.2",
     "underscore.string": "^3.2.2"
@@ -48,7 +49,6 @@
     "multidep": "^2.0.2",
     "portfinder": "^1.0.13",
     "prettier": "^1.8.2",
-    "semver": "^5.4.1",
     "sinon": "^4.1.2",
     "sinon-chai": "^2.14.0",
     "symlink-or-copy": "^1.1.8"
