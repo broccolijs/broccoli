@@ -1,7 +1,9 @@
 'use strict';
 
 const RSVP = require('rsvp');
+const WatchDetector = require('watch-detector');
 const chai = require('chai');
+const childProcess = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const sinon = require('sinon').createSandbox();
@@ -38,6 +40,9 @@ describe('cli', function() {
     });
 
     it('creates watcher with sane options', function() {
+      sinon
+        .stub(WatchDetector.prototype, 'findBestWatcherOption')
+        .value(() => ({ watcher: 'polling' }));
       const spy = createWatcherSpy();
       // --watch is passed so Watcher spy can be used
       return cli(['node', 'broccoli', 'build', 'dist', '--watch']).then(() =>
@@ -46,9 +51,9 @@ describe('cli', function() {
           sinon.match.has(
             'saneOptions',
             sinon.match({
-              poll: false,
+              poll: true,
               watchman: false,
-              node: true,
+              node: false,
             })
           )
         )
@@ -108,7 +113,8 @@ describe('cli', function() {
         );
       });
 
-      it('creates watcher with sane options for watching', function() {
+      it('creates watcher with sane options for watchman', function() {
+        sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
         const spy = createWatcherSpy();
         return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'watchman']).then(
           () =>
@@ -201,6 +207,9 @@ describe('cli', function() {
     });
 
     it('creates watcher with sane options', function() {
+      sinon
+        .stub(WatchDetector.prototype, 'findBestWatcherOption')
+        .value(() => ({ watcher: 'polling' }));
       sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       // --watch is passed so Watcher spy can be used
@@ -210,9 +219,9 @@ describe('cli', function() {
           sinon.match.has(
             'saneOptions',
             sinon.match({
-              poll: false,
+              poll: true,
               watchman: false,
-              node: true,
+              node: false,
             })
           )
         )
@@ -337,7 +346,8 @@ describe('cli', function() {
   });
 
   context('with param --watcher', function() {
-    it('creates watcher with sane options for polling', function() {
+    it('creates watcher with sane options for watchman', function() {
+      sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
       sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']).then(() =>
@@ -355,7 +365,7 @@ describe('cli', function() {
       );
     });
 
-    it('creates watcher with sane options for polling', function() {
+    it('creates watcher with sane options for node', function() {
       sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'node']).then(() =>
