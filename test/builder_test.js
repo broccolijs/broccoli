@@ -29,6 +29,9 @@ RSVP.on('error', error => {
   throw error;
 });
 
+function wait(time) {
+  return new RSVP.Promise(resolve => setTimeout(resolve, time || 0));
+}
 // Make a default set of plugins with the latest Plugin version. In some tests
 // we'll shadow this `plugins` variable with one created with different versions.
 const plugins = makePlugins(Plugin);
@@ -716,6 +719,180 @@ describe('Builder', function() {
   describe('Builder interface', function() {
     it('has a features hash', function() {
       expect(Builder.prototype).to.have.nested.property('features.persistentOutputFlag', true);
+    });
+  });
+
+  describe('cancel()', function() {
+    it('handles a cancel without an active build (has no affect)', function() {
+      let stepA = new plugins.Noop();
+      let pipeline = new Builder(stepA);
+
+      pipeline.cancel();
+      pipeline.cancel(); // ensure double cancel is always safe here
+
+      expect(stepA.buildCount).to.eql(0);
+
+      return pipeline.build().then(() => {
+        expect(stepA.buildCount).to.eql(1);
+      });
+    });
+
+    it('returns a promise which waits until cancellation is complete', function() {
+      let pipeline;
+      let stepAIsComplete = false;
+      let cancellingIsComplete = false;
+
+      class StepA extends plugins.Deferred {
+        build() {
+          resolveCancel(pipeline.cancel());
+
+          setTimeout(() => this.resolve(), 50);
+
+          return super.build().then(() => {
+            stepAIsComplete = true;
+            expect(cancellingIsComplete).to.eql(
+              false,
+              'expected cancelling to not complete before stepA'
+            );
+          });
+        }
+      }
+
+      const stepA = new StepA();
+      const stepB = new plugins.Deferred([stepA]);
+
+      pipeline = new Builder(stepB);
+
+      const building = expect(pipeline.build()).to.eventually.be.rejectedWith('BUILD CANCELLED');
+
+      let resolveCancel;
+      const cancelling = new RSVP.Promise(resolve => (resolveCancel = resolve));
+
+      return RSVP.Promise.all([
+        building,
+        cancelling.then(() => {
+          cancellingIsComplete = true;
+          expect(stepAIsComplete).to.eql(
+            true,
+            'expected stepA to be complete before cancel completes'
+          );
+        }),
+      ]);
+    });
+
+    it('errors if a new build is attempted during a cancellation', function() {
+      const stepA = new plugins.Deferred();
+      const pipeline = new Builder(stepA);
+      const build = pipeline.build();
+
+      return wait().then(() => {
+        let wait = RSVP.Promise.all([
+          expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED'),
+          pipeline.cancel(),
+          expect(pipeline.build()).to.eventually.be.rejectedWith(
+            'Cannot start a build if one is already running'
+          ),
+          expect(pipeline.build()).to.eventually.be.rejectedWith(
+            'Cannot start a build if one is already running'
+          ),
+          expect(pipeline.build()).to.eventually.be.rejectedWith(
+            'Cannot start a build if one is already running'
+          ),
+        ]);
+
+        stepA.resolve();
+
+        return wait;
+      });
+    });
+
+    it('build before cancel completes', function() {
+      let stepA = new plugins.Noop();
+      let pipeline = new Builder(stepA);
+
+      pipeline.cancel();
+      pipeline.cancel(); // ensure double cancel is always safe here
+
+      expect(stepA.buildCount).to.eql(0);
+
+      return pipeline.build().then(() => {
+        expect(stepA.buildCount).to.eql(1);
+      });
+    });
+
+    it('it cancels immediately if cancelled immediately after build', function() {
+      const step = new plugins.Deferred();
+      let pipeline = new Builder(step);
+      step.resolve();
+      let build = pipeline.build();
+      pipeline.cancel();
+
+      return RSVP.Promise.resolve(
+        expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED')
+      ).finally(() => {
+        expect(step.buildCount).to.eql(0);
+      });
+    });
+
+    it('completes the current task before cancelling, and can be resumed', function() {
+      let pipeline;
+
+      class SometimesBuildCanceller extends plugins.Noop {
+        build() {
+          super.build();
+
+          // cancel the first build, but allow the rest to proceed
+          if (this.buildCount === 1 || this.buildCount === 3) {
+            pipeline.cancel();
+          }
+        }
+      }
+
+      const stepA = new SometimesBuildCanceller();
+
+      const stepB = new plugins.Noop([stepA]);
+      const stepC = new plugins.Noop([stepB]);
+
+      pipeline = new Builder(stepC);
+
+      // build #1
+      let build = pipeline.build();
+
+      // once the build has begun:
+      // 1. allow StepA to complete
+      // 2. cancel the build
+      // 3. wait for the build settle
+      //   (stepB and stepC should not have run)
+
+      return expect(
+        build.finally(() => {
+          expect(stepA.buildCount).to.eql(1, 'stepA.buildCount');
+          expect(stepB.buildCount).to.eql(0, 'stepB.buildCount');
+          expect(stepC.buildCount).to.eql(0, 'stepC.buildCount');
+        })
+      )
+        .to.eventually.be.rejectedWith('BUILD CANCELLED')
+        .then(() => {
+          // build #2
+          let build = pipeline.build();
+
+          return build.then(() => {
+            expect(stepA.buildCount).to.eql(2, 'stepA.buildCount');
+            expect(stepB.buildCount).to.eql(1, 'stepB.buildCount');
+            expect(stepC.buildCount).to.eql(1, 'stepC.buildCount');
+
+            // build #3
+            return expect(pipeline.build())
+              .to.eventually.be.rejectedWith('BUILD CANCELLED')
+              .then(() => {
+                // build will cancel again during stepA (before the stepB) so
+                // only stepA should have made progress
+                expect(stepA.buildCount).to.eql(3, 'stepA.buildCount');
+                expect(stepB.buildCount).to.eql(1, 'stepB.buildCount');
+                expect(stepC.buildCount).to.eql(1, 'stepC.buildCount');
+              });
+          });
+        });
     });
   });
 });
