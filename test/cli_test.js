@@ -166,6 +166,12 @@ describe('cli', function() {
       });
     });
 
+    it('supports `b` alias', function() {
+      return cli(['node', 'broccoli', 'b']).then(() => {
+        chai.expect(exitStub).to.be.calledWith(0);
+      });
+    });
+
     context('with param --output-path', function() {
       it('closes process on completion', function() {
         return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
