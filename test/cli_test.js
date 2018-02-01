@@ -202,6 +202,13 @@ describe('cli', function() {
           consoleMock.verify();
         });
       });
+
+      it('accepts --overwrite option', function() {
+        fs.mkdirSync('dist');
+        return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
+          chai.expect(fs.existsSync('dist')).to.be.true;
+        });
+      });
     });
   });
 
@@ -407,6 +414,13 @@ describe('cli', function() {
           )
         )
       );
+    });
+
+    it('accepts --overwrite option', function() {
+      fs.mkdirSync('dist');
+      return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
+        chai.expect(fs.existsSync('dist')).to.be.true;
+      });
     });
   });
 });
