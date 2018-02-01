@@ -329,7 +329,9 @@ describe('cli', function() {
           consoleMock
             .expects('error')
             .once()
-            .withArgs('subdir/ already exists; we cannot build into an existing directory');
+            .withArgs(
+              'subdir/ already exists; we cannot build into an existing directory, pass --overwrite to auto-delete the output directory'
+            );
 
           sinon.stub(broccoli, 'server').value({ serve() {} });
           return cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']).then(() => {
