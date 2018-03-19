@@ -228,6 +228,13 @@ describe('cli', function() {
           consoleMock.verify();
         });
       });
+
+      it('accepts --overwrite option', function() {
+        fs.mkdirSync('dist');
+        return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
+          chai.expect(fs.existsSync('dist')).to.be.true;
+        });
+      });
     });
   });
 
@@ -363,7 +370,9 @@ describe('cli', function() {
           consoleMock
             .expects('error')
             .once()
-            .withArgs('subdir/ already exists; we cannot build into an existing directory');
+            .withArgs(
+              'subdir/ already exists; we cannot build into an existing directory, pass --overwrite to auto-delete the output directory'
+            );
 
           sinon.stub(broccoli, 'server').value({ serve() {} });
           return cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']).then(() => {
@@ -439,6 +448,13 @@ describe('cli', function() {
           )
         )
       );
+    });
+
+    it('accepts --overwrite option', function() {
+      fs.mkdirSync('dist');
+      return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
+        chai.expect(fs.existsSync('dist')).to.be.true;
+      });
     });
   });
 });
