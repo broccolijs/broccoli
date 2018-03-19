@@ -10,6 +10,7 @@ const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
 
 const Builder = require('../lib/builder');
+const BuilderError = require('../lib/errors/builder');
 const DummyWatcher = require('../lib/dummy-watcher');
 const broccoli = require('../lib/index');
 const cli = require('../lib/cli');
@@ -161,8 +162,33 @@ describe('cli', function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
         return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
-          () => chai.expect(spy).to.be.calledWith('../Brocfile.js')
+          () => chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'))
         );
+      });
+
+      context('and with param --cwd', function() {
+        it('closes process on completion', function() {
+          return cli([
+            'node',
+            'broccoli',
+            'build',
+            'dist',
+            '--cwd',
+            '..',
+            '--brocfile-path',
+            '../../empty/Brocfile.js',
+          ]).then(() => {
+            chai.expect(exitStub).to.be.calledWith(0);
+          });
+        });
+      });
+    });
+
+    context('with param --cwd', function() {
+      it('throws BuilderError on wrong path', function() {
+        chai
+          .expect(() => cli(['node', 'broccoli', 'build', 'dist', '--cwd', '../../basic']))
+          .to.throw(BuilderError, /Directory not found/);
       });
     });
 
@@ -291,7 +317,15 @@ describe('cli', function() {
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
         cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
-        chai.expect(spy).to.be.calledWith('../Brocfile.js');
+        chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'));
+      });
+    });
+
+    context('with param --cwd', function() {
+      it('throws BuilderError on wrong path', function() {
+        chai
+          .expect(() => cli(['node', 'broccoli', 'serve', '--cwd', '../../basic']))
+          .to.throw(BuilderError, /Directory not found/);
       });
     });
 
