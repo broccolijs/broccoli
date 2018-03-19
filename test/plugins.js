@@ -9,36 +9,48 @@ const symlinkOrCopySync = require('symlink-or-copy').sync;
 module.exports = function(Plugin) {
   const plugins = {};
 
-  plugins.Noop = class NoopPlugin extends Plugin {
-    build() {}
-  };
-
-  // This plugin writes foo.js into its outputPath
-  plugins.Veggies = class VeggiesPlugin extends Plugin {
+  class CountingPlugin extends Plugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
+      this._count = 0;
     }
 
     build() {
+      this._count++;
+    }
+
+    get buildCount() {
+      return this._count;
+    }
+  }
+
+  plugins.Noop = class NoopPlugin extends CountingPlugin {};
+
+  // This plugin writes foo.js into its outputPath
+  plugins.Veggies = class VeggiesPlugin extends CountingPlugin {
+    build() {
+      super.build();
       fs.writeFileSync(this.outputPath + '/veggies.txt', 'tasty');
     }
   };
 
-  plugins.Merge = class MergePlugin extends Plugin {
+  plugins.Merge = class MergePlugin extends CountingPlugin {
     build() {
+      super.build();
       for (let i = 0; i < this.inputPaths.length; i++) {
         symlinkOrCopySync(this.inputPaths[i], this.outputPath + '/' + i);
       }
     }
   };
 
-  plugins.Failing = class FailingPlugin extends Plugin {
+  plugins.Failing = class FailingPlugin extends CountingPlugin {
     constructor(errorObject, options) {
       super([], options);
       this.errorObject = errorObject;
     }
 
     build() {
+      super.build();
       throw this.errorObject;
     }
   };
@@ -47,7 +59,7 @@ module.exports = function(Plugin) {
   // The build will stall until you call node.finishBuild().
   // To wait until the build starts, chain on node.buildStarted.
   // Don't build more than once.
-  plugins.Async = class AsyncPlugin extends Plugin {
+  plugins.Async = class AsyncPlugin extends CountingPlugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
       this.buildFinishedDeferred = RSVP.defer();
@@ -56,6 +68,7 @@ module.exports = function(Plugin) {
     }
 
     build() {
+      super.build();
       this.buildStartedDeferred.resolve();
       return this.buildFinishedDeferred.promise;
     }
@@ -69,13 +82,29 @@ module.exports = function(Plugin) {
     }
   };
 
-  plugins.Sleeping = class SleepingPlugin extends Plugin {
+  plugins.Sleeping = class SleepingPlugin extends CountingPlugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
     }
 
     build() {
+      super.build();
       return new RSVP.Promise(resolve => setTimeout(resolve, 10));
+    }
+  };
+
+  plugins.Deferred = class DeferredPlugin extends CountingPlugin {
+    constructor(inputNodes, options) {
+      super(inputNodes || [], options);
+      this.promise = new RSVP.Promise((resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+      });
+    }
+
+    build() {
+      super.build();
+      return this.promise;
     }
   };
 
