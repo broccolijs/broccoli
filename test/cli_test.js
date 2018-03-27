@@ -213,9 +213,8 @@ describe('cli', function() {
 
       context('and with [target]', function() {
         it('exits with error', function() {
-          return cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']).then(() => {
-            chai.expect(exitStub).to.be.calledWith(1);
-          });
+          cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
+          chai.expect(exitStub).to.be.calledWith(1);
         });
 
         it('outputs error reason to console', function() {
@@ -360,9 +359,8 @@ describe('cli', function() {
       context('and with folder already existing', function() {
         it('exits with error', function() {
           sinon.stub(broccoli, 'server').value({ serve() {} });
-          return cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']).then(() => {
-            chai.expect(exitStub).to.be.calledWith(1);
-          });
+          cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
+          chai.expect(exitStub).to.be.calledWith(1);
         });
 
         it('outputs error reason to console', function() {
@@ -375,9 +373,8 @@ describe('cli', function() {
             );
 
           sinon.stub(broccoli, 'server').value({ serve() {} });
-          return cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']).then(() => {
-            consoleMock.verify();
-          });
+          cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
+          consoleMock.verify();
         });
       });
     });
