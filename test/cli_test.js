@@ -228,10 +228,28 @@ describe('cli', function() {
         });
       });
 
-      it('accepts --overwrite option', function() {
-        fs.mkdirSync('dist');
-        return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
-          chai.expect(fs.existsSync('dist')).to.be.true;
+      context('accepts --overwrite option', function() {
+        it('removes existing files', function() {
+          fs.mkdirSync('../dist');
+          fs.writeFileSync('../dist/foo.txt', 'foo');
+
+          return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
+            chai.expect(fs.existsSync('dist')).to.be.true;
+            chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
+          });
+        });
+
+        it('errors if [target] is a parent directory', function() {
+          const consoleMock = sinon.mock(console);
+          consoleMock
+            .expects('error')
+            .once()
+            .withArgs(
+              'option --overwrite can not be used if outputPath is a parent directory: ../'
+            );
+          cli(['node', 'broccoli', 'build', '--overwrite', '../']);
+          consoleMock.verify();
+          chai.expect(exitStub).to.be.calledWith(1);
         });
       });
     });
@@ -357,6 +375,10 @@ describe('cli', function() {
       });
 
       context('and with folder already existing', function() {
+        afterEach(() => {
+          rimraf.sync('dist');
+        });
+
         it('exits with error', function() {
           sinon.stub(broccoli, 'server').value({ serve() {} });
           cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
@@ -369,12 +391,47 @@ describe('cli', function() {
             .expects('error')
             .once()
             .withArgs(
-              'subdir/ already exists; we cannot build into an existing directory, pass --overwrite to auto-delete the output directory'
+              'subdir/ already exists; we cannot build into an existing directory, pass --overwrite to overwrite the output directory'
             );
 
           sinon.stub(broccoli, 'server').value({ serve() {} });
           cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
           consoleMock.verify();
+        });
+
+        context('accepts --overwrite option', function() {
+          it('removes existing files', function(done) {
+            fs.mkdirSync('../dist');
+            fs.writeFileSync('../dist/foo.txt', 'foo');
+
+            let watcher;
+            sinon.stub(broccoli, 'server').value({
+              serve(_watcher) {
+                watcher = _watcher;
+                _watcher.start();
+              },
+            });
+            cli(['node', 'broccoli', 'serve', '--overwrite', '--output-path', 'dist']);
+            watcher.on('buildSuccess', function() {
+              chai.expect(fs.existsSync('dist')).to.be.true;
+              chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
+              watcher.quit();
+              done();
+            });
+          });
+
+          it('errors if [target] is a parent directory', function() {
+            const consoleMock = sinon.mock(console);
+            consoleMock
+              .expects('error')
+              .once()
+              .withArgs(
+                'option --overwrite can not be used if outputPath is a parent directory: ../'
+              );
+            cli(['node', 'broccoli', 'build', '--overwrite', '../']);
+            consoleMock.verify();
+            chai.expect(exitStub).to.be.calledWith(1);
+          });
         });
       });
     });
@@ -445,13 +502,6 @@ describe('cli', function() {
           )
         )
       );
-    });
-
-    it('accepts --overwrite option', function() {
-      fs.mkdirSync('dist');
-      return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
-        chai.expect(fs.existsSync('dist')).to.be.true;
-      });
     });
   });
 });
