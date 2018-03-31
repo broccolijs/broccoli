@@ -39,7 +39,7 @@ describe('cli', function() {
     afterEach(function() {
       rimraf.sync('dist');
     });
-
+  
     it('creates watcher with sane options', function() {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
@@ -60,7 +60,7 @@ describe('cli', function() {
         )
       );
     });
-
+  
     context('on successful build', function() {
       it('cleanups tmp files', function() {
         const cleanup = sinon.spy(Builder.prototype, 'cleanup');
@@ -68,34 +68,34 @@ describe('cli', function() {
           chai.expect(cleanup).to.be.calledOnce;
         });
       });
-
+  
       it('closes process on completion', function() {
         return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
           chai.expect(exitStub).to.be.calledWith(0);
         });
       });
-
+  
       it('creates output folder', function() {
         return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
           chai.expect(fs.existsSync('dist')).to.be.true;
         });
       });
     });
-
+  
     context('with param --watch', function() {
       it('starts watcher', function(done) {
         sinon.stub(broccoli.Watcher.prototype, 'start').value(() => done());
         cli(['node', 'broccoli', 'build', 'dist', '--watch']);
       });
     });
-
+  
     context('with param --watcher', function() {
       it('closes process on completion', function() {
         return cli(['node', 'broccoli', 'build', 'dist', '--watcher', 'polling']).then(() =>
           chai.expect(exitStub).to.be.calledWith(0)
         );
       });
-
+  
       it('creates watcher with sane options for polling', function() {
         const spy = createWatcherSpy();
         return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'polling']).then(
@@ -113,7 +113,7 @@ describe('cli', function() {
             )
         );
       });
-
+  
       it('creates watcher with sane options for watchman', function() {
         sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
         const spy = createWatcherSpy();
@@ -132,7 +132,7 @@ describe('cli', function() {
             )
         );
       });
-
+  
       it('creates watcher with sane options for node', function() {
         const spy = createWatcherSpy();
         return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']).then(() =>
@@ -150,14 +150,14 @@ describe('cli', function() {
         );
       });
     });
-
+  
     context('with param --brocfile-path', function() {
       it('closes process on completion', function() {
         return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
           () => chai.expect(exitStub).to.be.calledWith(0)
         );
       });
-
+  
       it('loads brocfile from a path', function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
@@ -165,7 +165,7 @@ describe('cli', function() {
           () => chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'))
         );
       });
-
+  
       context('and with param --cwd', function() {
         it('closes process on completion', function() {
           return cli([
@@ -183,7 +183,7 @@ describe('cli', function() {
         });
       });
     });
-
+  
     context('with param --cwd', function() {
       it('throws BuilderError on wrong path', function() {
         chai
@@ -191,32 +191,32 @@ describe('cli', function() {
           .to.throw(BuilderError, /Directory not found/);
       });
     });
-
+  
     it('supports `b` alias', function() {
       return cli(['node', 'broccoli', 'b']).then(() => {
         chai.expect(exitStub).to.be.calledWith(0);
       });
     });
-
+  
     context('with param --output-path', function() {
       it('closes process on completion', function() {
         return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
           chai.expect(exitStub).to.be.calledWith(0);
         });
       });
-
+  
       it('creates output folder', function() {
         return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
           chai.expect(fs.existsSync('dist')).to.be.true;
         });
       });
-
+  
       context('and with [target]', function() {
         it('exits with error', function() {
           cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
           chai.expect(exitStub).to.be.calledWith(1);
         });
-
+  
         it('outputs error reason to console', function() {
           const consoleMock = sinon.mock(console);
           consoleMock
@@ -229,9 +229,12 @@ describe('cli', function() {
       });
 
       it('accepts --overwrite option', function() {
-        fs.mkdirSync('dist');
+        fs.mkdirSync('../dist');
+        fs.writeFileSync('../dist/foo.txt', 'foo');
+
         return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
           chai.expect(fs.existsSync('dist')).to.be.true;
+          chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
         });
       });
     });
@@ -265,7 +268,7 @@ describe('cli', function() {
         )
       );
     });
-
+  
     it('should start a server with default values', function() {
       server
         .expects('serve')
@@ -274,7 +277,7 @@ describe('cli', function() {
       cli(['node', 'broccoli', 'serve']);
       server.verify();
     });
-
+  
     it('supports `s` alias', function() {
       server
         .expects('serve')
@@ -283,13 +286,13 @@ describe('cli', function() {
       cli(['node', 'broccoli', 's']);
       server.verify();
     });
-
+  
     it('starts server with given ip adress', function() {
       server.expects('serve').withArgs(sinon.match.any, '192.168.2.123', sinon.match.number);
       cli(['node', 'broccoli', 'serve', '--host', '192.168.2.123']);
       server.verify();
     });
-
+  
     it('converts port to a number and starts the server at given port', function() {
       server
         .expects('serve')
@@ -298,7 +301,7 @@ describe('cli', function() {
       cli(['node', 'broccoli', 'serve', '--port', '1234']);
       server.verify();
     });
-
+  
     it('converts port to a number and starts the server at given port and host', function() {
       server
         .expects('serve')
@@ -307,7 +310,7 @@ describe('cli', function() {
       cli(['node', 'broccoli', 'serve', '--port=1234', '--host=192.168.2.123']);
       server.verify();
     });
-
+  
     context('with param --brocfile-path', function() {
       it('starts serve', function() {
         server
@@ -317,7 +320,7 @@ describe('cli', function() {
         cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
         server.verify();
       });
-
+  
       it('loads brocfile from a path', function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'server').value({ serve() {} });
@@ -326,7 +329,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'));
       });
     });
-
+  
     context('with param --cwd', function() {
       it('throws BuilderError on wrong path', function() {
         chai
@@ -334,7 +337,7 @@ describe('cli', function() {
           .to.throw(BuilderError, /Directory not found/);
       });
     });
-
+  
     context('with param --output-path', function() {
       afterEach(function() {
         rimraf.sync('dist');
@@ -357,6 +360,10 @@ describe('cli', function() {
       });
 
       context('and with folder already existing', function() {
+        afterEach(() => {
+          rimraf.sync('dist');
+        });
+
         it('exits with error', function() {
           sinon.stub(broccoli, 'server').value({ serve() {} });
           cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
@@ -369,16 +376,36 @@ describe('cli', function() {
             .expects('error')
             .once()
             .withArgs(
-              'subdir/ already exists; we cannot build into an existing directory, pass --overwrite to auto-delete the output directory'
+              'subdir/ already exists; we cannot build into an existing directory, pass --overwrite to overwrite the output directory'
             );
 
           sinon.stub(broccoli, 'server').value({ serve() {} });
           cli(['node', 'broccoli', 'serve', '--output-path', 'subdir']);
           consoleMock.verify();
         });
+
+        it('accepts --overwrite option', function(done) {
+          fs.mkdirSync('../dist');
+          fs.writeFileSync('../dist/foo.txt', 'foo');
+
+          let watcher;
+          sinon.stub(broccoli, 'server').value({
+            serve(_watcher) {
+              watcher = _watcher;
+              _watcher.start();
+            },
+          });
+          cli(['node', 'broccoli', 'serve', '--overwrite', '--output-path', 'dist']);
+          watcher.on('buildSuccess', function() {
+            chai.expect(fs.existsSync('dist')).to.be.true;
+            chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
+            watcher.quit();
+            done();
+          });
+        });
       });
     });
-
+  
     context('with param --no-watch', function() {
       it('should start a server with default values', function() {
         server
@@ -390,7 +417,7 @@ describe('cli', function() {
       });
     });
   });
-
+  
   context('with param --watcher', function() {
     it('creates watcher with sane options for watchman', function() {
       sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
@@ -410,7 +437,7 @@ describe('cli', function() {
         )
       );
     });
-
+  
     it('creates watcher with sane options for node', function() {
       sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
@@ -428,7 +455,7 @@ describe('cli', function() {
         )
       );
     });
-
+  
     it('creates watcher with sane options for polling', function() {
       sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
@@ -445,13 +472,6 @@ describe('cli', function() {
           )
         )
       );
-    });
-
-    it('accepts --overwrite option', function() {
-      fs.mkdirSync('dist');
-      return cli(['node', 'broccoli', 'build', '--overwrite']).then(() => {
-        chai.expect(fs.existsSync('dist')).to.be.true;
-      });
     });
   });
 });
