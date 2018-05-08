@@ -69,6 +69,25 @@ describe('Builder', function() {
     }
   });
 
+  describe('build result', function() {
+    it('returns a promise', function() {
+      let stepA = new plugins.Noop();
+      let builder = new Builder(stepA);
+      let promise = builder.build();
+      expect(promise).to.be.an.instanceOf(RSVP.Promise);
+    });
+
+    it('promise resolves to a node', function() {
+      let stepA = new plugins.Noop();
+      let builder = new Builder(stepA);
+      let promise = builder.build();
+
+      return promise.then(node => {
+        expect(node.node).to.be.an.instanceOf(plugins.Noop);
+      });
+    });
+  });
+
   describe('broccoli-plugin nodes (nodeType: "transform")', function() {
     multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
       const plugins = makePlugins(Plugin);
