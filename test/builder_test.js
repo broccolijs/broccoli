@@ -424,9 +424,10 @@ describe('Builder', function() {
     it('removes temporary directory when .cleanup() is called', function() {
       builder = new Builder(new plugins.Veggies(), { tmpdir });
       expect(hasBroccoliTmpDir(tmpdir)).to.be.true;
-      builder.cleanup();
-      builder = null;
-      expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+      return builder.cleanup().then(() => {
+        builder = null;
+        expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+      });
     });
 
     describe('failing node setup', function() {
