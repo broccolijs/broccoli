@@ -6,6 +6,7 @@ const path = require('path');
 const RSVP = require('rsvp');
 const tmp = require('tmp');
 const broccoli = require('..');
+const TransformNode = require('../lib/wrappers/transform-node');
 const makePlugins = require('./plugins');
 const Builder = broccoli.Builder;
 const fixturify = require('fixturify');
@@ -67,6 +68,26 @@ describe('Builder', function() {
       builder.cleanup();
       builder = null;
     }
+  });
+
+  describe('build result', function() {
+    it('returns a promise', function() {
+      let stepA = new plugins.Noop();
+      let builder = new Builder(stepA);
+      let promise = builder.build();
+      expect(promise).to.be.an.instanceOf(RSVP.Promise);
+    });
+
+    it('promise resolves to a node', function() {
+      let stepA = new plugins.Noop();
+      let builder = new Builder(stepA);
+      let promise = builder.build();
+
+      return promise.then(node => {
+        expect(node).to.be.an.instanceOf(TransformNode);
+        expect(node.node).to.be.an.instanceOf(plugins.Noop);
+      });
+    });
   });
 
   describe('broccoli-plugin nodes (nodeType: "transform")', function() {
