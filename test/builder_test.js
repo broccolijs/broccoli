@@ -19,6 +19,7 @@ const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const multidepRequire = require('multidep')('test/multidep.json');
 const semver = require('semver');
+const heimdall = require('heimdalljs');
 
 const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
@@ -60,6 +61,10 @@ describe('Builder', function() {
   }
 
   let builder;
+
+  beforeEach(function() {
+    heimdall._reset();
+  });
 
   afterEach(function() {
     sinon.restore();
@@ -914,6 +919,224 @@ describe('Builder', function() {
               });
           });
         });
+    });
+  });
+
+  describe('heimdall stats', function() {
+    it('produces stats', function() {
+      const timeEqualAssert = function(a, b) {
+        expect(a).to.be.a('number');
+
+        // do not run timing assertions in Travis builds
+        // the actual results of process.hrtime() are not
+        // reliable
+        if (process.env.CI !== 'true') {
+          expect(a).to.be.within(b, b + 10e6);
+        }
+      };
+
+      const timeTotalAssert = function(parentNode, childNodes) {
+        expect(parentNode.stats.time.self).to.be.a('number');
+
+        let childTime = childNodes.reduce(
+          (accumulator, node) => accumulator + node.stats.time.total,
+          0
+        );
+
+        expect(parentNode.stats.time.total).to.be.equal(childTime + parentNode.stats.time.self);
+      };
+
+      const veggies = new plugins.Veggies(['test/fixtures/basic'], {
+        annotation: 'Eat your greens',
+      });
+      const sleep = new plugins.Sleeping(['test/fixtures/basic']);
+      const sleep2 = new plugins.Sleeping(['test/fixtures/basic'], { sleep: 20 });
+      const merge = new plugins.Merge([veggies, sleep, sleep2]);
+
+      builder = new Builder(merge);
+      return builder.build().then(() => {
+        const json = heimdall.toJSON();
+
+        expect(json.nodes.length).to.equal(8);
+
+        const rootNode = json.nodes[0];
+        const mergeNode = json.nodes[1];
+        const veggiesNode = json.nodes[2];
+        const sourceNode = json.nodes[3];
+
+        const sleepingNode = json.nodes[4];
+        const sourceNode2 = json.nodes[5];
+
+        const sleepingNode2 = json.nodes[6];
+        const sourceNode3 = json.nodes[7];
+
+        timeTotalAssert(rootNode, [mergeNode]);
+        timeTotalAssert(mergeNode, [veggiesNode, sleepingNode, sleepingNode2]);
+        timeTotalAssert(veggiesNode, [sourceNode]);
+        timeTotalAssert(sleepingNode, [sourceNode2]);
+        timeTotalAssert(sleepingNode2, [sourceNode3]);
+
+        timeEqualAssert(sleepingNode.stats.time.self, 10e6);
+        timeEqualAssert(sleepingNode2.stats.time.self, 20e6);
+
+        // We can't use the actual times when doing a deep equal
+        for (let node of json.nodes) {
+          node.stats.time.self = 0;
+          node.stats.time.total = 0;
+        }
+
+        expect(json).to.deep.equal({
+          nodes: [
+            {
+              _id: 0,
+              id: {
+                name: 'heimdall',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [5],
+            },
+            {
+              _id: 5,
+              id: {
+                name: 'MergePlugin',
+                label: 'MergePlugin',
+                broccoliNode: true,
+                broccoliId: 4,
+                broccoliCachedNode: false,
+                broccoliPluginName: 'MergePlugin',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [2, 3, 4],
+            },
+            {
+              _id: 2,
+              id: {
+                name: 'Eat your greens',
+                label: 'VeggiesPlugin (Eat your greens)',
+                broccoliNode: true,
+                broccoliId: 1,
+                broccoliCachedNode: false,
+                broccoliPluginName: 'VeggiesPlugin',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [1],
+            },
+            {
+              _id: 1,
+              id: {
+                name: 'test/fixtures/basic',
+                label: 'WatchedDir (test/fixtures/basic; string node)',
+                broccoliNode: true,
+                broccoliId: 0,
+                broccoliCachedNode: false,
+                broccoliPluginName: 'WatchedDir',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [],
+            },
+            {
+              _id: 3,
+              id: {
+                name: 'SleepingPlugin',
+                label: 'SleepingPlugin',
+                broccoliNode: true,
+                broccoliId: 2,
+                broccoliCachedNode: false,
+                broccoliPluginName: 'SleepingPlugin',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [6],
+            },
+            {
+              _id: 6,
+              id: {
+                name: 'test/fixtures/basic',
+                label: 'WatchedDir (test/fixtures/basic; string node)',
+                broccoliNode: true,
+                broccoliId: 0,
+                broccoliCachedNode: true,
+                broccoliPluginName: 'WatchedDir',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [],
+            },
+            {
+              _id: 4,
+              id: {
+                name: 'SleepingPlugin',
+                label: 'SleepingPlugin',
+                broccoliNode: true,
+                broccoliId: 3,
+                broccoliCachedNode: false,
+                broccoliPluginName: 'SleepingPlugin',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [7],
+            },
+            {
+              _id: 7,
+              id: {
+                name: 'test/fixtures/basic',
+                label: 'WatchedDir (test/fixtures/basic; string node)',
+                broccoliNode: true,
+                broccoliId: 0,
+                broccoliCachedNode: true,
+                broccoliPluginName: 'WatchedDir',
+              },
+              stats: {
+                own: {},
+                time: {
+                  self: 0,
+                  total: 0,
+                },
+              },
+              children: [],
+            },
+          ],
+        });
+      });
     });
   });
 });
