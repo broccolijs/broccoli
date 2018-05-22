@@ -84,12 +84,15 @@ module.exports = function(Plugin) {
 
   plugins.Sleeping = class SleepingPlugin extends CountingPlugin {
     constructor(inputNodes, options) {
+      options = options || {};
+      options.sleep = options.sleep || 10;
       super(inputNodes || [], options);
+      this.options = options;
     }
 
     build() {
       super.build();
-      return new RSVP.Promise(resolve => setTimeout(resolve, 10));
+      return new RSVP.Promise(resolve => setTimeout(resolve, this.options.sleep));
     }
   };
 

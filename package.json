@@ -26,6 +26,7 @@
     "connect": "^3.6.5",
     "findup-sync": "^2.0.0",
     "handlebars": "^4.0.11",
+    "heimdalljs": "^0.2.3",
     "heimdalljs-logger": "^0.1.9",
     "mime": "^1.5.0",
     "rimraf": "^2.6.2",
