@@ -1,5 +1,22 @@
 # master
 
+# 2.0.0-beta.1
+
+* Drop Node 4 support.
+* Drop Node 0.12 support.
+* Add visualization support via heimdalljs.
+* Add support for Node 10.
+* Ensure that mid-build cancelation avoids extra work.
+* Add `--overwrite` option to the command line interface which clobbers any
+  existing directory contents with the contents of the new build.
+* Add `--cwd` option to the command line interface which allows customizing the
+  builders working directory (and where the `Brocfile.js` is looked up from).
+* Add `--output-path` option to the command line interface.
+* Add `--watch` option to `build` sub-command.
+* Add `--no-watch` option to `serve` sub-command.
+* Add `--watcher` option to allow configuration of the watcher to be used. Currently supported values are polling, watchman, node, events.
+* General code cleanup and modernization.
+
 # 1.1.4
 
 * Roll back broccoli-slow-trees dependency
