@@ -142,7 +142,7 @@ describe('WatcherAdapter', function() {
           expect(trigger).to.have.been.calledWith('change');
 
           // reset the spy
-          trigger.reset();
+          trigger.resetHistory();
 
           // this time also watch the FIXTURE_PROJECT
           let watching = adapter.watch([FIXTURE_PROJECT]);
@@ -159,7 +159,7 @@ describe('WatcherAdapter', function() {
                 expect(trigger).to.have.been.calledWith('change');
               })
               .then(() => {
-                trigger.reset();
+                trigger.resetHistory();
 
                 fs.utimesSync(FIXTURE_BASIC + '/foo.txt', new Date(), new Date());
                 fs.utimesSync(FIXTURE_PROJECT + '/Brocfile.js', new Date(), new Date());
