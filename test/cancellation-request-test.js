@@ -4,14 +4,13 @@ const chai = require('chai');
 const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 const CancelationRequest = require('../lib/cancellation-request');
-const RSVP = require('rsvp');
 const BuilderError = require('../lib/errors/builder');
 
 chai.use(chaiAsPromised);
 
 describe('cancellation-request', function() {
   it('.isCancelled / .cancel', function() {
-    let request = new CancelationRequest(RSVP.Promise.resolve());
+    let request = new CancelationRequest(Promise.resolve());
 
     expect(request.isCancelled).to.eql(false);
     let wait = request.cancel();
@@ -23,7 +22,7 @@ describe('cancellation-request', function() {
   });
 
   it('.throwIfRequested (requested)', function() {
-    let request = new CancelationRequest(RSVP.Promise.resolve());
+    let request = new CancelationRequest(Promise.resolve());
 
     request.throwIfRequested();
 
@@ -39,13 +38,13 @@ describe('cancellation-request', function() {
   });
 
   it('.cancel (with builder rejection)', function() {
-    let request = new CancelationRequest(RSVP.Promise.reject(new BuilderError()));
+    let request = new CancelationRequest(Promise.reject(new BuilderError()));
 
     return request.cancel();
   });
 
   it('.cancel (with non-builder rejection)', function() {
-    let request = new CancelationRequest(RSVP.Promise.reject(new Error('OOPS')));
+    let request = new CancelationRequest(Promise.reject(new Error('OOPS')));
 
     return expect(request.cancel()).to.eventually.be.rejectedWith('OOPS');
   });

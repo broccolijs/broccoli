@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const RSVP = require('rsvp');
 const symlinkOrCopySync = require('symlink-or-copy').sync;
 
 // Create various test plugins subclassing from Plugin. Wrapped in a function
@@ -62,8 +61,16 @@ module.exports = function(Plugin) {
   plugins.Async = class AsyncPlugin extends CountingPlugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
-      this.buildFinishedDeferred = RSVP.defer();
-      this.buildStartedDeferred = RSVP.defer();
+      let buildFinishedDeferred = (this.buildFinishedDeferred = {});
+      buildFinishedDeferred.promise = new Promise((resolve, reject) => {
+        buildFinishedDeferred.resolve = resolve;
+        buildFinishedDeferred.reject = reject;
+      });
+      let buildStartedDeferred = (this.buildStartedDeferred = {});
+      buildStartedDeferred.promise = new Promise((resolve, reject) => {
+        buildStartedDeferred.resolve = resolve;
+        buildStartedDeferred.reject = reject;
+      });
       this.buildStarted = this.buildStartedDeferred.promise;
     }
 
@@ -92,14 +99,14 @@ module.exports = function(Plugin) {
 
     build() {
       super.build();
-      return new RSVP.Promise(resolve => setTimeout(resolve, this.options.sleep));
+      return new Promise(resolve => setTimeout(resolve, this.options.sleep));
     }
   };
 
   plugins.Deferred = class DeferredPlugin extends CountingPlugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
-      this.promise = new RSVP.Promise((resolve, reject) => {
+      this.promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
       });
