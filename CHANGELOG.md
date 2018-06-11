@@ -4,6 +4,7 @@
 
 * Update internal dependencies to latest versions.
 * Remove usages of `RSVP` (in favor of using native promises).
+* Drop support for Node versions older than 6.
 
 # 2.0.0-beta.1
 
