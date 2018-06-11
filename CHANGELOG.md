@@ -1,5 +1,10 @@
 # master
 
+# 2.0.0-beta.2
+
+* Update internal dependencies to latest versions.
+* Remove usages of `RSVP` (in favor of using native promises).
+
 # 2.0.0-beta.1
 
 * Drop Node 4 support.
