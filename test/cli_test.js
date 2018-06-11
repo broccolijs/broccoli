@@ -1,6 +1,5 @@
 'use strict';
 
-const RSVP = require('rsvp');
 const WatchDetector = require('watch-detector');
 const chai = require('chai');
 const childProcess = require('child_process');
@@ -516,7 +515,7 @@ function createWatcherSpy() {
       }
 
       start() {
-        return RSVP.resolve();
+        return Promise.resolve();
       }
     }
   );

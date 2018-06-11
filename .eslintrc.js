@@ -9,19 +9,12 @@ module.exports = {
     node: true,
   },
   rules: {
-    'strict': 'error',
+    strict: 'error',
     'no-var': 'error',
     'no-console': 'off',
     'no-process-exit': 'off',
     'object-shorthand': 'error',
-    'prettier/prettier': [
-      'error',
-      {
-        singleQuote: true,
-        trailingComma: 'es5',
-        printWidth: 100,
-      },
-    ],
+    'prettier/prettier': ['error', require('./prettier.config')],
   },
   overrides: [
     {

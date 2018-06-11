@@ -17,7 +17,7 @@ describe('WatcherAdapter', function() {
 
   describe('bindFileEvent', function() {
     const adapter = {
-      trigger() {},
+      emit() {},
     };
 
     const watcher = {
@@ -27,7 +27,7 @@ describe('WatcherAdapter', function() {
     };
 
     it('works', function() {
-      const trigger = sinon.spy(adapter, 'trigger');
+      const trigger = sinon.spy(adapter, 'emit');
       const on = sinon.spy(watcher, 'on');
 
       expect(on).to.have.not.been.called;
@@ -122,7 +122,7 @@ describe('WatcherAdapter', function() {
     it('actually works !!', function() {
       adapter = new WatcherAdapter();
 
-      let trigger = sinon.spy(adapter, 'trigger');
+      let trigger = sinon.spy(adapter, 'emit');
 
       expect(trigger).to.have.callCount(0);
 

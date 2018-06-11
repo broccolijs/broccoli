@@ -3,8 +3,8 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const RSVP = require('rsvp');
 const tmp = require('tmp');
+const promiseFinally = require('promise.prototype.finally');
 const broccoli = require('..');
 const TransformNode = require('../lib/wrappers/transform-node');
 const makePlugins = require('./plugins');
@@ -27,19 +27,15 @@ const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup();
 
-RSVP.on('error', error => {
-  throw error;
-});
-
 function wait(time) {
-  return new RSVP.Promise(resolve => setTimeout(resolve, time || 0));
+  return new Promise(resolve => setTimeout(resolve, time || 0));
 }
 // Make a default set of plugins with the latest Plugin version. In some tests
 // we'll shadow this `plugins` variable with one created with different versions.
 const plugins = makePlugins(Plugin);
 
 function sleep() {
-  return new RSVP.Promise(resolve => setTimeout(resolve, 10));
+  return new Promise(resolve => setTimeout(resolve, 10));
 }
 
 class FixtureBuilder extends Builder {
@@ -52,7 +48,7 @@ class FixtureBuilder extends Builder {
 
 function buildToFixture(node) {
   const fixtureBuilder = new FixtureBuilder(node);
-  return fixtureBuilder.build().finally(fixtureBuilder.cleanup.bind(fixtureBuilder));
+  return promiseFinally(fixtureBuilder.build(), fixtureBuilder.cleanup.bind(fixtureBuilder));
 }
 
 describe('Builder', function() {
@@ -80,7 +76,7 @@ describe('Builder', function() {
       let stepA = new plugins.Noop();
       let builder = new Builder(stepA);
       let promise = builder.build();
-      expect(promise).to.be.an.instanceOf(RSVP.Promise);
+      expect(promise).to.be.an.instanceOf(Promise);
     });
 
     it('promise resolves to a node', function() {
@@ -232,11 +228,13 @@ describe('Builder', function() {
         function isPersistent(options) {
           const builder = new FixtureBuilder(new BuildOncePlugin(options));
 
-          return builder
-            .build()
-            .then(() => builder.build())
-            .then(obj => obj['foo.txt'] === 'test')
-            .finally(() => builder.cleanup());
+          return promiseFinally(
+            builder
+              .build()
+              .then(() => builder.build())
+              .then(obj => obj['foo.txt'] === 'test'),
+            () => builder.cleanup()
+          );
         }
 
         describe('broccoli-plugin ' + version, function() {
@@ -792,9 +790,9 @@ describe('Builder', function() {
       const building = expect(pipeline.build()).to.eventually.be.rejectedWith('BUILD CANCELLED');
 
       let resolveCancel;
-      const cancelling = new RSVP.Promise(resolve => (resolveCancel = resolve));
+      const cancelling = new Promise(resolve => (resolveCancel = resolve));
 
-      return RSVP.Promise.all([
+      return Promise.all([
         building,
         cancelling.then(() => {
           cancellingIsComplete = true;
@@ -812,7 +810,7 @@ describe('Builder', function() {
       const build = pipeline.build();
 
       return wait().then(() => {
-        let wait = RSVP.Promise.all([
+        let wait = Promise.all([
           expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED'),
           pipeline.cancel(),
           expect(pipeline.build()).to.eventually.be.rejectedWith(
@@ -853,11 +851,12 @@ describe('Builder', function() {
       let build = pipeline.build();
       pipeline.cancel();
 
-      return RSVP.Promise.resolve(
-        expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED')
-      ).finally(() => {
-        expect(step.buildCount).to.eql(0);
-      });
+      return promiseFinally(
+        Promise.resolve(expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED')),
+        () => {
+          expect(step.buildCount).to.eql(0);
+        }
+      );
     });
 
     it('completes the current task before cancelling, and can be resumed', function() {
@@ -891,7 +890,7 @@ describe('Builder', function() {
       //   (stepB and stepC should not have run)
 
       return expect(
-        build.finally(() => {
+        promiseFinally(build, () => {
           expect(stepA.buildCount).to.eql(1, 'stepA.buildCount');
           expect(stepB.buildCount).to.eql(0, 'stepB.buildCount');
           expect(stepC.buildCount).to.eql(0, 'stepC.buildCount');

@@ -1,6 +1,5 @@
 'use strict';
 
-const RSVP = require('rsvp');
 const expect = require('chai').expect;
 const multidepRequire = require('multidep')('test/multidep.json');
 const sinon = require('sinon').createSandbox();
@@ -63,7 +62,7 @@ describe('server', function() {
     server = Server.serve(watcher, '0.0.0.0', PORT);
     const onBuildSuccessful = server.onBuildSuccessful;
 
-    return new RSVP.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       server.onBuildSuccessful = function() {
         try {
           onBuildSuccessful();
@@ -94,7 +93,7 @@ describe('server', function() {
     server = Server.serve(watcher, '0.0.0.0', PORT, altConnect);
     expect(altConnectWasUsed).to.eql(true);
     const onBuildSuccessful = server.onBuildSuccessful;
-    return new RSVP.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       server.onBuildSuccessful = function() {
         try {
           onBuildSuccessful();
