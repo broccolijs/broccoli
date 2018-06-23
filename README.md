@@ -88,6 +88,68 @@ running `broccoli build the-output` would generate the following folder:
 
 You can find plugins under the [broccoli-plugin keyword](https://www.npmjs.org/browse/keyword/broccoli-plugin) on npm.
 
+## Using Broccoli Programmatically
+
+In addition to using Broccoli via the combination of `broccoli-cli` and a `Brocfile.js`, you can also use Broccoli programmatically to construct your own build output via the `Builder` class. The `Builder` is one of the core APIs in Broccoli, and is responsible for taking a graph of Broccoli nodes and producing an actual build artifact (i.e. the output usually found in your `dist` directory after you run `broccoli build`). The output of a `Builder`'s `build` method is a Promise that resolves when all the operations in the graph are complete. You can use this promise to chain together additional operations (such as error handling or cleanup) that will execute once the build step is complete.
+
+By way of example, let's assume we have a graph of Broccoli nodes constructed via a combination of `Funnel` and `MergeTrees`:
+
+```js
+const html = new Funnel(appRoot, {
+  files: ['index.html'],
+  annotation: 'Index file'
+})
+
+const js = new Funnel(appRoot, {
+  files: ['app.js'],
+  destDir: '/assets',
+  annotation: 'JS Files'
+});
+
+const css = new Funnel(appRoot, {
+  srcDir: 'styles',
+  files: ['app.css'],
+  destDir: '/assets',
+  annotation: "CSS Files"
+});
+
+const public = new Funnel(appRoot, {
+  annotation: "Public Files"
+});
+
+const tree = new Merge([html, js, css, public]);
+```
+
+At this point, `tree` is a graph of nodes, each of which can represent either an input or a transformation that we want to perform. In other words, `tree` is an abstract set of operations, *not* a concrete set of output files.
+
+In order to perform all the operations described in `tree`, we need to do the following:
+- construct a `Builder` instance, passing in the graph we constructed before
+- call the `build` method, which will traverse the graph, performing each operation and eventually writing the output to a temporary folder indicated by `builder.outputPath`
+
+Since we typically want do more than write to a temporary folder, we'll also use a library called `TreeSync` to sync the contents of the temp file with our desired output directory. Finally, we'll clean up the temporary folder once all our operations are complete:
+
+```js
+const { Builder } = require('broccoli');
+const TreeSync = require('tree-sync');
+// ...snip...
+const tree = new Merge([html, js, css, public]);
+
+const builder = new Builder(tree);
+
+const outputDir = 'dist';
+const outputTree = new TreeSync(builder.outputPath, outputDir);
+
+builder.build()
+  .then(() => {
+    // Calling `sync` will synchronize the contents of the builder's `outPath` with our output directory.
+    outputTree.sync();
+  })
+  .finally(() => {
+    // Now that we're done with the build, we want to clean up the temporary files we created
+    return builder.cleanup();
+  });
+```
+
 ### Running Broccoli, Directly or Through Other Tools
 
 * [broccoli-timepiece](https://github.com/rjackson/broccoli-timepiece)
