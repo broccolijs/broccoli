@@ -142,10 +142,15 @@ const outputTree = new TreeSync(builder.outputPath, outputDir);
 builder.build()
   .then(() => {
     // Calling `sync` will synchronize the contents of the builder's `outPath` with our output directory.
-    outputTree.sync();
+    return outputTree.sync();
   })
-  .finally(() => {
-    // Now that we're done with the build, we want to clean up the temporary files we created
+  .then(() => {
+    // Now that we're done with the build, clean up any temporary files were created
+    return builder.cleanup();
+  })
+  .catch(err => {
+    // In case something in this process fails, we still want to ensure that we clean up the temp files
+    console.log(err);
     return builder.cleanup();
   });
 ```
