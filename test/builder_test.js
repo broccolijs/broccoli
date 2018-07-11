@@ -6,7 +6,6 @@ const path = require('path');
 const tmp = require('tmp');
 const promiseFinally = require('promise.prototype.finally');
 const broccoli = require('..');
-const TransformNode = require('../lib/wrappers/transform-node');
 const makePlugins = require('./plugins');
 const Builder = broccoli.Builder;
 const fixturify = require('fixturify');
@@ -84,10 +83,7 @@ describe('Builder', function() {
       let builder = new Builder(stepA);
       let promise = builder.build();
 
-      return promise.then(node => {
-        expect(node).to.be.an.instanceOf(TransformNode);
-        expect(node.node).to.be.an.instanceOf(plugins.Noop);
-      });
+      return promise;
     });
   });
 
