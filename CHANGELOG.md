@@ -1,5 +1,10 @@
 # master
 
+# 2.0.0-beta.3
+
+* Cleanup `Builder.prototype.build` to properly return `Promise<void>` (removing the `outputNodeWrapper`).
+* Add documentation for programmatic `Builder` usage.
+
 # 2.0.0-beta.2
 
 * Update internal dependencies to latest versions.
