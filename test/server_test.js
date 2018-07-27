@@ -118,19 +118,12 @@ describe('server', function() {
     const watcher = new Watcher(builder);
 
     server = Server.serve(watcher, '0.0.0.0', PORT);
-    const onBuildSuccessful = server.onBuildSuccessful;
     return new Promise((resolve, reject) => {
-      server.onBuildSuccessful = function() {
-        try {
-          onBuildSuccessful();
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      };
-    })
-      .then(() => got(`http://0.0.0.0:${PORT}/foo.txt`))
-      .then(res => {
+      server.http.on('listening', resolve);
+      server.http.on('close', reject);
+      server.http.on('error', reject);
+    }).then(() =>
+      got(`http://0.0.0.0:${PORT}/foo.txt`).then(res => {
         expect(res.statusCode).to.eql(200);
         expect(res.body).to.eql('OK');
         expect(res.headers['last-modified']).to.eql('Fri, 27 Jul 2018 17:23:02 GMT');
@@ -138,7 +131,6 @@ describe('server', function() {
         expect(res.headers['content-length']).to.eql('2');
         expect(res.headers['content-type']).to.eql('text/plain; charset=utf-8');
       })
-      .then(() => watcher.quit())
-      .then(() => server.closingPromise);
+    );
   });
 });
