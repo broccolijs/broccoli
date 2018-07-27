@@ -3,6 +3,8 @@
 const expect = require('chai').expect;
 const multidepRequire = require('multidep')('test/multidep.json');
 const sinon = require('sinon').createSandbox();
+const got = require('got');
+const fs = require('fs');
 
 const Server = require('../lib/server');
 const Watcher = require('../lib/watcher');
@@ -104,5 +106,39 @@ describe('server', function() {
         watcher.quit();
       };
     }).then(() => server.closingPromise);
+  });
+
+  it('supports serving a built file', function() {
+    fs.utimesSync(
+      'test/fixtures/basic/foo.txt',
+      new Date('2018-07-27T17:25:23.102Z'),
+      new Date('2018-07-27T17:23:02.000Z')
+    );
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+    const watcher = new Watcher(builder);
+
+    server = Server.serve(watcher, '0.0.0.0', PORT);
+    const onBuildSuccessful = server.onBuildSuccessful;
+    return new Promise((resolve, reject) => {
+      server.onBuildSuccessful = function() {
+        try {
+          onBuildSuccessful();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      };
+    })
+      .then(() => got(`http://0.0.0.0:${PORT}/foo.txt`))
+      .then(res => {
+        expect(res.statusCode).to.eql(200);
+        expect(res.body).to.eql('OK');
+        expect(res.headers['last-modified']).to.eql('Fri, 27 Jul 2018 17:23:02 GMT');
+        expect(res.headers['cache-control']).to.eql('private, max-age=0, must-revalidate');
+        expect(res.headers['content-length']).to.eql('2');
+        expect(res.headers['content-type']).to.eql('text/plain; charset=utf-8');
+      })
+      .then(() => watcher.quit())
+      .then(() => server.closingPromise);
   });
 });
