@@ -110,27 +110,48 @@ describe('server', function() {
 
   it('supports serving a built file', function() {
     fs.utimesSync(
-      'test/fixtures/basic/foo.txt',
+      'test/fixtures/public/foo.txt',
       new Date('2018-07-27T17:25:23.102Z'),
       new Date('2018-07-27T17:23:02.000Z')
     );
-    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/public'));
     const watcher = new Watcher(builder);
-
     server = Server.serve(watcher, '0.0.0.0', PORT);
     return new Promise((resolve, reject) => {
       server.http.on('listening', resolve);
       server.http.on('close', reject);
       server.http.on('error', reject);
     }).then(() =>
-      got(`http://0.0.0.0:${PORT}/foo.txt`).then(res => {
-        expect(res.statusCode).to.eql(200);
-        expect(res.body).to.eql('OK');
-        expect(res.headers['last-modified']).to.eql('Fri, 27 Jul 2018 17:23:02 GMT');
-        expect(res.headers['cache-control']).to.eql('private, max-age=0, must-revalidate');
-        expect(res.headers['content-length']).to.eql('2');
-        expect(res.headers['content-type']).to.eql('text/plain; charset=utf-8');
-      })
+      got(`http://0.0.0.0:${PORT}/foo.txt`) // basic serving
+        .then(res => {
+          expect(res.statusCode).to.eql(200);
+          expect(res.body).to.eql('Hello');
+          expect(res.headers['last-modified']).to.eql('Fri, 27 Jul 2018 17:23:02 GMT');
+          expect(res.headers['cache-control']).to.eql('private, max-age=0, must-revalidate');
+          expect(res.headers['content-length']).to.eql('5');
+          expect(res.headers['content-type']).to.eql('text/plain; charset=utf-8');
+        })
+        .then(() => got(`http://0.0.0.0:${PORT}/`)) // generated index
+        .then(res => {
+          expect(res.statusCode).to.eql(200);
+          expect(res.headers['content-type']).to.eql('text/html; charset=utf-8');
+          expect(res.body).to.match(/foo\.txt/);
+        })
+        .then(() => got(`http://0.0.0.0:${PORT}/subpath`)) // index redirect and existing index.html
+        .then(res => {
+          expect(res.statusCode).to.eql(200);
+          expect(res.headers['content-type']).to.eql('text/html; charset=utf-8');
+          expect(res.body).to.eql('<html><body>Index</body></html>');
+        })
+        .then(() => got(`http://0.0.0.0:${PORT}/../public/foo.txt`)) // dont leak root
+        .then(
+          () => {
+            new Error('should not be reached');
+          },
+          err => {
+            expect(err.message).to.match(/Forbidden/);
+          }
+        )
     );
-  });
+  }).timeout(5000);
 });
