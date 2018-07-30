@@ -1,5 +1,9 @@
 # master
 
+# 2.0.0-beta.4
+
+* Fix issues with `broccoli serve` caused by dependency updates.
+
 # 2.0.0-beta.3
 
 * Cleanup `Builder.prototype.build` to properly return `Promise<void>` (removing the `outputNodeWrapper`).
