@@ -110,11 +110,11 @@ const css = new Funnel(appRoot, {
   srcDir: 'styles',
   files: ['app.css'],
   destDir: '/assets',
-  annotation: "CSS Files"
+  annotation: 'CSS Files'
 });
 
 const public = new Funnel(appRoot, {
-  annotation: "Public Files"
+  annotation: 'Public Files'
 });
 
 const tree = new Merge([html, js, css, public]);
