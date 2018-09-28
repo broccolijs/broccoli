@@ -1,26 +1,17 @@
 # master
 
-# 2.0.0-beta.4
+# 2.0.0
 
-* Fix issues with `broccoli serve` caused by dependency updates.
-
-# 2.0.0-beta.3
-
+* Update `sane` to ensure no native dependencies are needed.
 * Cleanup `Builder.prototype.build` to properly return `Promise<void>` (removing the `outputNodeWrapper`).
 * Add documentation for programmatic `Builder` usage.
-
-# 2.0.0-beta.2
-
 * Update internal dependencies to latest versions.
 * Remove usages of `RSVP` (in favor of using native promises).
-* Drop support for Node versions older than 6.
-
-# 2.0.0-beta.1
-
-* Drop Node 4 support.
-* Drop Node 0.12 support.
-* Add visualization support via heimdalljs.
 * Add support for Node 10.
+* Drop support for Node versions older than 6.
+  * Drop Node 4 support.
+  * Drop Node 0.12 support.
+* Add visualization support via heimdalljs.
 * Ensure that mid-build cancelation avoids extra work.
 * Add `--overwrite` option to the command line interface which clobbers any
   existing directory contents with the contents of the new build.
