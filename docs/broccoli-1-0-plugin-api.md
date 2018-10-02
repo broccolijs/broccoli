@@ -7,8 +7,8 @@ plugin author wishing to make your plugin compatible with Broccoli 1.0, then
 this document is for you.
 
 If you have been directed here from an `ember-cli` build error, please see
-https://github.com/broccolijs/broccoli/issues/374 for details on how to resolve
-the error.
+https://github.com/broccolijs/broccoli/issues/374 for details on next steps
+to resolve the error.
 
 ## Overview
 
