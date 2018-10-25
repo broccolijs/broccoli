@@ -153,5 +153,5 @@ describe('server', function() {
           }
         )
     );
-  }).timeout(5000);
+  }).timeout(10000);
 });
