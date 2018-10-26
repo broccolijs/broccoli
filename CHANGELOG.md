@@ -1,5 +1,9 @@
 # master
 
+# 2.0.1
+
+* Fix various issues resulting in out of memory errors during instrumentation node traversal.
+
 # 2.0.0
 
 * Update `sane` to ensure no native dependencies are needed.
