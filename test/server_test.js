@@ -51,17 +51,17 @@ describe('server', function() {
   });
 
   it('throws if port is not a number', function() {
-    expect(() => Server.serve(new Watcher(), '0.0.0.0', '1234')).to.throw(/port/);
+    expect(() => Server.serve(new Watcher(), '127.0.0.1', '1234')).to.throw(/port/);
   });
 
   it('throws if port is NaN', function() {
-    expect(() => Server.serve(new Watcher(), '0.0.0.0', parseInt('port'))).to.throw(/port/);
+    expect(() => Server.serve(new Watcher(), '127.0.0.1', parseInt('port'))).to.throw(/port/);
   });
 
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
-    server = Server.serve(watcher, '0.0.0.0', PORT);
+    server = Server.serve(watcher, '127.0.0.1', PORT);
     const onBuildSuccessful = server.onBuildSuccessful;
 
     return new Promise((resolve, reject) => {
@@ -92,7 +92,7 @@ describe('server', function() {
     }
 
     expect(altConnectWasUsed).to.eql(false);
-    server = Server.serve(watcher, '0.0.0.0', PORT, altConnect);
+    server = Server.serve(watcher, '127.0.0.1', PORT, altConnect);
     expect(altConnectWasUsed).to.eql(true);
     const onBuildSuccessful = server.onBuildSuccessful;
     return new Promise((resolve, reject) => {
@@ -116,13 +116,13 @@ describe('server', function() {
     );
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/public'));
     const watcher = new Watcher(builder);
-    server = Server.serve(watcher, '0.0.0.0', PORT);
+    server = Server.serve(watcher, '127.0.0.1', PORT);
     return new Promise((resolve, reject) => {
       server.http.on('listening', resolve);
       server.http.on('close', reject);
       server.http.on('error', reject);
     }).then(() =>
-      got(`http://0.0.0.0:${PORT}/foo.txt`) // basic serving
+      got(`http://127.0.0.1:${PORT}/foo.txt`) // basic serving
         .then(res => {
           expect(res.statusCode).to.eql(200);
           expect(res.body).to.eql('Hello');
@@ -131,19 +131,19 @@ describe('server', function() {
           expect(res.headers['content-length']).to.eql('5');
           expect(res.headers['content-type']).to.eql('text/plain; charset=utf-8');
         })
-        .then(() => got(`http://0.0.0.0:${PORT}/`)) // generated index
+        .then(() => got(`http://127.0.0.1:${PORT}/`)) // generated index
         .then(res => {
           expect(res.statusCode).to.eql(200);
           expect(res.headers['content-type']).to.eql('text/html; charset=utf-8');
           expect(res.body).to.match(/foo\.txt/);
         })
-        .then(() => got(`http://0.0.0.0:${PORT}/subpath`)) // index redirect and existing index.html
+        .then(() => got(`http://127.0.0.1:${PORT}/subpath`)) // index redirect and existing index.html
         .then(res => {
           expect(res.statusCode).to.eql(200);
           expect(res.headers['content-type']).to.eql('text/html; charset=utf-8');
           expect(res.body).to.eql('<html><body>Index</body></html>');
         })
-        .then(() => got(`http://0.0.0.0:${PORT}/../public/foo.txt`)) // dont leak root
+        .then(() => got(`http://127.0.0.1:${PORT}/../public/foo.txt`)) // dont leak root
         .then(
           () => {
             new Error('should not be reached');
