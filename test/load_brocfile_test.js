@@ -4,6 +4,7 @@ const loadBrocfile = require('../lib/load_brocfile');
 const chai = require('chai');
 
 const projectPath = 'test/fixtures/project';
+const projectPathEsm = 'test/fixtures/project-esm';
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
 
 describe('loadBrocfile', function() {
@@ -57,6 +58,16 @@ describe('loadBrocfile', function() {
     it('throws error on invalid path', function() {
       const brocfilePath = projectPath + '/missing-brocfile.js';
       chai.expect(() => loadBrocfile({ brocfilePath })).to.throw(Error, /missing-brocfile.js/);
+    });
+  });
+
+  context('with ESM Brocfile.js', function() {
+    beforeEach(function() {
+      process.chdir(projectPathEsm);
+    });
+
+    it('return tree definition', function() {
+      chai.expect(loadBrocfile().default).to.equal('subdir');
     });
   });
 });
