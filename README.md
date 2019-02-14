@@ -35,7 +35,7 @@ The following simple `Brocfile.js` would export the `app/` subdirectory as a
 tree:
 
 ```js
-module.exports = 'app'
+export default 'app'
 ```
 
 With that Brocfile, the build result would equal the contents of the `app`
@@ -62,12 +62,16 @@ the following folder within your project folder:
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-var Funnel = require('broccoli-funnel')
+// Brocfile.js
+import funnel from 'broccoli-funnel';
 
-module.exports = new Funnel('app', {
+export default funnel('app', {
   destDir: 'appkit'
 })
 ```
+
+Broccoli support ESM modules via [esm](https://www.npmjs.com/package/esm). You can also use regular CommonJS `require`
+and `module.exports` if you prefer.
 
 That example uses the plugin
 [`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
@@ -95,29 +99,33 @@ In addition to using Broccoli via the combination of `broccoli-cli` and a `Brocf
 By way of example, let's assume we have a graph of Broccoli nodes constructed via a combination of `Funnel` and `MergeTrees`:
 
 ```js
-const html = new Funnel(appRoot, {
+// non Brocfile.js, regular commonjs
+const funnel = require('broccoli-funnel');
+const merge = require('broccoli-merge');
+
+const html = funnel(appRoot, {
   files: ['index.html'],
   annotation: 'Index file'
 })
 
-const js = new Funnel(appRoot, {
+const js = funnel(appRoot, {
   files: ['app.js'],
   destDir: '/assets',
   annotation: 'JS Files'
 });
 
-const css = new Funnel(appRoot, {
+const css = funnel(appRoot, {
   srcDir: 'styles',
   files: ['app.css'],
   destDir: '/assets',
   annotation: 'CSS Files'
 });
 
-const public = new Funnel(appRoot, {
+const public = funnel(appRoot, {
   annotation: 'Public Files'
 });
 
-const tree = new Merge([html, js, css, public]);
+const tree = merge([html, js, css, public]);
 ```
 
 At this point, `tree` is a graph of nodes, each of which can represent either an input or a transformation that we want to perform. In other words, `tree` is an abstract set of operations, *not* a concrete set of output files.
@@ -131,8 +139,9 @@ Since we typically want do more than write to a temporary folder, we'll also use
 ```js
 const { Builder } = require('broccoli');
 const TreeSync = require('tree-sync');
+const merge = require('broccoli-merge');
 // ...snip...
-const tree = new Merge([html, js, css, public]);
+const tree = merge([html, js, css, public]);
 
 const builder = new Builder(tree);
 
