@@ -23,7 +23,7 @@ npm install --global broccoli-cli
 ## Brocfile.js
 
 A `Brocfile.js` file in the project root contains the build specification. It
-should export a tree.
+should export a function that returns a tree.
 
 A tree can be any string representing a directory path, like `'app'` or
 `'src'`. Or a tree can be an object conforming to the [Plugin API
@@ -35,7 +35,7 @@ The following simple `Brocfile.js` would export the `app/` subdirectory as a
 tree:
 
 ```js
-module.exports = 'app'
+module.exports = () => 'app';
 ```
 
 With that Brocfile, the build result would equal the contents of the `app`
@@ -62,11 +62,13 @@ the following folder within your project folder:
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-var Funnel = require('broccoli-funnel')
+const Funnel = require('broccoli-funnel')
 
-module.exports = new Funnel('app', {
+module.exports = () => {
+ return new Funnel('app', {
   destDir: 'appkit'
-})
+ })
+}
 ```
 
 That example uses the plugin
