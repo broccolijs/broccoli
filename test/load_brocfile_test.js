@@ -35,8 +35,8 @@ describe('loadBrocfile', function() {
 
     it('return tree definition', function() {
       const brocfile = loadBrocfile();
-      chai.expect(brocfile).to.be.a('function')
-      chai.expect(brocfile()).to.equal(brocfileFixture)
+      chai.expect(brocfile).to.be.a('function');
+      chai.expect(brocfile()).to.equal(brocfileFixture);
     });
   });
 
