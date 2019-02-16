@@ -5,6 +5,7 @@ const chai = require('chai');
 
 const projectPath = 'test/fixtures/project';
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
+const brocfileFunctionFixture = require('../' + projectPath + '/Brocfile-Function.js');
 
 describe('loadBrocfile', function() {
   let oldCwd = null;
@@ -33,7 +34,9 @@ describe('loadBrocfile', function() {
     });
 
     it('return tree definition', function() {
-      chai.expect(loadBrocfile()).to.equal(brocfileFixture);
+      const brocfile = loadBrocfile();
+      chai.expect(brocfile).to.be.a('function');
+      chai.expect(brocfile()).to.equal(brocfileFixture);
     });
   });
 
@@ -43,20 +46,28 @@ describe('loadBrocfile', function() {
     });
 
     it('return tree definition', function() {
-      chai.expect(loadBrocfile()).to.equal(brocfileFixture);
+      chai.expect(loadBrocfile()()).to.equal(brocfileFixture);
     });
   });
 
   context('with path', function() {
     it('return tree definition', function() {
       chai
-        .expect(loadBrocfile({ brocfilePath: projectPath + '/Brocfile.js' }))
+        .expect(loadBrocfile({ brocfilePath: projectPath + '/Brocfile.js' })())
         .to.equal(brocfileFixture);
     });
 
     it('throws error on invalid path', function() {
       const brocfilePath = projectPath + '/missing-brocfile.js';
       chai.expect(() => loadBrocfile({ brocfilePath })).to.throw(Error, /missing-brocfile.js/);
+    });
+  });
+
+  context('with Brocfile that returns a function', function() {
+    it('does not wrap the function', function() {
+      const brocfile = loadBrocfile({ brocfilePath: projectPath + '/Brocfile-Function.js' });
+      chai.expect(brocfile).to.equal(brocfileFunctionFixture);
+      chai.expect(brocfile()).to.equal(brocfileFixture);
     });
   });
 });
