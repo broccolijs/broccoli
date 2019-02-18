@@ -183,6 +183,14 @@ describe('cli', function() {
       });
     });
 
+    context('with param --cwd', function() {
+      it('throws BuilderError on wrong path', function() {
+        chai
+          .expect(() => cli(['node', 'broccoli', 'build', 'dist', '--cwd', '../../basic']))
+          .to.throw(BuilderError, /Directory not found/);
+      });
+    });
+
     context('with param --environment', function() {
       it('defaults to --environment=development: { env: "development" }', function() {
         const spy = sinon.spy(loadBrocfile());
