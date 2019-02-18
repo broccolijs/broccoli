@@ -517,7 +517,7 @@ describe('cli', function() {
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        cli(['node', 'broccoli', 'serve', '--environment=production']);
+        cli(['node', 'broccoli', 'serve', '--prod']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
     });
