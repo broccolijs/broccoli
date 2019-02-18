@@ -183,11 +183,41 @@ describe('cli', function() {
       });
     });
 
-    context('with param --cwd', function() {
-      it('throws BuilderError on wrong path', function() {
-        chai
-          .expect(() => cli(['node', 'broccoli', 'build', 'dist', '--cwd', '../../basic']))
-          .to.throw(BuilderError, /Directory not found/);
+    context('with param --environment', function() {
+      it('defaults to --environment=development: { env: "development" }', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        return cli(['node', 'broccoli', 'build', 'dist']).then(() =>
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'))
+        );
+      });
+
+      it('with --environment=production passes { env: "production" }', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        return cli(['node', 'broccoli', 'build', 'dist', '--environment=production']).then(() =>
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
+        );
+      });
+
+      it('aliases --dev to --environment=development', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        return cli(['node', 'broccoli', 'build', 'dist', '--dev']).then(() =>
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'))
+        );
+      });
+
+      it('aliases --prod to --environment=production', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        return cli(['node', 'broccoli', 'build', 'dist', '--prod']).then(() =>
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
+        );
       });
     });
 
@@ -443,6 +473,44 @@ describe('cli', function() {
           .withArgs(sinon.match.instanceOf(DummyWatcher), sinon.match.string, sinon.match.number);
         cli(['node', 'broccoli', 'serve', '--no-watch']);
         server.verify();
+      });
+    });
+
+    context('with param --environment', function() {
+      it('defaults to --environment=development: { env: "development" }', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        cli(['node', 'broccoli', 'serve']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
+      });
+
+      it('with --environment=production passes { env: "production" }', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        cli(['node', 'broccoli', 'serve', '--environment=production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+      });
+
+      it('aliases --dev to --environment=development', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        cli(['node', 'broccoli', 'serve', '--dev']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
+      });
+
+      it('aliases --prod to --environment=production', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        cli(['node', 'broccoli', 'serve', '--environment=production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
     });
   });
