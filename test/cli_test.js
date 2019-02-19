@@ -210,6 +210,15 @@ describe('cli', function() {
         );
       });
 
+      it('with -e production passes { env: "production" }', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        return cli(['node', 'broccoli', 'build', 'dist', '-e', 'production']).then(() =>
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
+        );
+      });
+
       it('aliases --dev to --environment=development', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
@@ -500,6 +509,15 @@ describe('cli', function() {
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
         cli(['node', 'broccoli', 'serve', '--environment=production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+      });
+
+      it('with -e production passes { env: "production" }', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+
+        cli(['node', 'broccoli', 'serve', '-e', 'production']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
