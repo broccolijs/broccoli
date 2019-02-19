@@ -2,10 +2,13 @@
 
 const loadBrocfile = require('../lib/load_brocfile');
 const chai = require('chai');
+const esmRequire = require('esm')(module);
 
 const projectPath = 'test/fixtures/project';
+const projectPathEsm = 'test/fixtures/project-esm';
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
 const brocfileFunctionFixture = require('../' + projectPath + '/Brocfile-Function.js');
+const brocfileEsmFixture = esmRequire('../' + projectPathEsm + '/Brocfile.js');
 
 describe('loadBrocfile', function() {
   let oldCwd = null;
@@ -68,6 +71,17 @@ describe('loadBrocfile', function() {
       const brocfile = loadBrocfile({ brocfilePath: projectPath + '/Brocfile-Function.js' });
       chai.expect(brocfile).to.equal(brocfileFunctionFixture);
       chai.expect(brocfile()).to.equal(brocfileFixture);
+    });
+  });
+
+  context('with ESM Brocfile.js', function() {
+    beforeEach(function() {
+      process.chdir(projectPathEsm);
+    });
+
+    it('return tree definition', function() {
+      chai.expect(loadBrocfile()).to.equal(brocfileEsmFixture.default);
+      chai.expect(loadBrocfile()()).to.equal('subdir');
     });
   });
 });

@@ -35,7 +35,7 @@ The following simple `Brocfile.js` would export the `app/` subdirectory as a
 tree:
 
 ```js
-module.exports = () => 'app';
+export default () => 'app';
 ```
 
 With that Brocfile, the build result would equal the contents of the `app`
@@ -91,14 +91,18 @@ module.exports = (options) => {
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-const Funnel = require('broccoli-funnel')
+// Brocfile.js
+import Funnel from 'broccoli-funnel';
 
-module.exports = () => {
- return new Funnel('app', {
+export default () => new Funnel('app', {
   destDir: 'appkit'
  })
 }
 ```
+
+Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm).
+You can also use regular CommonJS `require` and `module.exports` if you prefer, however ESM is the future of Node,
+and the recommended syntax to use.
 
 That example uses the plugin
 [`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
@@ -126,6 +130,10 @@ In addition to using Broccoli via the combination of `broccoli-cli` and a `Brocf
 By way of example, let's assume we have a graph of Broccoli nodes constructed via a combination of `Funnel` and `MergeTrees`:
 
 ```js
+// non Brocfile.js, regular commonjs
+const Funnel = require('broccoli-funnel');
+const Merge = require('broccoli-merge');
+
 const html = new Funnel(appRoot, {
   files: ['index.html'],
   annotation: 'Index file'
@@ -162,6 +170,7 @@ Since we typically want do more than write to a temporary folder, we'll also use
 ```js
 const { Builder } = require('broccoli');
 const TreeSync = require('tree-sync');
+const Merge = require('broccoli-merge');
 // ...snip...
 const tree = new Merge([html, js, css, public]);
 
