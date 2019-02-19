@@ -57,6 +57,35 @@ the following folder within your project folder:
     ├─ main.js
     └─ helper.js
 
+### Options
+
+The function that is exported from `module.exports` is passed an options hash by Broccoli
+that can be used when assembling the build.
+
+The options hash is populated by the CLI environment when running `broccoli build`
+or `broccoli serve`. It currently only accepts a single option `--environment`, which
+is passed as `env` in the `options` hash.
+
+Additionally `--prod` and `--dev` are available aliases to `--environment=production`
+and `--environment=development` respectively.
+
+* `options`:
+    * `env`: Defaults to `development`, and can be overridden with the CLI argument `--environment=X`
+
+For example:
+```js
+module.exports = (options) => {
+    // tree = ... assemble tree
+
+    // In production environment, minify the files
+    if (options.environment === 'production') {
+        tree = minify(tree);
+    }
+
+    return tree;
+}
+```
+
 ### Using plugins in a `Brocfile.js`
 
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
