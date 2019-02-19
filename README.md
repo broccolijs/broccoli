@@ -35,7 +35,7 @@ The following simple `Brocfile.js` would export the `app/` subdirectory as a
 tree:
 
 ```js
-export default () => 'app'
+export default () => 'app';
 ```
 
 With that Brocfile, the build result would equal the contents of the `app`
@@ -101,8 +101,8 @@ export default () => new Funnel('app', {
 ```
 
 Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm).
-You can also use regular CommonJS `require` and `module.exports` if you prefer, however ESM is the future of Node, and
-the recommended syntax to use.
+You can also use regular CommonJS `require` and `module.exports` if you prefer, however ESM is the future of Node,
+and the recommended syntax to use.
 
 That example uses the plugin
 [`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
