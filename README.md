@@ -92,16 +92,17 @@ The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
 // Brocfile.js
-import funnel from 'broccoli-funnel';
+import Funnel from 'broccoli-funnel';
 
-export default () => funnel('app', {
+export default () => new Funnel('app', {
   destDir: 'appkit'
  })
 }
 ```
 
-Broccoli support ESM modules via [esm](https://www.npmjs.com/package/esm). You can also use regular CommonJS `require`
-and `module.exports` if you prefer.
+Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm).
+You can also use regular CommonJS `require` and `module.exports` if you prefer, however ESM is the future of Node, and
+the recommended syntax to use.
 
 That example uses the plugin
 [`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
@@ -130,32 +131,32 @@ By way of example, let's assume we have a graph of Broccoli nodes constructed vi
 
 ```js
 // non Brocfile.js, regular commonjs
-const funnel = require('broccoli-funnel');
-const merge = require('broccoli-merge');
+const Funnel = require('broccoli-funnel');
+const Merge = require('broccoli-merge');
 
-const html = funnel(appRoot, {
+const html = new Funnel(appRoot, {
   files: ['index.html'],
   annotation: 'Index file'
 })
 
-const js = funnel(appRoot, {
+const js = new Funnel(appRoot, {
   files: ['app.js'],
   destDir: '/assets',
   annotation: 'JS Files'
 });
 
-const css = funnel(appRoot, {
+const css = new Funnel(appRoot, {
   srcDir: 'styles',
   files: ['app.css'],
   destDir: '/assets',
   annotation: 'CSS Files'
 });
 
-const public = funnel(appRoot, {
+const public = new Funnel(appRoot, {
   annotation: 'Public Files'
 });
 
-const tree = merge([html, js, css, public]);
+const tree = new Merge([html, js, css, public]);
 ```
 
 At this point, `tree` is a graph of nodes, each of which can represent either an input or a transformation that we want to perform. In other words, `tree` is an abstract set of operations, *not* a concrete set of output files.
@@ -169,9 +170,9 @@ Since we typically want do more than write to a temporary folder, we'll also use
 ```js
 const { Builder } = require('broccoli');
 const TreeSync = require('tree-sync');
-const merge = require('broccoli-merge');
+const Merge = require('broccoli-merge');
 // ...snip...
-const tree = merge([html, js, css, public]);
+const tree = new Merge([html, js, css, public]);
 
 const builder = new Builder(tree);
 
