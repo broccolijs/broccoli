@@ -23,7 +23,9 @@ npm install --global broccoli-cli
 ## Brocfile.js
 
 A `Brocfile.js` file in the project root contains the build specification. It
-should export a function that returns a tree.
+should export a function that returns a tree. Note: the Brocfile historically
+could export a tree/string directly, however this is now deprecated in favor
+of a function that can receive [options](#options)
 
 A tree can be any string representing a directory path, like `'app'` or
 `'src'`. Or a tree can be an object conforming to the [Plugin API
