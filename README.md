@@ -98,8 +98,7 @@ import Funnel from 'broccoli-funnel';
 
 export default () => new Funnel('app', {
   destDir: 'appkit'
- })
-}
+})
 ```
 
 Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm).
