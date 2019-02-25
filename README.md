@@ -89,6 +89,8 @@ module.exports = (options) => {
 ```
 
 Note: Additionally, `process.env.BROCCOLI_ENV` is supported and contains the same value as `options.env`.
+This allows https://www.npmjs.com/package/broccoli-env and https://github.com/stefanpenner/broccoli-stew
+to function without requiring the additional environment variable being defined at CLI level.
 
 ### Using plugins in a `Brocfile.js`
 
