@@ -261,17 +261,6 @@ describe('cli', function() {
           chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
         });
       });
-
-      it('overwrites BROCCOLI_ENV if --environment is set', function() {
-        const spy = sinon.spy(loadBrocfile());
-        sinon.stub(broccoli, 'server').value({ serve() {} });
-        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
-        process.env.BROCCOLI_ENV = 'development';
-
-        cli(['node', 'broccoli', 'serve', '--environment=production']);
-        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
-        chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
-      });
     });
 
     it('supports `b` alias', function() {
