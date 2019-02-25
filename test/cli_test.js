@@ -241,17 +241,15 @@ describe('cli', function() {
         );
       });
 
-      it('throws exception if BROCCOLI_ENV and --environment used together', function() {
+      it('overwrites BROCCOLI_ENV with --environment', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
-        process.env.BROCCOLI_ENV = 'production';
+        process.env.BROCCOLI_ENV = 'development';
 
-        chai
-          .expect(() => cli(['node', 'broccoli', 'build', 'dist', '--environment=production']))
-          .to.throw(
-            CliError,
-            'You can not use BROCCOLI_ENV and --environment/--prod/--dev together'
-          );
+        return cli(['node', 'broccoli', 'build', 'dist', '--environment=production']).then(() => {
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+          chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
+        });
       });
     });
 
@@ -558,17 +556,15 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('throws exception if BROCCOLI_ENV and --environment used together', function() {
+      it('overwrites BROCCOLI_ENV with --environment', function() {
         const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
-        process.env.BROCCOLI_ENV = 'production';
+        process.env.BROCCOLI_ENV = 'development';
 
-        chai
-          .expect(() => cli(['node', 'broccoli', 'serve', '--environment=production']))
-          .to.throw(
-            CliError,
-            'You can not use BROCCOLI_ENV and --environment/--prod/--dev together'
-          );
+        cli(['node', 'broccoli', 'serve', '--environment=production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+        chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
       });
     });
   });
