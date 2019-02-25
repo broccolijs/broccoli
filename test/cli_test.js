@@ -10,7 +10,6 @@ const sinonChai = require('sinon-chai');
 
 const Builder = require('../lib/builder');
 const BuilderError = require('../lib/errors/builder');
-const CliError = require('../lib/errors/cli');
 const DummyWatcher = require('../lib/dummy-watcher');
 const broccoli = require('../lib/index');
 const cli = require('../lib/cli');
