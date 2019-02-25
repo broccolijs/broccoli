@@ -88,6 +88,8 @@ module.exports = (options) => {
 }
 ```
 
+Note: Additionally, `process.env.BROCCOLI_ENV` is supported and contains the same value as `options.env`.
+
 ### Using plugins in a `Brocfile.js`
 
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:

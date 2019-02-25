@@ -10,6 +10,7 @@ const sinonChai = require('sinon-chai');
 
 const Builder = require('../lib/builder');
 const BuilderError = require('../lib/errors/builder');
+const CliError = require('../lib/errors/cli');
 const DummyWatcher = require('../lib/dummy-watcher');
 const broccoli = require('../lib/index');
 const cli = require('../lib/cli');
@@ -25,6 +26,7 @@ describe('cli', function() {
     exitStub = sinon.stub(process, 'exit');
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
+    delete process.env.BROCCOLI_ENV;
   });
 
   afterEach(function() {
@@ -192,22 +194,24 @@ describe('cli', function() {
     });
 
     context('with param --environment', function() {
-      it('defaults to --environment=development: { env: "development" }', function() {
+      it('defaults to { env: "development" } and sets process.env.BROCCOLI_ENV = "development"', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'))
-        );
+        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
+          chai.expect(process.env.BROCCOLI_ENV).to.equal('development');
+        });
       });
 
-      it('with --environment=production passes { env: "production" }', function() {
+      it('with --environment=production passes { env: "production" } and sets process.env.BROCCOLI_ENV', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist', '--environment=production']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
-        );
+        return cli(['node', 'broccoli', 'build', 'dist', '--environment=production']).then(() => {
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+          chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
+        });
       });
 
       it('with -e production passes { env: "production" }', function() {
@@ -235,6 +239,19 @@ describe('cli', function() {
         return cli(['node', 'broccoli', 'build', 'dist', '--prod']).then(() =>
           chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
         );
+      });
+
+      it('throws exception if BROCCOLI_ENV and --environment used together', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+        process.env.BROCCOLI_ENV = 'production';
+
+        chai
+          .expect(() => cli(['node', 'broccoli', 'build', 'dist', '--environment=production']))
+          .to.throw(
+            CliError,
+            'You can not use BROCCOLI_ENV and --environment/--prod/--dev together'
+          );
       });
     });
 
@@ -494,22 +511,24 @@ describe('cli', function() {
     });
 
     context('with param --environment', function() {
-      it('defaults to --environment=development: { env: "development" }', function() {
+      it('defaults to { env: "development" } and process.env.BROCCOLI_ENV = "development"', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
         cli(['node', 'broccoli', 'serve']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
+        chai.expect(process.env.BROCCOLI_ENV).to.equal('development');
       });
 
-      it('with --environment=production passes { env: "production" }', function() {
+      it('with --environment=production passes { env: "production" } and sets process.env.BROCCOLI_ENV', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
         cli(['node', 'broccoli', 'serve', '--environment=production']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+        chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
       });
 
       it('with -e production passes { env: "production" }', function() {
@@ -537,6 +556,19 @@ describe('cli', function() {
 
         cli(['node', 'broccoli', 'serve', '--prod']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+      });
+
+      it('throws exception if BROCCOLI_ENV and --environment used together', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+        process.env.BROCCOLI_ENV = 'production';
+
+        chai
+          .expect(() => cli(['node', 'broccoli', 'serve', '--environment=production']))
+          .to.throw(
+            CliError,
+            'You can not use BROCCOLI_ENV and --environment/--prod/--dev together'
+          );
       });
     });
   });
