@@ -240,7 +240,18 @@ describe('cli', function() {
         );
       });
 
-      it('overwrites BROCCOLI_ENV with --environment', function() {
+      it('leaves BROCCOLI_ENV unaltered if --environment is not set', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+        process.env.BROCCOLI_ENV = 'production';
+
+        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
+          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
+          chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
+        });
+      });
+
+      it('overwrites BROCCOLI_ENV if --environment is set', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
         process.env.BROCCOLI_ENV = 'development';
@@ -249,6 +260,17 @@ describe('cli', function() {
           chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
           chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
         });
+      });
+
+      it('overwrites BROCCOLI_ENV if --environment is set', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+        process.env.BROCCOLI_ENV = 'development';
+
+        cli(['node', 'broccoli', 'serve', '--environment=production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
+        chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
       });
     });
 
@@ -555,7 +577,18 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('overwrites BROCCOLI_ENV with --environment', function() {
+      it('leaves BROCCOLI_ENV unaltered if --environment is not set', function() {
+        const spy = sinon.spy(loadBrocfile());
+        sinon.stub(broccoli, 'server').value({ serve() {} });
+        sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
+        process.env.BROCCOLI_ENV = 'production';
+
+        cli(['node', 'broccoli', 'serve']);
+        chai.expect(process.env.BROCCOLI_ENV).to.equal('production');
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
+      });
+
+      it('overwrites BROCCOLI_ENV if --environment is set', function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
