@@ -199,7 +199,7 @@ describe('cli', function() {
 
         return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
           chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
-          chai.expect(process.env.BROCCOLI_ENV).to.equal('development');
+          chai.expect(process.env.BROCCOLI_ENV).to.be.undefined;
         });
       });
 
@@ -526,7 +526,7 @@ describe('cli', function() {
 
         cli(['node', 'broccoli', 'serve']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
-        chai.expect(process.env.BROCCOLI_ENV).to.equal('development');
+        chai.expect(process.env.BROCCOLI_ENV).to.be.undefined;
       });
 
       it('with --environment=production passes { env: "production" } and sets process.env.BROCCOLI_ENV', function() {
