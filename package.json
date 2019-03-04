@@ -34,7 +34,7 @@
     "esm": "^3.2.4",
     "findup-sync": "^2.0.0",
     "handlebars": "^4.0.11",
-    "heimdalljs": "^0.2.5",
+    "heimdalljs": "^0.2.6",
     "heimdalljs-logger": "^0.1.9",
     "mime-types": "^2.1.19",
     "promise.prototype.finally": "^3.1.0",

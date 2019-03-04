@@ -444,9 +444,10 @@ describe('Builder', function() {
     it('removes temporary directory when .cleanup() is called', function() {
       builder = new Builder(new plugins.Veggies(), { tmpdir });
       expect(hasBroccoliTmpDir(tmpdir)).to.be.true;
-      builder.cleanup();
-      builder = null;
-      expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+      return builder.cleanup().then(() => {
+        builder = null;
+        expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+      });
     });
 
     describe('failing node setup', function() {
@@ -471,7 +472,12 @@ describe('Builder', function() {
           Builder.NodeSetupError,
           /foo error\s+at FailingSetupPlugin\n-~- created here: -~-/
         );
-        expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+
+        return new Promise(resolve => {
+          setTimeout(resolve, 100);
+        }).then(() => {
+          expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+        });
       });
 
       it('supports string errors, and cleans up temporary directory', function() {
@@ -483,7 +489,12 @@ describe('Builder', function() {
           Builder.NodeSetupError,
           /bar error\s+at FailingSetupPlugin\n-~- created here: -~-/
         );
-        expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+
+        return new Promise(resolve => {
+          setTimeout(resolve, 100);
+        }).then(() => {
+          expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
+        });
       });
     });
   });
