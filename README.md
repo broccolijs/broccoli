@@ -80,7 +80,7 @@ module.exports = (options) => {
     // tree = ... assemble tree
 
     // In production environment, minify the files
-    if (options.environment === 'production') {
+    if (options.env === 'production') {
         tree = minify(tree);
     }
 
