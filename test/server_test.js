@@ -3,6 +3,8 @@
 const expect = require('chai').expect;
 const multidepRequire = require('multidep')('test/multidep.json');
 const sinon = require('sinon').createSandbox();
+const got = require('got');
+const fs = require('fs');
 
 const Server = require('../lib/server');
 const Watcher = require('../lib/watcher');
@@ -49,17 +51,17 @@ describe('server', function() {
   });
 
   it('throws if port is not a number', function() {
-    expect(() => Server.serve(new Watcher(), '0.0.0.0', '1234')).to.throw(/port/);
+    expect(() => Server.serve(new Watcher(), '127.0.0.1', '1234')).to.throw(/port/);
   });
 
   it('throws if port is NaN', function() {
-    expect(() => Server.serve(new Watcher(), '0.0.0.0', parseInt('port'))).to.throw(/port/);
+    expect(() => Server.serve(new Watcher(), '127.0.0.1', parseInt('port'))).to.throw(/port/);
   });
 
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
-    server = Server.serve(watcher, '0.0.0.0', PORT);
+    server = Server.serve(watcher, '127.0.0.1', PORT);
     const onBuildSuccessful = server.onBuildSuccessful;
 
     return new Promise((resolve, reject) => {
@@ -90,7 +92,7 @@ describe('server', function() {
     }
 
     expect(altConnectWasUsed).to.eql(false);
-    server = Server.serve(watcher, '0.0.0.0', PORT, altConnect);
+    server = Server.serve(watcher, '127.0.0.1', PORT, altConnect);
     expect(altConnectWasUsed).to.eql(true);
     const onBuildSuccessful = server.onBuildSuccessful;
     return new Promise((resolve, reject) => {
@@ -105,4 +107,51 @@ describe('server', function() {
       };
     }).then(() => server.closingPromise);
   });
+
+  it('supports serving a built file', function() {
+    fs.utimesSync(
+      'test/fixtures/public/foo.txt',
+      new Date('2018-07-27T17:25:23.102Z'),
+      new Date('2018-07-27T17:23:02.000Z')
+    );
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/public'));
+    const watcher = new Watcher(builder);
+    server = Server.serve(watcher, '127.0.0.1', PORT);
+    return new Promise((resolve, reject) => {
+      server.http.on('listening', resolve);
+      server.http.on('close', reject);
+      server.http.on('error', reject);
+    }).then(() =>
+      got(`http://127.0.0.1:${PORT}/foo.txt`) // basic serving
+        .then(res => {
+          expect(res.statusCode).to.eql(200);
+          expect(res.body).to.eql('Hello');
+          expect(res.headers['last-modified']).to.eql('Fri, 27 Jul 2018 17:23:02 GMT');
+          expect(res.headers['cache-control']).to.eql('private, max-age=0, must-revalidate');
+          expect(res.headers['content-length']).to.eql('5');
+          expect(res.headers['content-type']).to.eql('text/plain; charset=utf-8');
+        })
+        .then(() => got(`http://127.0.0.1:${PORT}/`)) // generated index
+        .then(res => {
+          expect(res.statusCode).to.eql(200);
+          expect(res.headers['content-type']).to.eql('text/html; charset=utf-8');
+          expect(res.body).to.match(/foo\.txt/);
+        })
+        .then(() => got(`http://127.0.0.1:${PORT}/subpath`)) // index redirect and existing index.html
+        .then(res => {
+          expect(res.statusCode).to.eql(200);
+          expect(res.headers['content-type']).to.eql('text/html; charset=utf-8');
+          expect(res.body).to.eql('<html><body>Index</body></html>');
+        })
+        .then(() => got(`http://127.0.0.1:${PORT}/../public/foo.txt`)) // dont leak root
+        .then(
+          () => {
+            new Error('should not be reached');
+          },
+          err => {
+            expect(err.message).to.match(/Forbidden/);
+          }
+        )
+    );
+  }).timeout(10000);
 });

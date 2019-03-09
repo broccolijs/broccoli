@@ -23,7 +23,9 @@ npm install --global broccoli-cli
 ## Brocfile.js
 
 A `Brocfile.js` file in the project root contains the build specification. It
-should export a tree.
+should export a function that returns a tree. Note: the Brocfile historically
+could export a tree/string directly, however this is now deprecated in favor
+of a function that can receive [options](#options)
 
 A tree can be any string representing a directory path, like `'app'` or
 `'src'`. Or a tree can be an object conforming to the [Plugin API
@@ -35,7 +37,7 @@ The following simple `Brocfile.js` would export the `app/` subdirectory as a
 tree:
 
 ```js
-module.exports = 'app'
+export default () => 'app';
 ```
 
 With that Brocfile, the build result would equal the contents of the `app`
@@ -57,17 +59,51 @@ the following folder within your project folder:
     ├─ main.js
     └─ helper.js
 
+### Options
+
+The function that is exported from `module.exports` is passed an options hash by Broccoli
+that can be used when assembling the build.
+
+The options hash is populated by the CLI environment when running `broccoli build`
+or `broccoli serve`. It currently only accepts a single option `--environment`, which
+is passed as `env` in the `options` hash.
+
+Additionally `--prod` and `--dev` are available aliases to `--environment=production`
+and `--environment=development` respectively.
+
+* `options`:
+    * `env`: Defaults to `development`, and can be overridden with the CLI argument `--environment=X`
+
+For example:
+```js
+module.exports = (options) => {
+    // tree = ... assemble tree
+
+    // In production environment, minify the files
+    if (options.env === 'production') {
+        tree = minify(tree);
+    }
+
+    return tree;
+}
+```
+
 ### Using plugins in a `Brocfile.js`
 
 The following `Brocfile.js` exports the `app/` subdirectory as `appkit/`:
 
 ```js
-var Funnel = require('broccoli-funnel')
+// Brocfile.js
+import Funnel from 'broccoli-funnel';
 
-module.exports = new Funnel('app', {
+export default () => new Funnel('app', {
   destDir: 'appkit'
 })
 ```
+
+Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm).
+You can also use regular CommonJS `require` and `module.exports` if you prefer, however ESM is the future of Node,
+and the recommended syntax to use.
 
 That example uses the plugin
 [`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
@@ -95,6 +131,10 @@ In addition to using Broccoli via the combination of `broccoli-cli` and a `Brocf
 By way of example, let's assume we have a graph of Broccoli nodes constructed via a combination of `Funnel` and `MergeTrees`:
 
 ```js
+// non Brocfile.js, regular commonjs
+const Funnel = require('broccoli-funnel');
+const Merge = require('broccoli-merge');
+
 const html = new Funnel(appRoot, {
   files: ['index.html'],
   annotation: 'Index file'
@@ -110,11 +150,11 @@ const css = new Funnel(appRoot, {
   srcDir: 'styles',
   files: ['app.css'],
   destDir: '/assets',
-  annotation: "CSS Files"
+  annotation: 'CSS Files'
 });
 
 const public = new Funnel(appRoot, {
-  annotation: "Public Files"
+  annotation: 'Public Files'
 });
 
 const tree = new Merge([html, js, css, public]);
@@ -131,6 +171,7 @@ Since we typically want do more than write to a temporary folder, we'll also use
 ```js
 const { Builder } = require('broccoli');
 const TreeSync = require('tree-sync');
+const Merge = require('broccoli-merge');
 // ...snip...
 const tree = new Merge([html, js, css, public]);
 
