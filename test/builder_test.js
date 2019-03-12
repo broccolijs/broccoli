@@ -400,6 +400,61 @@ describe('Builder', function() {
     });
   });
 
+  describe('cleanup', function() {
+    let builder;
+
+    class Sleep extends Plugin {
+      constructor() {
+        super(...arguments);
+        this.buildWasCalled = false;
+        this.wait = new Promise(resolve => {
+          this.resolve = resolve;
+        });
+      }
+
+      build() {
+        this.buildWasCalled = true;
+        return this.wait;
+      }
+    }
+
+    afterEach(() => {
+      if (builder) {
+        return builder.cleanup();
+      }
+    });
+
+    it('mid-build cleanup cancels the build', function() {
+      const innerSleep = new Sleep([], { name: 'Sleep 1' });
+      const outerSleep = new Sleep([innerSleep], { name: 'Sleep 2' });
+
+      builder = new Builder(outerSleep);
+
+      const cleanup = innerSleep.wait.then(() => {
+        expect(innerSleep.buildWasCalled).to.eql(true);
+        expect(outerSleep.buildWasCalled).to.eql(false);
+        return builder.cleanup();
+      });
+
+      const build = builder.build();
+
+      setTimeout(() => innerSleep.resolve(), 10);
+
+      expect(innerSleep.buildWasCalled).to.eql(false);
+      expect(outerSleep.buildWasCalled).to.eql(false);
+
+      return Promise.all([
+        build.catch(e => {
+          expect(e.message).to.eql('Build Canceled');
+        }),
+        cleanup,
+      ]).then(function() {
+        expect(innerSleep.buildWasCalled).to.eql(true);
+        expect(outerSleep.buildWasCalled).to.eql(false);
+      });
+    });
+  });
+
   describe('temporary directories', function() {
     let tmpdir, tmpRemoveCallback;
 
@@ -794,7 +849,7 @@ describe('Builder', function() {
 
       pipeline = new Builder(stepB);
 
-      const building = expect(pipeline.build()).to.eventually.be.rejectedWith('BUILD CANCELLED');
+      const building = expect(pipeline.build()).to.eventually.be.rejectedWith('Build Canceled');
 
       let resolveCancel;
       const cancelling = new Promise(resolve => (resolveCancel = resolve));
@@ -818,7 +873,7 @@ describe('Builder', function() {
 
       return wait().then(() => {
         let wait = Promise.all([
-          expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED'),
+          expect(build).to.eventually.be.rejectedWith('Build Canceled'),
           pipeline.cancel(),
           expect(pipeline.build()).to.eventually.be.rejectedWith(
             'Cannot start a build if one is already running'
@@ -859,7 +914,7 @@ describe('Builder', function() {
       pipeline.cancel();
 
       return promiseFinally(
-        Promise.resolve(expect(build).to.eventually.be.rejectedWith('BUILD CANCELLED')),
+        Promise.resolve(expect(build).to.eventually.be.rejectedWith('Build Canceled')),
         () => {
           expect(step.buildCount).to.eql(0);
         }
@@ -903,7 +958,7 @@ describe('Builder', function() {
           expect(stepC.buildCount).to.eql(0, 'stepC.buildCount');
         })
       )
-        .to.eventually.be.rejectedWith('BUILD CANCELLED')
+        .to.eventually.be.rejectedWith('Build Canceled')
         .then(() => {
           // build #2
           let build = pipeline.build();
@@ -915,7 +970,7 @@ describe('Builder', function() {
 
             // build #3
             return expect(pipeline.build())
-              .to.eventually.be.rejectedWith('BUILD CANCELLED')
+              .to.eventually.be.rejectedWith('Build Canceled')
               .then(() => {
                 // build will cancel again during stepA (before the stepB) so
                 // only stepA should have made progress
