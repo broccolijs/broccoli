@@ -111,6 +111,17 @@ export default (options: BrocfileOptions) => {
 
 ```
 
+Typescript by default only allows the [ES6 modules](https://nodejs.org/api/esm.html) `import/export` syntax to work
+when importing ES6 modules. In order to import a CommonJS module (one that uses `require() or module.exports`, you must
+use the following syntax:
+
+```ts
+import foo = require('foo');
+
+export = 'bar';
+```
+
+You'll note the syntax is slightly different from the ESM syntax, but reads fairly well.
 
 ### Using plugins in a `Brocfile.js`
 
@@ -125,14 +136,14 @@ export default () => new Funnel('app', {
 })
 ```
 
-Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm).
+Broccoli supports [ES6 modules](https://nodejs.org/api/esm.html) via [esm](https://www.npmjs.com/package/esm) for
+`Brocfile.js`. Note, TypeScript requires the use of a different syntax, see the TypeScript section above.
+
 You can also use regular CommonJS `require` and `module.exports` if you prefer, however ESM is the future of Node,
 and the recommended syntax to use.
 
-That example uses the plugin
-[`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
-In order for the `require` call to work, you must first put the plugin in
-your `devDependencies` and install it, with
+That example uses the plugin [`broccoli-funnel`](https://www.npmjs.com/package/broccoli-funnel).
+In order for the `import` call to work, you must first put the plugin in your `devDependencies` and install it, with
 
     npm install --save-dev broccoli-funnel
 
