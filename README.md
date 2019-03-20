@@ -76,7 +76,7 @@ and `--environment=development` respectively.
 
 For example:
 ```js
-module.exports = (options) => {
+export default (options) => {
     // tree = ... assemble tree
 
     // In production environment, minify the files
@@ -87,6 +87,30 @@ module.exports = (options) => {
     return tree;
 }
 ```
+
+### TypeScript Support
+
+A `Brocfile.ts` can be used in place of a `Brocfile.js` and Broccoli will automatically parse this
+through [ts-node](https://www.npmjs.com/package/ts-node) to provide [TypeScript](https://www.typescriptlang.org)
+support. This allows developers to leverage type information when assembling a build pipeline. By default,
+Broccoli provides [type information](lib/index.d.ts) for the [options](#options) object passed to the build function.
+
+```ts
+import { BrocfileOptions } from 'broccoli';
+
+export default (options: BrocfileOptions) => {
+  // tree = ... assemble tree
+
+  // In production environment, minify the files
+  if (options.env === 'production') {
+    tree = minify(tree);
+  }
+
+  return tree;
+};
+
+```
+
 
 ### Using plugins in a `Brocfile.js`
 
