@@ -106,7 +106,7 @@ export default (options: BrocfileOptions) => {
     tree = minify(tree);
   }
 
-  return tree';
+  return tree;
 };
 
 ```
