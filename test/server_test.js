@@ -64,7 +64,7 @@ describe('server', function() {
   it('errors if port already in use', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
 
-    const invokeServer = (isPrimary) => {
+    const invokeServer = isPrimary => {
       const watcher = new Watcher(builder);
       const svr = Server.serve(watcher, '127.0.0.1', PORT);
       if (isPrimary) {
@@ -81,7 +81,7 @@ describe('server', function() {
             reject(e);
           }
           watcher.quit();
-        }
+        };
       });
     };
 
