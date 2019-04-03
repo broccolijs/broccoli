@@ -1,6 +1,7 @@
 'use strict';
 
-const expect = require('chai').expect;
+const chai = require('chai');
+const expect = chai.expect;
 const multidepRequire = require('multidep')('test/multidep.json');
 const sinon = require('sinon').createSandbox();
 const got = require('got');
@@ -12,12 +13,14 @@ const Builder = require('../lib/builder');
 
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 
+chai.use(require('sinon-chai'));
+
 describe('server', function() {
-  let server;
+  let server, exitStub;
   let PORT;
 
   beforeEach(function() {
-    sinon.stub(process, 'exit');
+    exitStub = sinon.stub(process, 'exit');
   });
 
   before(function() {
@@ -56,6 +59,38 @@ describe('server', function() {
 
   it('throws if port is NaN', function() {
     expect(() => Server.serve(new Watcher(), '127.0.0.1', parseInt('port'))).to.throw(/port/);
+  });
+
+  it('errors if port already in use', function() {
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+
+    const invokeServer = (isPrimary) => {
+      const watcher = new Watcher(builder);
+      const svr = Server.serve(watcher, '127.0.0.1', PORT);
+      if (isPrimary) {
+        server = svr;
+      }
+      const onBuildSuccessful = svr.onBuildSuccessful;
+
+      return new Promise((resolve, reject) => {
+        svr.onBuildSuccessful = function() {
+          try {
+            onBuildSuccessful();
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+          watcher.quit();
+        }
+      });
+    };
+
+    return invokeServer(true)
+      .then(invokeServer)
+      .then(() => server.closingPromise)
+      .then(() => {
+        chai.expect(exitStub).to.be.calledWith(1);
+      });
   });
 
   it('buildSuccess is handled', function() {
