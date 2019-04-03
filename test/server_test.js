@@ -91,7 +91,7 @@ describe('server', function() {
       .then(() => {
         chai.expect(exitStub).to.be.calledWith(1);
       });
-  });
+  }).timeout(10000);
 
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
