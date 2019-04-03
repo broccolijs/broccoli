@@ -64,11 +64,25 @@ describe('server', function() {
   it('errors if port already in use', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
 
+    let errorMessage =
+      `Oh snap 😫. It appears the serve port http://127.0.0.1:${PORT} is already in use\n` +
+      `Are you perhaps already running serve in another terminal window?\n`;
+
+    const consoleMock = sinon.mock(console);
+    consoleMock
+      .expects('error')
+      .once()
+      .withArgs(errorMessage);
+
+    let server2;
+
     const invokeServer = isPrimary => {
       const watcher = new Watcher(builder);
       const svr = Server.serve(watcher, '127.0.0.1', PORT);
       if (isPrimary) {
         server = svr;
+      } else {
+        server2 = svr;
       }
       const onBuildSuccessful = svr.onBuildSuccessful;
 
@@ -87,10 +101,12 @@ describe('server', function() {
 
     return invokeServer(true)
       .then(invokeServer)
-      .then(() => server.closingPromise)
       .then(() => {
         chai.expect(exitStub).to.be.calledWith(1);
-      });
+        consoleMock.verify();
+      })
+      .then(() => server2.closingPromise)
+      .then(() => server.closingPromise);
   }).timeout(10000);
 
   it('buildSuccess is handled', function() {
