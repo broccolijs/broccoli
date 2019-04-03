@@ -65,7 +65,7 @@ describe('server', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
 
     let errorMessage =
-      `Oh snap 😫. It appears the serve port http://127.0.0.1:${PORT} is already in use\n` +
+      `Oh snap 😫. It appears a server is already running on http://127.0.0.1:${PORT}\n` +
       `Are you perhaps already running serve in another terminal window?\n`;
 
     const consoleMock = sinon.mock(console);
