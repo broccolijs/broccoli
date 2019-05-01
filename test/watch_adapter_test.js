@@ -93,6 +93,10 @@ describe('WatcherAdapter', function() {
     const FIXTURE_PROJECT = __dirname + '/fixtures/project';
     let adapter;
 
+    const watchRoot = {
+      revise() {},
+    };
+
     afterEach(function() {
       adapter.quit();
     });
@@ -127,7 +131,7 @@ describe('WatcherAdapter', function() {
       expect(trigger).to.have.callCount(0);
 
       expect(adapter.watchers.length).to.eql(0);
-      let watching = adapter.watch([FIXTURE_BASIC]);
+      let watching = adapter.watch([{ path: FIXTURE_BASIC, root: watchRoot }]);
 
       expect(adapter.watchers.length).to.eql(1);
 
@@ -145,7 +149,7 @@ describe('WatcherAdapter', function() {
           trigger.resetHistory();
 
           // this time also watch the FIXTURE_PROJECT
-          let watching = adapter.watch([FIXTURE_PROJECT]);
+          let watching = adapter.watch([{ path: FIXTURE_PROJECT, root: watchRoot }]);
           expect(adapter.watchers.length).to.eql(2);
 
           return watching.then(val => {

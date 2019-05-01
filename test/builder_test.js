@@ -255,7 +255,9 @@ describe('Builder', function() {
           builder = new FixtureBuilder(new broccoliSource.UnwatchedDir('test/fixtures/basic'));
 
           expect(builder.watchedPaths).to.deep.equal([]);
-          expect(builder.unwatchedPaths).to.deep.equal(['test/fixtures/basic']);
+          expect(builder.unwatchedPaths.map(paths => paths.path)).to.deep.equal([
+            'test/fixtures/basic',
+          ]);
 
           return expect(builder.build()).to.eventually.deep.equal({
             'foo.txt': 'OK',
@@ -265,7 +267,9 @@ describe('Builder', function() {
         it('records watched source directories', function() {
           builder = new FixtureBuilder(new broccoliSource.WatchedDir('test/fixtures/basic'));
 
-          expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
+          expect(builder.watchedPaths.map(paths => paths.path)).to.deep.equal([
+            'test/fixtures/basic',
+          ]);
           expect(builder.unwatchedPaths).to.deep.equal([]);
 
           return expect(builder.build()).to.eventually.deep.equal({
@@ -278,7 +282,7 @@ describe('Builder', function() {
     it('records string (watched) source directories', function() {
       builder = new FixtureBuilder('test/fixtures/basic');
 
-      expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
+      expect(builder.watchedPaths.map(paths => paths.path)).to.deep.equal(['test/fixtures/basic']);
       expect(builder.unwatchedPaths).to.deep.equal([]);
 
       return expect(builder.build()).to.eventually.deep.equal({
@@ -291,7 +295,7 @@ describe('Builder', function() {
 
       builder = new FixtureBuilder(new plugins.Merge([src, src]));
 
-      expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
+      expect(builder.watchedPaths.map(paths => paths.path)).to.deep.equal(['test/fixtures/basic']);
     });
 
     it("fails construction when a watched source directory doesn't exist", function() {
