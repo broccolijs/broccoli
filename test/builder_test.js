@@ -146,6 +146,69 @@ describe('Builder', function() {
             });
         });
 
+        it('only builds if revision counter has incremented', function() {
+          const outputNode = new plugins.Merge(
+            [
+              new broccoliSource.WatchedDir('test/fixtures/basic'),
+              new broccoliSource.WatchedDir('test/fixtures/public'),
+            ],
+            { memoize: true }
+          );
+          const buildSpy = sinon.spy(outputNode, 'build');
+
+          builder = new FixtureBuilder(outputNode);
+          builder.nodeWrappers.forEach(wrap => (wrap.nodeInfo.memoize = true));
+
+          return builder
+            .build()
+            .then(() => {
+              // Now we simulate a rebuild (and the revisions have not changed)
+              return builder.build();
+            })
+            .then(() => {
+              expect(buildSpy).to.have.been.calledOnce;
+            });
+        });
+
+        it('only nodes with inputs that have different revisions call their builds', function() {
+          const basicWatchDir = new broccoliSource.WatchedDir('test/fixtures/basic');
+          const publicWatchDir = new broccoliSource.WatchedDir('test/fixtures/public');
+
+          const fooNode = new plugins.Merge([basicWatchDir], {
+            memoize: true,
+            overwrite: true,
+          });
+          const barNode = new plugins.Merge([publicWatchDir], {
+            memoize: true,
+            overwrite: true,
+          });
+          const outputNode = new plugins.Merge([fooNode, barNode], {
+            memoize: true,
+            overwrite: true,
+          });
+          const fooBuildSpy = sinon.spy(fooNode, 'build');
+          const barBuildSpy = sinon.spy(barNode, 'build');
+          const buildSpy = sinon.spy(outputNode, 'build');
+
+          builder = new FixtureBuilder(outputNode);
+          builder.nodeWrappers.forEach(wrap => (wrap.nodeInfo.memoize = true));
+
+          return builder
+            .build()
+            .then(() => {
+              // Now we simulate a rebuild (and the revisions have not changed)
+              builder.nodeWrappers
+                .find(wrap => wrap.outputPath === 'test/fixtures/basic')
+                .revised();
+              return builder.build();
+            })
+            .then(() => {
+              expect(fooBuildSpy).to.have.been.calledTwice;
+              expect(barBuildSpy).to.have.been.calledOnce;
+              expect(buildSpy).to.have.been.calledTwice;
+            });
+        });
+
         it('supplies a cachePath by default', function() {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
