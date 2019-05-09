@@ -1,7 +1,6 @@
 'use strict';
 
 const Watcher = require('../lib/watcher');
-const WatcherAdapter = require('../lib/watcher_adapter');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -15,24 +14,16 @@ describe('Watcher', function() {
   });
 
   const builder = {
-    watchedPaths: [
-      'some/path'
-    ],
+    watchedPaths: ['some/path'],
     build() {
       return Promise.resolve();
-    }
+    },
   };
 
   const adapter = {
-    on(event, cb) {
-
-    },
-    watch(watchedPaths) {
-
-    },
-    quit() {
-
-    }
+    on() {},
+    watch() {},
+    quit() {},
   };
 
   describe('start', function() {
@@ -54,8 +45,36 @@ describe('Watcher', function() {
         expect(trigger).to.have.been.calledWith('buildStart');
         expect(trigger).to.have.been.calledWith('buildSuccess');
         expect(builderBuild).to.have.been.called;
-      })
-    })
+      });
+    });
+
+    it('throws error if called twice', function() {
+      const watcher = new Watcher(builder, { watcherAdapter: adapter });
+
+      watcher._lifetimeDeferred = true;
+      expect(watcher.start.bind(watcher)).to.throw(
+        'Watcher.prototype.start() must not be called more than once'
+      );
+    });
+
+    it('calls error if build rejects', function() {
+      const watcher = new Watcher(
+        {
+          build() {
+            return Promise.reject('fail');
+          },
+        },
+        { watcherAdapter: adapter }
+      );
+      const trigger = sinon.stub(watcher, 'emit');
+
+      watcher.start();
+
+      return watcher.currentBuild.catch(error => {
+        expect(error).to.equal('fail');
+        expect(trigger).to.have.been.calledWith('buildFailure', 'fail');
+      });
+    });
   });
 
   describe('change', function() {
@@ -76,7 +95,30 @@ describe('Watcher', function() {
           expect(builderBuild).to.have.been.called;
         });
       });
-    })
+    });
+
+    it('does nothing if not ready', function() {
+      const builderBuild = sinon.spy(builder, 'build');
+
+      const watcher = new Watcher(builder, { watcherAdapter: adapter });
+      const trigger = sinon.stub(watcher, 'emit');
+
+      watcher._change('change', 'file.js', 'root');
+      expect(trigger).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
+      expect(builderBuild).to.not.have.been.called;
+    });
+
+    it('does nothing if rebuilding', function() {
+      const builderBuild = sinon.spy(builder, 'build');
+
+      const watcher = new Watcher(builder, { watcherAdapter: adapter });
+      const trigger = sinon.stub(watcher, 'emit');
+
+      watcher._rebuildScheduled = true;
+      watcher._change('change', 'file.js', 'root');
+      expect(trigger).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
+      expect(builderBuild).to.not.have.been.called;
+    });
   });
 
   describe('error', function() {
@@ -90,7 +132,17 @@ describe('Watcher', function() {
         expect(trigger).to.have.been.calledWith('quitStart');
         expect(trigger).to.have.been.calledWith('quitEnd');
       });
-    })
+    });
+
+    it('does noting if already quitting', function() {
+      const error = new Error('fail');
+      const watcher = new Watcher(builder, { watcherAdapter: adapter });
+      const trigger = sinon.stub(watcher, 'emit');
+      watcher._quittingPromise = true;
+
+      watcher._error(error);
+      expect(trigger).to.have.not.been.calledWith('error', error);
+    });
   });
 
   describe('quit', function() {
@@ -108,6 +160,18 @@ describe('Watcher', function() {
           expect(trigger).to.have.been.calledWith('quitEnd');
         });
       });
-    })
+    });
+
+    it('does nothing if already quitting', function() {
+      const adapterQuit = sinon.spy(adapter, 'quit');
+      const watcher = new Watcher(builder, { watcherAdapter: adapter });
+      const trigger = sinon.stub(watcher, 'emit');
+      watcher._quittingPromise = true;
+
+      watcher.quit();
+      expect(adapterQuit).to.not.have.been.called;
+      expect(trigger).to.not.have.been.calledWith('quitStart');
+      expect(trigger).to.not.have.been.calledWith('quitEnd');
+    });
   });
 });
