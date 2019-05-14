@@ -92,6 +92,10 @@ describe('Builder', function() {
       const plugins = makePlugins(Plugin);
 
       describe('broccoli-plugin ' + version, function() {
+        afterEach(() => {
+          delete process.env['BROCCOLI_VOLATILE'];
+        });
+
         it('builds a single node, repeatedly', function() {
           const node = new plugins.Veggies();
           const buildSpy = sinon.spy(node, 'build');
@@ -147,21 +151,22 @@ describe('Builder', function() {
         });
 
         it('only builds if revision counter has incremented', function() {
-          const outputNode = new plugins.Merge(
-            [
-              new broccoliSource.WatchedDir('test/fixtures/basic'),
-              new broccoliSource.WatchedDir('test/fixtures/public'),
-            ],
-            { memoize: true }
-          );
+          process.env['BROCCOLI_VOLATILE'] = true;
+
+          const outputNode = new plugins.Merge([
+            new broccoliSource.WatchedDir('test/fixtures/basic'),
+            new broccoliSource.WatchedDir('test/fixtures/public'),
+          ]);
+
           const buildSpy = sinon.spy(outputNode, 'build');
 
           builder = new FixtureBuilder(outputNode);
-          builder.nodeWrappers.forEach(wrap => (wrap.nodeInfo.memoize = true));
 
           return builder
             .build()
             .then(() => {
+              expect(buildSpy).to.have.been.calledOnce;
+
               // Now we simulate a rebuild (and the revisions have not changed)
               return builder.build();
             })
@@ -171,35 +176,30 @@ describe('Builder', function() {
         });
 
         it('only nodes with inputs that have different revisions call their builds', function() {
+          process.env['BROCCOLI_VOLATILE'] = true;
+
           const basicWatchDir = new broccoliSource.WatchedDir('test/fixtures/basic');
           const publicWatchDir = new broccoliSource.WatchedDir('test/fixtures/public');
 
-          const fooNode = new plugins.Merge([basicWatchDir], {
-            memoize: true,
-            overwrite: true,
-          });
-          const barNode = new plugins.Merge([publicWatchDir], {
-            memoize: true,
-            overwrite: true,
-          });
-          const outputNode = new plugins.Merge([fooNode, barNode], {
-            memoize: true,
-            overwrite: true,
-          });
+          const fooNode = new plugins.Merge([basicWatchDir], { overwrite: true });
+          const barNode = new plugins.Merge([publicWatchDir], { overwrite: true });
+          const outputNode = new plugins.Merge([fooNode, barNode], { overwrite: true });
           const fooBuildSpy = sinon.spy(fooNode, 'build');
           const barBuildSpy = sinon.spy(barNode, 'build');
           const buildSpy = sinon.spy(outputNode, 'build');
 
           builder = new FixtureBuilder(outputNode);
-          builder.nodeWrappers.forEach(wrap => (wrap.nodeInfo.memoize = true));
 
           return builder
             .build()
             .then(() => {
+              expect(fooBuildSpy).to.have.been.calledOnce;
+              expect(barBuildSpy).to.have.been.calledOnce;
+              expect(buildSpy).to.have.been.calledOnce;
+
               // Now we simulate a rebuild (and the revisions have not changed)
-              builder.nodeWrappers
-                .find(wrap => wrap.outputPath === 'test/fixtures/basic')
-                .revised();
+              builder.nodeWrappers.find(wrap => wrap.outputPath === 'test/fixtures/basic').revise();
+
               return builder.build();
             })
             .then(() => {

@@ -27,23 +27,23 @@ describe('WatcherAdapter', function() {
     };
 
     const watchRoot = {
-      revised() {},
+      revise() {},
     };
 
     it('works', function() {
       const trigger = sinon.spy(adapter, 'emit');
       const on = sinon.spy(watcher, 'on');
-      const revised = sinon.spy(watchRoot, 'revised');
+      const revise = sinon.spy(watchRoot, 'revise');
 
       expect(on).to.have.not.been.called;
       expect(trigger).to.have.not.been.called;
-      expect(revised).to.have.not.been.called;
+      expect(revise).to.have.not.been.called;
 
       bindFileEvent(adapter, watcher, watchRoot, 'change');
 
       expect(on).to.have.been.calledOnce;
       expect(trigger).to.have.been.calledOnce;
-      expect(revised).to.have.been.calledOnce;
+      expect(revise).to.have.been.calledOnce;
       expect(on).to.have.been.calledWith('change');
       expect(trigger).to.have.been.calledWith('change');
 
@@ -51,7 +51,7 @@ describe('WatcherAdapter', function() {
 
       expect(on).to.have.been.calledTwice;
       expect(trigger).to.have.been.calledTwice;
-      expect(revised).to.have.been.calledTwice;
+      expect(revise).to.have.been.calledTwice;
       expect(on).to.have.been.calledWith('add');
       expect(trigger).to.have.been.calledWith('change');
 
@@ -59,7 +59,7 @@ describe('WatcherAdapter', function() {
 
       expect(on).to.have.been.calledThrice;
       expect(trigger).to.have.been.calledThrice;
-      expect(revised).to.have.been.calledThrice;
+      expect(revise).to.have.been.calledThrice;
       expect(on).to.have.been.calledWith('remove');
       expect(trigger).to.have.been.calledWith('change');
     });
@@ -103,7 +103,7 @@ describe('WatcherAdapter', function() {
     let adapter;
 
     const watchRoot = {
-      revised() {},
+      revise() {},
     };
 
     afterEach(function() {

@@ -20,15 +20,19 @@ describe('transform-node', function() {
     transform.inputNodeWrappers = [];
   });
 
+  afterEach(() => {
+    delete process.env['BROCCOLI_VOLATILE'];
+  });
+
   it('shouldBuild method should return false there are no input nodes and this is a rebuild', function() {
-    transform.nodeInfo.memoize = true;
+    process.env['BROCCOLI_VOLATILE'] = true;
     transform._revision = 1;
 
     expect(transform.shouldBuild()).to.be.false;
   });
 
   it('shouldBuild method should return false if none of the inputs changed', function() {
-    transform.nodeInfo.memoize = true;
+    process.env['BROCCOLI_VOLATILE'] = true;
     transform.nodeInfo.persistentOutput = true;
 
     let inputWrapperA = new Node();
@@ -42,7 +46,8 @@ describe('transform-node', function() {
   });
 
   it('shouldBuild method should return true if some of the inputs changed', function() {
-    transform.nodeInfo.memoize = true;
+    process.env['BROCCOLI_VOLATILE'] = true;
+
     transform.nodeInfo.persistentOutput = true;
 
     let inputWrapperA = new Node();
@@ -51,7 +56,7 @@ describe('transform-node', function() {
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
     return transform.build().then(() => {
-      inputWrapperA.revised();
+      inputWrapperA.revise();
       expect(transform.shouldBuild()).to.be.true;
     });
   });
