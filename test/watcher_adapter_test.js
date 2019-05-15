@@ -3,7 +3,6 @@
 const WatcherAdapter = require('../lib/watcher_adapter');
 const bindFileEvent = WatcherAdapter.bindFileEvent;
 const fs = require('fs');
-
 const chai = require('chai');
 const expect = chai.expect;
 const sinonChai = require('sinon-chai');
