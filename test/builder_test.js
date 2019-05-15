@@ -93,7 +93,7 @@ describe('Builder', function() {
 
       describe('broccoli-plugin ' + version, function() {
         afterEach(() => {
-          delete process.env['BROCCOLI_VOLATILE'];
+          delete process.env['BROCCOLI_ENABLED_VOLATILE'];
         });
 
         it('builds a single node, repeatedly', function() {
@@ -150,8 +150,8 @@ describe('Builder', function() {
             });
         });
 
-        it('only builds if revision counter has incremented', function() {
-          process.env['BROCCOLI_VOLATILE'] = true;
+        it('builds if revision counter has incremented', function() {
+          process.env['BROCCOLI_ENABLED_VOLATILE'] = true;
 
           const outputNode = new plugins.Merge([
             new broccoliSource.WatchedDir('test/fixtures/basic'),
@@ -175,8 +175,8 @@ describe('Builder', function() {
             });
         });
 
-        it('only nodes with inputs that have different revisions call their builds', function() {
-          process.env['BROCCOLI_VOLATILE'] = true;
+        it('nodes with inputs that have different revisions call their builds', function() {
+          process.env['BROCCOLI_ENABLED_VOLATILE'] = true;
 
           const basicWatchDir = new broccoliSource.WatchedDir('test/fixtures/basic');
           const publicWatchDir = new broccoliSource.WatchedDir('test/fixtures/public');
@@ -318,9 +318,7 @@ describe('Builder', function() {
           builder = new FixtureBuilder(new broccoliSource.UnwatchedDir('test/fixtures/basic'));
 
           expect(builder.watchedPaths).to.deep.equal([]);
-          expect(builder.unwatchedPaths.map(paths => paths.path)).to.deep.equal([
-            'test/fixtures/basic',
-          ]);
+          expect(builder.unwatchedPaths).to.deep.equal(['test/fixtures/basic']);
 
           return expect(builder.build()).to.eventually.deep.equal({
             'foo.txt': 'OK',
@@ -330,9 +328,7 @@ describe('Builder', function() {
         it('records watched source directories', function() {
           builder = new FixtureBuilder(new broccoliSource.WatchedDir('test/fixtures/basic'));
 
-          expect(builder.watchedPaths.map(paths => paths.path)).to.deep.equal([
-            'test/fixtures/basic',
-          ]);
+          expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
           expect(builder.unwatchedPaths).to.deep.equal([]);
 
           return expect(builder.build()).to.eventually.deep.equal({
@@ -345,7 +341,7 @@ describe('Builder', function() {
     it('records string (watched) source directories', function() {
       builder = new FixtureBuilder('test/fixtures/basic');
 
-      expect(builder.watchedPaths.map(paths => paths.path)).to.deep.equal(['test/fixtures/basic']);
+      expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
       expect(builder.unwatchedPaths).to.deep.equal([]);
 
       return expect(builder.build()).to.eventually.deep.equal({
@@ -358,7 +354,7 @@ describe('Builder', function() {
 
       builder = new FixtureBuilder(new plugins.Merge([src, src]));
 
-      expect(builder.watchedPaths.map(paths => paths.path)).to.deep.equal(['test/fixtures/basic']);
+      expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
     });
 
     it("fails construction when a watched source directory doesn't exist", function() {
