@@ -93,7 +93,7 @@ describe('Builder', function() {
 
       describe('broccoli-plugin ' + version, function() {
         afterEach(() => {
-          delete process.env['BROCCOLI_ENABLED_VOLATILE'];
+          delete process.env['BROCCOLI_ENABLED_MEMOIZE'];
         });
 
         it('builds a single node, repeatedly', function() {
@@ -151,7 +151,7 @@ describe('Builder', function() {
         });
 
         it('builds if revision counter has incremented', function() {
-          process.env['BROCCOLI_ENABLED_VOLATILE'] = true;
+          process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
           const outputNode = new plugins.Merge([
             new broccoliSource.WatchedDir('test/fixtures/basic'),
@@ -176,7 +176,7 @@ describe('Builder', function() {
         });
 
         it('nodes with inputs that have different revisions call their builds', function() {
-          process.env['BROCCOLI_ENABLED_VOLATILE'] = true;
+          process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
           const basicWatchDir = new broccoliSource.WatchedDir('test/fixtures/basic');
           const publicWatchDir = new broccoliSource.WatchedDir('test/fixtures/public');
