@@ -25,31 +25,40 @@ describe('WatcherAdapter', function() {
       },
     };
 
+    const watchedNode = {
+      revise() {},
+    };
+
     it('works', function() {
       const trigger = sinon.spy(adapter, 'emit');
       const on = sinon.spy(watcher, 'on');
+      const revise = sinon.spy(watchedNode, 'revise');
 
       expect(on).to.have.not.been.called;
       expect(trigger).to.have.not.been.called;
+      expect(revise).to.have.not.been.called;
 
-      bindFileEvent(adapter, watcher, 'change');
+      bindFileEvent(adapter, watcher, watchedNode, 'change');
 
       expect(on).to.have.been.calledOnce;
       expect(trigger).to.have.been.calledOnce;
+      expect(revise).to.have.been.calledOnce;
       expect(on).to.have.been.calledWith('change');
       expect(trigger).to.have.been.calledWith('change', 'change');
 
-      bindFileEvent(adapter, watcher, 'add');
+      bindFileEvent(adapter, watcher, watchedNode, 'add');
 
       expect(on).to.have.been.calledTwice;
       expect(trigger).to.have.been.calledTwice;
+      expect(revise).to.have.been.calledTwice;
       expect(on).to.have.been.calledWith('add');
       expect(trigger).to.have.been.calledWith('change', 'add');
 
-      bindFileEvent(adapter, watcher, 'remove');
+      bindFileEvent(adapter, watcher, watchedNode, 'remove');
 
       expect(on).to.have.been.calledThrice;
       expect(trigger).to.have.been.calledThrice;
+      expect(revise).to.have.been.calledThrice;
       expect(on).to.have.been.calledWith('remove');
       expect(trigger).to.have.been.calledWith('change', 'remove');
     });
@@ -92,6 +101,22 @@ describe('WatcherAdapter', function() {
     const FIXTURE_PROJECT = __dirname + '/fixtures/project';
     let adapter;
 
+    const watchedNodeBasic = {
+      revise() {},
+      nodeInfo: {
+        nodeType: 'source',
+        sourceDirectory: FIXTURE_BASIC,
+      },
+    };
+
+    const watchedNodeProject = {
+      revise() {},
+      nodeInfo: {
+        nodeType: 'source',
+        sourceDirectory: FIXTURE_PROJECT,
+      },
+    };
+
     afterEach(function() {
       adapter.quit();
     });
@@ -105,14 +130,14 @@ describe('WatcherAdapter', function() {
 
       expect(() => adapter.watch()).to.throw(
         TypeError,
-        `WatcherAdapter#watch's first argument must be an array of watchedPaths`
+        `WatcherAdapter#watch's first argument must be an array of WatchedDir nodes`
       );
 
       [null, undefined, NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(
         arg => {
           expect(() => adapter.watch(arg)).to.throw(
             TypeError,
-            `WatcherAdapter#watch's first argument must be an array of watchedPaths`
+            `WatcherAdapter#watch's first argument must be an array of WatchedDir nodes`
           );
         }
       );
@@ -126,7 +151,8 @@ describe('WatcherAdapter', function() {
       expect(trigger).to.have.callCount(0);
 
       expect(adapter.watchers.length).to.eql(0);
-      let watching = adapter.watch([FIXTURE_BASIC]);
+
+      let watching = adapter.watch([watchedNodeBasic]);
 
       expect(adapter.watchers.length).to.eql(1);
 
@@ -144,7 +170,7 @@ describe('WatcherAdapter', function() {
           trigger.resetHistory();
 
           // this time also watch the FIXTURE_PROJECT
-          let watching = adapter.watch([FIXTURE_PROJECT]);
+          let watching = adapter.watch([watchedNodeProject]);
           expect(adapter.watchers.length).to.eql(2);
 
           return watching.then(val => {
