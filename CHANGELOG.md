@@ -1,5 +1,11 @@
 # master
 
+# 3.0.0
+* Add rebuild memoization support behind feature flag (#396)
+* Drop support for unsupported Node versions.
+  * Drop Node 6 support.
+* Bump broccoli-node-info to v2.0.0
+
 # 2.0.1
 
 * Fix various issues resulting in out of memory errors during instrumentation node traversal.
