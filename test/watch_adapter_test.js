@@ -1,6 +1,8 @@
 'use strict';
 
 const WatcherAdapter = require('../lib/watcher_adapter');
+const TransformNodeWrapper = require('../lib/wrappers/transform-node');
+const SourceNodeWrapper = require('../lib/wrappers/source-node');
 const bindFileEvent = WatcherAdapter.bindFileEvent;
 const fs = require('fs');
 
@@ -14,6 +16,30 @@ describe('WatcherAdapter', function() {
   afterEach(function() {
     sinon.restore();
   });
+
+  const FIXTURE_BASIC = __dirname + '/fixtures/basic';
+  const FIXTURE_PROJECT = __dirname + '/fixtures/project';
+  const watchedNodeBasic = new SourceNodeWrapper();
+  watchedNodeBasic.nodeInfo = {
+    nodeType: 'source',
+    sourceDirectory: FIXTURE_BASIC,
+    watched: true,
+  };
+
+  const unwatchedNodeBasic = new SourceNodeWrapper();
+  unwatchedNodeBasic.nodeInfo = {
+    nodeType: 'source',
+    sourceDirectory: FIXTURE_BASIC,
+    watched: false,
+  };
+
+  const watchedNodeProject = new SourceNodeWrapper();
+  watchedNodeProject.nodeInfo = {
+    nodeType: 'source',
+    sourceDirectory: FIXTURE_PROJECT,
+    watched: true,
+  };
+
 
   describe('bindFileEvent', function() {
     const adapter = {
@@ -71,7 +97,7 @@ describe('WatcherAdapter', function() {
     });
 
     it('has defaults', function() {
-      const adapter = new WatcherAdapter();
+      const adapter = new WatcherAdapter([]);
 
       expect(adapter.options).to.have.keys('filter');
       expect(adapter.options.filter).to.have.be.a('Function');
@@ -79,7 +105,7 @@ describe('WatcherAdapter', function() {
 
     it('supports custom options, but without filter', function() {
       const customOptions = {};
-      const adapter = new WatcherAdapter(customOptions);
+      const adapter = new WatcherAdapter([], customOptions);
 
       expect(adapter.options).to.eql(customOptions);
       expect(adapter.options.filter).to.have.be.a('Function');
@@ -88,64 +114,65 @@ describe('WatcherAdapter', function() {
     it('supports custom options, and allows for a  custom filter', function() {
       function filter() {}
       const customOptions = { filter };
-      const adapter = new WatcherAdapter(customOptions);
+      const adapter = new WatcherAdapter([], customOptions);
 
       expect(adapter.options).to.eql(customOptions);
       expect(adapter.options.filter).to.eql(filter);
+    });
+
+    it('throws if you try to watch a non array', function() {
+      expect(() => new WatcherAdapter()).to.throw(
+        TypeError,
+        `WatcherAdapter's first argument must be an array of SourceNodeWrapper nodes`
+      );
+
+      [null, undefined, NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(
+        arg => {
+          expect(() => new WatcherAdapter(arg)).to.throw(
+            TypeError,
+            `WatcherAdapter's first argument must be an array of SourceNodeWrapper nodes`
+          );
+        }
+      );
+    });
+
+    it('throws if you try to watch a non node', function() {
+      expect(() => new WatcherAdapter([{}])).to.throw(
+        Error,
+        `[object Object] is not a SourceNode`
+      );
+    });
+
+    it('throws if you try to watch a non-source node', function() {
+      expect(() => new WatcherAdapter([new TransformNodeWrapper()])).to.throw(
+        Error,
+        `[NodeWrapper:undefined undefined at undefined] is not a SourceNode`
+      );
+    });
+
+    it('throws if you try to watch a non-watchable node', function() {
+      expect(() => new WatcherAdapter([unwatchedNodeBasic])).to.throw(
+        Error,
+        `/Users/goli/Projects/broccoli/test/fixtures/basic it not watched`
+      );
     });
   });
 
   describe('watch', function() {
     this.timeout(20000);
 
-    const FIXTURE_BASIC = __dirname + '/fixtures/basic';
-    const FIXTURE_PROJECT = __dirname + '/fixtures/project';
     let adapter;
-
-    const watchedNodeBasic = {
-      revise() {},
-      nodeInfo: {
-        nodeType: 'source',
-        sourceDirectory: FIXTURE_BASIC,
-      },
-    };
-
-    const watchedNodeProject = {
-      revise() {},
-      nodeInfo: {
-        nodeType: 'source',
-        sourceDirectory: FIXTURE_PROJECT,
-      },
-    };
 
     afterEach(function() {
       adapter.quit();
     });
 
     it('supports symmetric start/shutdown', function() {
-      adapter = new WatcherAdapter();
-    });
-
-    it('throws if you try to watch a non array', function() {
-      adapter = new WatcherAdapter();
-
-      expect(() => adapter.watch()).to.throw(
-        TypeError,
-        `WatcherAdapter#watch's first argument must be an array of WatchedDir nodes`
-      );
-
-      [null, undefined, NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(
-        arg => {
-          expect(() => adapter.watch(arg)).to.throw(
-            TypeError,
-            `WatcherAdapter#watch's first argument must be an array of WatchedDir nodes`
-          );
-        }
-      );
+      adapter = new WatcherAdapter([]);
     });
 
     it('actually works !!', function() {
-      adapter = new WatcherAdapter();
+      adapter = new WatcherAdapter([watchedNodeBasic]);
 
       let trigger = sinon.spy(adapter, 'emit');
 
@@ -153,7 +180,7 @@ describe('WatcherAdapter', function() {
 
       expect(adapter.watchers.length).to.eql(0);
 
-      let watching = adapter.watch([watchedNodeBasic]);
+      let watching = adapter.watch();
 
       expect(adapter.watchers.length).to.eql(1);
 

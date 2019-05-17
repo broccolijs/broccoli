@@ -387,6 +387,17 @@ describe('Builder', function() {
         /test\/fixtures\/basic\/foo\.txt: Not a directory/
       );
     });
+
+    it('returns only watched SourceNodeWrappers from watchedSourceNodeWrappers', function() {
+      const source1 = new broccoliSource.WatchedDir('test/fixtures/basic/');
+      const source2 = new broccoliSource.UnwatchedDir('test/fixtures/empty/');
+      builder = new Builder(new plugins.Merge([source1, source2]));
+
+      const watchedSourceNodeWrappers = builder.watchedSourceNodeWrappers;
+
+      expect(watchedSourceNodeWrappers).length.to.be(1);
+      expect(watchedSourceNodeWrappers[0].node).to.equal(source1)
+    })
   });
 
   describe('error handling in constructor', function() {
