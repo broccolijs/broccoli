@@ -27,7 +27,7 @@
     "test:debug": "mocha --inspect-brk"
   },
   "dependencies": {
-    "broccoli-node-info": "1.1.0",
+    "broccoli-node-info": "^2.0.0",
     "broccoli-slow-trees": "^3.0.1",
     "broccoli-source": "^1.1.0",
     "commander": "^2.15.1",
