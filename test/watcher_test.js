@@ -14,7 +14,13 @@ describe('Watcher', function() {
   });
 
   const builder = {
-    watchedPaths: ['some/path'],
+    nodeWrappers: [{
+      nodeInfo: {
+        sourceDirectory: 'some/path',
+        nodeType: 'source',
+        watched: true
+      }
+    }],
     build() {
       return Promise.resolve();
     },
@@ -41,7 +47,7 @@ describe('Watcher', function() {
       expect(adapterOn).to.have.been.calledWith('error');
 
       return watcher.currentBuild.then(() => {
-        expect(adapterWatch).to.have.been.calledWith(builder.watchedPaths);
+        expect(adapterWatch).to.have.been.calledWith(builder.nodeWrappers);
         expect(trigger).to.have.been.calledWith('buildStart');
         expect(trigger).to.have.been.calledWith('buildSuccess');
         expect(builderBuild).to.have.been.called;
@@ -60,6 +66,7 @@ describe('Watcher', function() {
     it('calls error if build rejects', function() {
       const watcher = new Watcher(
         {
+          nodeWrappers: [],
           build() {
             return Promise.reject('fail');
           },
