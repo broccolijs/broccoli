@@ -14,13 +14,15 @@ describe('Watcher', function() {
   });
 
   const builder = {
-    nodeWrappers: [{
-      nodeInfo: {
-        sourceDirectory: 'some/path',
-        nodeType: 'source',
-        watched: true
-      }
-    }],
+    nodeWrappers: [
+      {
+        nodeInfo: {
+          sourceDirectory: 'some/path',
+          nodeType: 'source',
+          watched: true,
+        },
+      },
+    ],
     build() {
       return Promise.resolve();
     },
@@ -73,13 +75,14 @@ describe('Watcher', function() {
         },
         { watcherAdapter: adapter }
       );
-      const trigger = sinon.stub(watcher, 'emit');
+      let failHandler = sinon.spy();
+      watcher.on('buildFailure', failHandler);
 
       watcher.start();
 
       return watcher.currentBuild.catch(error => {
         expect(error).to.equal('fail');
-        expect(trigger).to.have.been.calledWith('buildFailure', 'fail');
+        expect(failHandler).to.be.have.been.calledWith('fail');
       });
     });
   });
@@ -89,16 +92,24 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
 
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
+
+      let changeHandler = sinon.spy();
+      let debounceHandler = sinon.spy();
+      let buildStartHandler = sinon.spy();
+      let buildEndHandler = sinon.spy();
+      watcher.on('change', changeHandler);
+      watcher.on('debounce', debounceHandler);
+      watcher.on('buildStart', buildStartHandler);
+      watcher.on('buildSuccess', buildEndHandler);
 
       watcher._ready = true;
       return watcher._change('change', 'file.js', 'root').then(() => {
-        expect(trigger).to.have.been.calledWith('change', 'change', 'file.js', 'root');
+        expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
 
         return watcher.currentBuild.then(() => {
-          expect(trigger).to.have.been.calledWith('debounce');
-          expect(trigger).to.have.been.calledWith('buildStart');
-          expect(trigger).to.have.been.calledWith('buildSuccess');
+          expect(debounceHandler).to.have.been.called;
+          expect(buildStartHandler).to.have.been.called;
+          expect(buildEndHandler).to.have.been.called;
           expect(builderBuild).to.have.been.called;
         });
       });
@@ -108,10 +119,12 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
 
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
+
+      let changeHandler = sinon.spy();
+      watcher.on('change', changeHandler);
 
       watcher._change('change', 'file.js', 'root');
-      expect(trigger).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
+      expect(changeHandler).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
       expect(builderBuild).to.not.have.been.called;
     });
 
@@ -119,11 +132,13 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
 
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
+
+      let changeHandler = sinon.spy();
+      watcher.on('change', changeHandler);
 
       watcher._rebuildScheduled = true;
       watcher._change('change', 'file.js', 'root');
-      expect(trigger).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
+      expect(changeHandler).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
       expect(builderBuild).to.not.have.been.called;
     });
   });
@@ -132,23 +147,32 @@ describe('Watcher', function() {
     it('emits an error and quits', function() {
       const error = new Error('fail');
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
+
+      let errorHandler = sinon.spy();
+      let quitStartHandler = sinon.spy();
+      let quitEndHandler = sinon.spy();
+      watcher.on('error', errorHandler);
+      watcher.on('quitStart', quitStartHandler);
+      watcher.on('quitEnd', quitEndHandler);
 
       return watcher._error(error).catch(() => {
-        expect(trigger).to.have.been.calledWith('error', error);
-        expect(trigger).to.have.been.calledWith('quitStart');
-        expect(trigger).to.have.been.calledWith('quitEnd');
+        expect(errorHandler).to.have.been.calledWith(error);
+        expect(quitStartHandler).to.have.been.called;
+        expect(quitEndHandler).to.have.been.called;
       });
     });
 
     it('does noting if already quitting', function() {
       const error = new Error('fail');
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
+
+      let errorHandler = sinon.spy();
+      watcher.on('error', errorHandler);
+
       watcher._quittingPromise = true;
 
       watcher._error(error);
-      expect(trigger).to.have.not.been.calledWith('error', error);
+      expect(errorHandler).to.have.not.been.calledWith(error);
     });
   });
 
@@ -156,15 +180,19 @@ describe('Watcher', function() {
     it('quits the watcher', function() {
       const adapterQuit = sinon.spy(adapter, 'quit');
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
+
+      let quitStartHandler = sinon.spy();
+      let quitEndHandler = sinon.spy();
+      watcher.on('quitStart', quitStartHandler);
+      watcher.on('quitEnd', quitEndHandler);
 
       watcher.start();
 
       return watcher.currentBuild.then(() => {
         return watcher.quit().then(() => {
           expect(adapterQuit).to.have.been.called;
-          expect(trigger).to.have.been.calledWith('quitStart');
-          expect(trigger).to.have.been.calledWith('quitEnd');
+          expect(quitStartHandler).to.have.been.called;
+          expect(quitEndHandler).to.have.been.called;
         });
       });
     });
@@ -172,13 +200,17 @@ describe('Watcher', function() {
     it('does nothing if already quitting', function() {
       const adapterQuit = sinon.spy(adapter, 'quit');
       const watcher = new Watcher(builder, { watcherAdapter: adapter });
-      const trigger = sinon.stub(watcher, 'emit');
       watcher._quittingPromise = true;
+
+      let quitStartHandler = sinon.spy();
+      let quitEndHandler = sinon.spy();
+      watcher.on('quitStart', quitStartHandler);
+      watcher.on('quitEnd', quitEndHandler);
 
       watcher.quit();
       expect(adapterQuit).to.not.have.been.called;
-      expect(trigger).to.not.have.been.calledWith('quitStart');
-      expect(trigger).to.not.have.been.calledWith('quitEnd');
+      expect(quitStartHandler).to.not.have.been.called;
+      expect(quitEndHandler).to.not.have.been.called;
     });
   });
 });
