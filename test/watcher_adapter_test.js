@@ -98,8 +98,9 @@ describe('WatcherAdapter', function() {
   describe('watch', function() {
     this.timeout(20000);
 
-    const FIXTURE_BASIC = __dirname + '/fixtures/basic';
-    const FIXTURE_PROJECT = __dirname + '/fixtures/project';
+    const isWin = process.platform === "win32";
+    const FIXTURE_BASIC = __dirname + (isWin ? '\\fixtures\\basic' : '/fixtures/basic');
+    const FIXTURE_PROJECT = __dirname + (isWin ? '\\fixtures\\project' : '/fixtures/project');
     let adapter;
 
     const watchedNodeBasic = {
