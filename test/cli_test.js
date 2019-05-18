@@ -48,6 +48,7 @@ describe('cli', function() {
       return cli(['node', 'broccoli', 'build', 'dist', '--watch']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -140,6 +141,7 @@ describe('cli', function() {
           () =>
             chai.expect(spy).to.have.been.calledWith(
               sinon.match.instanceOf(Builder),
+              sinon.match.array,
               sinon.match.has(
                 'saneOptions',
                 sinon.match({
@@ -159,6 +161,7 @@ describe('cli', function() {
           () =>
             chai.expect(spy).to.have.been.calledWith(
               sinon.match.instanceOf(Builder),
+              sinon.match.array,
               sinon.match.has(
                 'saneOptions',
                 sinon.match({
@@ -176,6 +179,7 @@ describe('cli', function() {
         return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']).then(() =>
           chai.expect(spy).to.have.been.calledWith(
             sinon.match.instanceOf(Builder),
+            sinon.match.array,
             sinon.match.has(
               'saneOptions',
               sinon.match({
@@ -332,6 +336,7 @@ describe('cli', function() {
       return cli(['node', 'broccoli', 'serve']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -541,6 +546,7 @@ describe('cli', function() {
       return cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -559,6 +565,7 @@ describe('cli', function() {
       return cli(['node', 'broccoli', 'serve', '--watcher', 'node']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -577,6 +584,7 @@ describe('cli', function() {
       return cli(['node', 'broccoli', 'serve', '--watcher', 'polling']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -595,9 +603,9 @@ function createWatcherSpy() {
   const spy = sinon.spy();
   sinon.stub(broccoli, 'Watcher').value(
     class Watcher extends DummyWatcher {
-      constructor(builder, options) {
-        super(builder, options);
-        spy.call(null, builder, options);
+      constructor(builder, watchedSourceNodes, options) {
+        super(builder, watchedSourceNodes, options);
+        spy.call(null, builder, watchedSourceNodes, options);
       }
 
       start() {
