@@ -3,7 +3,6 @@
 const WatcherAdapter = require('../lib/watcher_adapter');
 const bindFileEvent = WatcherAdapter.bindFileEvent;
 const fs = require('fs');
-
 const chai = require('chai');
 const expect = chai.expect;
 const sinonChai = require('sinon-chai');
@@ -31,37 +30,38 @@ describe('WatcherAdapter', function() {
     };
 
     it('works', function() {
-      const trigger = sinon.spy(adapter, 'emit');
+      const emitHandler = sinon.spy();
+      adapter.emit = emitHandler;
       const on = sinon.spy(watcher, 'on');
       const revise = sinon.spy(watchedNode, 'revise');
 
       expect(on).to.have.not.been.called;
-      expect(trigger).to.have.not.been.called;
+      expect(emitHandler).to.have.not.been.called;
       expect(revise).to.have.not.been.called;
 
       bindFileEvent(adapter, watcher, watchedNode, 'change');
 
       expect(on).to.have.been.calledOnce;
-      expect(trigger).to.have.been.calledOnce;
+      expect(emitHandler).to.have.been.calledOnce;
       expect(revise).to.have.been.calledOnce;
       expect(on).to.have.been.calledWith('change');
-      expect(trigger).to.have.been.calledWith('change');
+      expect(emitHandler).to.have.been.calledWith('change', 'change');
 
       bindFileEvent(adapter, watcher, watchedNode, 'add');
 
       expect(on).to.have.been.calledTwice;
-      expect(trigger).to.have.been.calledTwice;
+      expect(emitHandler).to.have.been.calledTwice;
       expect(revise).to.have.been.calledTwice;
       expect(on).to.have.been.calledWith('add');
-      expect(trigger).to.have.been.calledWith('change');
+      expect(emitHandler).to.have.been.calledWith('change', 'add');
 
       bindFileEvent(adapter, watcher, watchedNode, 'remove');
 
       expect(on).to.have.been.calledThrice;
-      expect(trigger).to.have.been.calledThrice;
+      expect(emitHandler).to.have.been.calledThrice;
       expect(revise).to.have.been.calledThrice;
       expect(on).to.have.been.calledWith('remove');
-      expect(trigger).to.have.been.calledWith('change');
+      expect(emitHandler).to.have.been.calledWith('change', 'remove');
     });
   });
 
@@ -98,8 +98,9 @@ describe('WatcherAdapter', function() {
   describe('watch', function() {
     this.timeout(20000);
 
-    const FIXTURE_BASIC = __dirname + '/fixtures/basic';
-    const FIXTURE_PROJECT = __dirname + '/fixtures/project';
+    const isWin = process.platform === 'win32';
+    const FIXTURE_BASIC = __dirname + (isWin ? '\\fixtures\\basic' : '/fixtures/basic');
+    const FIXTURE_PROJECT = __dirname + (isWin ? '\\fixtures\\project' : '/fixtures/project');
     let adapter;
 
     const watchedNodeBasic = {
@@ -146,10 +147,10 @@ describe('WatcherAdapter', function() {
 
     it('actually works !!', function() {
       adapter = new WatcherAdapter();
+      const changeHandler = sinon.spy();
+      adapter.on('change', changeHandler);
 
-      let trigger = sinon.spy(adapter, 'emit');
-
-      expect(trigger).to.have.callCount(0);
+      expect(changeHandler).to.have.callCount(0);
 
       expect(adapter.watchers.length).to.eql(0);
 
@@ -160,15 +161,15 @@ describe('WatcherAdapter', function() {
       return watching.then(function() {
         expect(arguments.length).to.eql(1);
 
-        expect(trigger).to.have.callCount(0);
+        expect(changeHandler).to.have.callCount(0);
         fs.utimesSync(FIXTURE_BASIC + '/foo.txt', new Date(), new Date());
         fs.utimesSync(FIXTURE_PROJECT + '/Brocfile.js', new Date(), new Date());
 
-        return spin(() => expect(trigger).to.have.callCount(1), 10000).then(() => {
-          expect(trigger).to.have.been.calledWith('change');
+        return spin(() => expect(changeHandler).to.have.callCount(1), 10000).then(() => {
+          expect(changeHandler).to.have.been.calledWith('change', 'foo.txt', FIXTURE_BASIC);
 
           // reset the spy
-          trigger.resetHistory();
+          changeHandler.resetHistory();
 
           // this time also watch the FIXTURE_PROJECT
           let watching = adapter.watch([watchedNodeProject]);
@@ -180,12 +181,12 @@ describe('WatcherAdapter', function() {
             fs.utimesSync(FIXTURE_BASIC + '/foo.txt', new Date(), new Date());
             fs.utimesSync(FIXTURE_PROJECT + '/Brocfile.js', new Date(), new Date());
 
-            return spin(() => expect(trigger).to.have.callCount(2), 10000)
+            return spin(() => expect(changeHandler).to.have.callCount(2), 10000)
               .then(() => {
-                expect(trigger).to.have.been.calledWith('change');
+                expect(changeHandler).to.have.been.calledWith('change');
               })
               .then(() => {
-                trigger.resetHistory();
+                changeHandler.resetHistory();
 
                 fs.utimesSync(FIXTURE_BASIC + '/foo.txt', new Date(), new Date());
                 fs.utimesSync(FIXTURE_PROJECT + '/Brocfile.js', new Date(), new Date());
@@ -198,7 +199,7 @@ describe('WatcherAdapter', function() {
                   return new Promise((resolve, reject) => {
                     setTimeout(() => {
                       try {
-                        expect(trigger).to.have.callCount(0);
+                        expect(changeHandler).to.have.callCount(0);
                         resolve();
                       } catch (e) {
                         reject(e);
