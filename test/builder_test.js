@@ -396,8 +396,8 @@ describe('Builder', function() {
       const watchedSourceNodeWrappers = builder.watchedSourceNodeWrappers;
 
       expect(watchedSourceNodeWrappers).length.to.be(1);
-      expect(watchedSourceNodeWrappers[0].node).to.equal(source1)
-    })
+      expect(watchedSourceNodeWrappers[0].node).to.equal(source1);
+    });
   });
 
   describe('error handling in constructor', function() {

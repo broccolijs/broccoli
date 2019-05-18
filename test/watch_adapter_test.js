@@ -40,7 +40,6 @@ describe('WatcherAdapter', function() {
     watched: true,
   };
 
-
   describe('bindFileEvent', function() {
     const adapter = {
       emit() {},
@@ -137,10 +136,7 @@ describe('WatcherAdapter', function() {
     });
 
     it('throws if you try to watch a non node', function() {
-      expect(() => new WatcherAdapter([{}])).to.throw(
-        Error,
-        `[object Object] is not a SourceNode`
-      );
+      expect(() => new WatcherAdapter([{}])).to.throw(Error, `[object Object] is not a SourceNode`);
     });
 
     it('throws if you try to watch a non-source node', function() {
