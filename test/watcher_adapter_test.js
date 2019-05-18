@@ -98,7 +98,7 @@ describe('WatcherAdapter', function() {
   describe('watch', function() {
     this.timeout(20000);
 
-    const isWin = process.platform === "win32";
+    const isWin = process.platform === 'win32';
     const FIXTURE_BASIC = __dirname + (isWin ? '\\fixtures\\basic' : '/fixtures/basic');
     const FIXTURE_PROJECT = __dirname + (isWin ? '\\fixtures\\project' : '/fixtures/project');
     let adapter;
