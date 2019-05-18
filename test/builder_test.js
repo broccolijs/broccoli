@@ -213,14 +213,15 @@ describe('Builder', function() {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
-          CacheTestPlugin.prototype = Object.create(Plugin.prototype);
-          CacheTestPlugin.prototype.constructor = CacheTestPlugin;
-          function CacheTestPlugin() {
-            Plugin.call(this, []);
+          class CacheTestPlugin extends Plugin {
+            constructor() {
+              super([]);
+            }
+
+            build() {
+              expect(fs.existsSync(this.cachePath)).to.be.true;
+            }
           }
-          CacheTestPlugin.prototype.build = function() {
-            expect(fs.existsSync(this.cachePath)).to.be.true;
-          };
 
           builder = new Builder(new CacheTestPlugin());
           return builder.build();
@@ -230,16 +231,17 @@ describe('Builder', function() {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
-          CacheTestPlugin.prototype = Object.create(Plugin.prototype);
-          CacheTestPlugin.prototype.constructor = CacheTestPlugin;
-          function CacheTestPlugin() {
-            Plugin.call(this, [], {
-              needsCache: true,
-            });
+          class CacheTestPlugin extends Plugin {
+            constructor() {
+              super([], {
+                needsCache: true,
+              });
+            }
+
+            build() {
+              expect(fs.existsSync(this.cachePath)).to.be.true;
+            }
           }
-          CacheTestPlugin.prototype.build = function() {
-            expect(fs.existsSync(this.cachePath)).to.be.true;
-          };
 
           builder = new Builder(new CacheTestPlugin());
           return builder.build();
@@ -251,16 +253,17 @@ describe('Builder', function() {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
-          CacheTestPlugin.prototype = Object.create(Plugin.prototype);
-          CacheTestPlugin.prototype.constructor = CacheTestPlugin;
-          function CacheTestPlugin() {
-            Plugin.call(this, [], {
-              needsCache: false,
-            });
+          class CacheTestPlugin extends Plugin {
+            constructor() {
+              super([], {
+                needsCache: false,
+              });
+            }
+
+            build() {
+              expect(this.cachePath).to.equal(undefined);
+            }
           }
-          CacheTestPlugin.prototype.build = function() {
-            expect(this.cachePath).to.equal(undefined);
-          };
 
           builder = new Builder(new CacheTestPlugin());
           return builder.build();
@@ -270,19 +273,18 @@ describe('Builder', function() {
 
     describe('persistentOutput flag', function() {
       multidepRequire.forEachVersion('broccoli-plugin', (version, Plugin) => {
-        BuildOncePlugin.prototype = Object.create(Plugin.prototype);
-        BuildOncePlugin.prototype.constructor = BuildOncePlugin;
-
-        function BuildOncePlugin(options) {
-          Plugin.call(this, [], options);
-        }
-
-        BuildOncePlugin.prototype.build = function() {
-          if (!this.builtOnce) {
-            this.builtOnce = true;
-            fs.writeFileSync(path.join(this.outputPath, 'foo.txt'), 'test');
+        class BuildOncePlugin extends Plugin {
+          constructor(options) {
+            super([], options);
           }
-        };
+
+          build() {
+            if (!this.builtOnce) {
+              this.builtOnce = true;
+              fs.writeFileSync(path.join(this.outputPath, 'foo.txt'), 'test');
+            }
+          }
+        }
 
         function isPersistent(options) {
           const builder = new FixtureBuilder(new BuildOncePlugin(options));
