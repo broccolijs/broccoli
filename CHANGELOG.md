@@ -7,6 +7,8 @@
 * Drop support for unsupported Node versions (#400)
   * Drop Node 6 support.
 * Bump broccoli-node-info to v2.0.0
+* Pass watchedNodes to Watcher/WatcherAdapter (#403)
+  * Require watchedNodes arguments to Watcher/WatcherAdapter (#405)
 
 # 2.3.0
 * Add Brocfile.ts TypeScript support (#390)
