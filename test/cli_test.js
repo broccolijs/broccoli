@@ -330,7 +330,6 @@ describe('cli', function() {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
         .value(() => ({ watcher: 'polling' }));
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       // --watch is passed so Watcher spy can be used
       return cli(['node', 'broccoli', 'serve']).then(() =>
@@ -541,7 +540,6 @@ describe('cli', function() {
   context('with param --watcher', function() {
     it('creates watcher with sane options for watchman', function() {
       sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
@@ -560,7 +558,6 @@ describe('cli', function() {
     });
 
     it('creates watcher with sane options for node', function() {
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'node']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
@@ -579,7 +576,6 @@ describe('cli', function() {
     });
 
     it('creates watcher with sane options for polling', function() {
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'polling']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
@@ -599,6 +595,7 @@ describe('cli', function() {
   });
 });
 
+// TODO: remove these mocks and spys
 function createWatcherSpy() {
   const spy = sinon.spy();
   sinon.stub(broccoli, 'Watcher').value(
@@ -609,6 +606,9 @@ function createWatcherSpy() {
       }
 
       start() {
+        return Promise.resolve();
+      }
+      quit() {
         return Promise.resolve();
       }
     }

@@ -6,6 +6,7 @@ const multidepRequire = require('multidep')('test/multidep.json');
 const sinon = require('sinon').createSandbox();
 const got = require('got');
 const fs = require('fs');
+const promiseFinally = require('promise.prototype.finally');
 
 const Server = require('../lib/server');
 const Watcher = require('../lib/watcher');
@@ -16,12 +17,8 @@ const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 chai.use(require('sinon-chai'));
 
 describe('server', function() {
-  let server, exitStub;
+  let server;
   let PORT;
-
-  beforeEach(function() {
-    exitStub = sinon.stub(process, 'exit');
-  });
 
   before(function() {
     return require('portfinder')
@@ -30,19 +27,9 @@ describe('server', function() {
   });
 
   afterEach(function() {
-    process.removeAllListeners('SIGTERM');
-    process.removeAllListeners('SIGINT');
+    const stopping = server ? server.stop() : Promise.resolve();
 
-    let closingPromise = Promise.resolve();
-
-    if (server) {
-      server.cleanupAndExit();
-      if (server.closingPromise) {
-        closingPromise = server.closingPromise;
-      }
-    }
-
-    return closingPromise.then(() => sinon.restore());
+    return promiseFinally(stopping, () => sinon.restore());
   });
 
   it('throws if first argument is not an instance of Watcher', function() {
@@ -50,82 +37,57 @@ describe('server', function() {
   });
 
   it('throws if host is not a string', function() {
-    expect(() => Server.serve(new Watcher(), 123, 1234)).to.throw(/host/);
+    expect(() => Server.serve(new Watcher(null, []), 123, 1234)).to.throw(/host/);
   });
 
   it('throws if port is not a number', function() {
-    expect(() => Server.serve(new Watcher(), '127.0.0.1', '1234')).to.throw(/port/);
+    expect(() => Server.serve(new Watcher(null, []), '127.0.0.1', '1234')).to.throw(/port/);
   });
 
   it('throws if port is NaN', function() {
-    expect(() => Server.serve(new Watcher(), '127.0.0.1', parseInt('port'))).to.throw(/port/);
+    expect(() => Server.serve(new Watcher(null, []), '127.0.0.1', parseInt('port'))).to.throw(
+      /port/
+    );
   });
 
   it('errors if port already in use', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+    const serverOne = new Server.Server(new Watcher(builder), '127.0.0.1', PORT, undefined);
+    const serverTwo = new Server.Server(new Watcher(builder), '127.0.0.1', PORT, undefined);
 
-    let errorMessage =
-      `Oh snap 😫. It appears a server is already running on http://127.0.0.1:${PORT}\n` +
-      `Are you perhaps already running serve in another terminal window?\n`;
+    serverOne.start();
 
-    const consoleMock = sinon.mock(console);
-    consoleMock
-      .expects('error')
-      .once()
-      .withArgs(errorMessage);
-
-    let server2;
-
-    const invokeServer = isPrimary => {
-      const watcher = new Watcher(builder);
-      const svr = Server.serve(watcher, '127.0.0.1', PORT);
-      if (isPrimary) {
-        server = svr;
-      } else {
-        server2 = svr;
+    const wait = serverTwo.start().then(
+      () => {
+        throw new Error('should not fulfill');
+      },
+      err => {
+        expect(err.message).to.include('It appears a server is already running on');
       }
-      const onBuildSuccessful = svr.onBuildSuccessful;
+    );
 
-      return new Promise((resolve, reject) => {
-        svr.onBuildSuccessful = function() {
-          try {
-            onBuildSuccessful();
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
-          watcher.quit();
-        };
-      });
-    };
-
-    return invokeServer(true)
-      .then(invokeServer)
-      .then(() => {
-        chai.expect(exitStub).to.be.calledWith(1);
-        consoleMock.verify();
-      })
-      .then(() => server2.closingPromise)
-      .then(() => server.closingPromise);
+    return promiseFinally(wait, () => {
+      return Promise.all([serverOne.stop(), serverTwo.stop()]);
+    });
   }).timeout(10000);
 
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder);
-    server = Server.serve(watcher, '127.0.0.1', PORT);
-    const onBuildSuccessful = server.onBuildSuccessful;
+    server = new Server.Server(watcher, '127.0.0.1', PORT);
 
-    return new Promise((resolve, reject) => {
-      server.onBuildSuccessful = function() {
-        try {
-          onBuildSuccessful();
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-        watcher.quit();
-      };
-    }).then(() => server.closingPromise);
+    const start = server.start();
+
+    let buildSuccessWasCalled = 0;
+
+    server.addListener('buildSuccess', () => {
+      buildSuccessWasCalled++;
+      server.stop();
+    });
+
+    return start.then(() => {
+      expect(buildSuccessWasCalled).to.eql(1);
+    });
   });
 
   it('supports being provided a custom connect middleware root', function() {
@@ -143,20 +105,9 @@ describe('server', function() {
     }
 
     expect(altConnectWasUsed).to.eql(false);
-    server = Server.serve(watcher, '127.0.0.1', PORT, altConnect);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, altConnect);
+    server.start();
     expect(altConnectWasUsed).to.eql(true);
-    const onBuildSuccessful = server.onBuildSuccessful;
-    return new Promise((resolve, reject) => {
-      server.onBuildSuccessful = function() {
-        try {
-          onBuildSuccessful();
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-        watcher.quit();
-      };
-    }).then(() => server.closingPromise);
   });
 
   it('supports serving a built file', function() {
@@ -167,13 +118,15 @@ describe('server', function() {
     );
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/public'));
     const watcher = new Watcher(builder);
-    server = Server.serve(watcher, '127.0.0.1', PORT);
+    server = new Server.Server(watcher, '127.0.0.1', PORT);
+    server.start();
+
     return new Promise((resolve, reject) => {
       server.http.on('listening', resolve);
       server.http.on('close', reject);
       server.http.on('error', reject);
-    }).then(() =>
-      got(`http://127.0.0.1:${PORT}/foo.txt`) // basic serving
+    }).then(() => {
+      return got(`http://127.0.0.1:${PORT}/foo.txt`) // basic serving
         .then(res => {
           expect(res.statusCode).to.eql(200);
           expect(res.body).to.eql('Hello');
@@ -202,7 +155,7 @@ describe('server', function() {
           err => {
             expect(err.message).to.match(/Forbidden/);
           }
-        )
-    );
+        );
+    });
   }).timeout(10000);
 });

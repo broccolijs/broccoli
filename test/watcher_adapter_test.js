@@ -120,19 +120,12 @@ describe('WatcherAdapter', function() {
     });
 
     it('throws if you try to watch a non array', function() {
-      expect(() => new WatcherAdapter()).to.throw(
-        TypeError,
-        `WatcherAdapter's first argument must be an array of SourceNodeWrapper nodes`
-      );
-
-      [null, undefined, NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(
-        arg => {
-          expect(() => new WatcherAdapter(arg)).to.throw(
-            TypeError,
-            `WatcherAdapter's first argument must be an array of SourceNodeWrapper nodes`
-          );
-        }
-      );
+      [NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(arg => {
+        expect(() => new WatcherAdapter(arg)).to.throw(
+          TypeError,
+          `WatcherAdapter's first argument must be an array of SourceNodeWrapper nodes`
+        );
+      });
     });
 
     it('throws if you try to watch a non node', function() {
@@ -149,7 +142,7 @@ describe('WatcherAdapter', function() {
     it('throws if you try to watch a non-watchable node', function() {
       expect(() => new WatcherAdapter([unwatchedNodeBasic])).to.throw(
         Error,
-        `/Users/goli/Projects/broccoli/test/fixtures/basic it not watched`
+        /[/\\]broccoli[/\\]test[/\\]fixtures[/\\]basic' is not watched/
       );
     });
   });

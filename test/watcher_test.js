@@ -10,7 +10,14 @@ chai.use(sinonChai);
 const sinon = require('sinon').createSandbox();
 
 describe('Watcher', function() {
+  let watcher;
+
   afterEach(function() {
+    if (watcher) {
+      watcher.quit();
+      watcher = null;
+    }
+
     sinon.restore();
   });
 
@@ -39,7 +46,7 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
 
       const watchedNodes = [watchedNodeBasic];
-      const watcher = new Watcher(builder, watchedNodes);
+      watcher = new Watcher(builder, watchedNodes);
       const trigger = sinon.stub(watcher, 'emit');
       const adapterOn = sinon.spy(watcher.watcherAdapter, 'on');
       const adapterWatch = sinon.spy(watcher.watcherAdapter, 'watch');
@@ -59,10 +66,9 @@ describe('Watcher', function() {
     });
 
     it('throws error if called twice', function() {
-      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
-
-      watcher._lifetimeDeferred = true;
-      expect(watcher.start.bind(watcher)).to.throw(
+      const watcher = new Watcher(builder, [], { watcherAdapter: adapter });
+      watcher.start();
+      expect(() => watcher.start()).to.throw(
         'Watcher.prototype.start() must not be called more than once'
       );
     });
@@ -93,7 +99,6 @@ describe('Watcher', function() {
   describe('change', function() {
     it('on change, rebuild is invoked', function() {
       const builderBuild = sinon.spy(builder, 'build');
-
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       let changeHandler = sinon.spy();
@@ -120,7 +125,6 @@ describe('Watcher', function() {
 
     it('does nothing if not ready', function() {
       const builderBuild = sinon.spy(builder, 'build');
-
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       let changeHandler = sinon.spy();
@@ -133,7 +137,6 @@ describe('Watcher', function() {
 
     it('does nothing if rebuilding', function() {
       const builderBuild = sinon.spy(builder, 'build');
-
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       let changeHandler = sinon.spy();
