@@ -1,5 +1,27 @@
 # master
 
+# 3.0.0
+* Add rebuild memoization support behind feature flag (#396)
+  * BROCCOLI_ENABLED_MEMOIZE=true to turn on
+* Add more watcher events (#398)
+* Drop support for unsupported Node versions (#400)
+  * Drop Node 6 support.
+* Bump broccoli-node-info to v2.0.0
+* Pass watchedNodes to Watcher/WatcherAdapter (#403)
+  * Require watchedNodes arguments to Watcher/WatcherAdapter (#405)
+
+# 2.3.0
+* Add Brocfile.ts TypeScript support (#390)
+
+# 2.2.0
+* Cleanup syntax (#383)
+* Ensure `builder.cleanup()` waits on pending work (#393)
+
+# 2.1.0
+* Add support for ES Modules syntax (#385) 
+* Add support for Export function (#386)
+* Add support for Environment flag (#387)
+
 # 2.0.1
 
 * Fix various issues resulting in out of memory errors during instrumentation node traversal.
