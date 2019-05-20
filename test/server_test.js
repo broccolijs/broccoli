@@ -52,8 +52,8 @@ describe('server', function() {
 
   it('errors if port already in use', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
-    const serverOne = new Server.Server(new Watcher(builder), '127.0.0.1', PORT, undefined);
-    const serverTwo = new Server.Server(new Watcher(builder), '127.0.0.1', PORT, undefined);
+    const serverOne = new Server.Server(new Watcher(builder, []), '127.0.0.1', PORT, undefined);
+    const serverTwo = new Server.Server(new Watcher(builder, []), '127.0.0.1', PORT, undefined);
 
     serverOne.start();
 
@@ -73,7 +73,7 @@ describe('server', function() {
 
   it('buildSuccess is handled', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
-    const watcher = new Watcher(builder);
+    const watcher = new Watcher(builder, []);
     server = new Server.Server(watcher, '127.0.0.1', PORT);
 
     const start = server.start();
@@ -92,7 +92,7 @@ describe('server', function() {
 
   it('supports being provided a custom connect middleware root', function() {
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
-    const watcher = new Watcher(builder);
+    const watcher = new Watcher(builder, []);
     let altConnectWasUsed = false;
 
     function altConnect() {
@@ -117,7 +117,7 @@ describe('server', function() {
       new Date('2018-07-27T17:23:02.000Z')
     );
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/public'));
-    const watcher = new Watcher(builder);
+    const watcher = new Watcher(builder, []);
     server = new Server.Server(watcher, '127.0.0.1', PORT);
     server.start();
 
