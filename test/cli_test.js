@@ -48,6 +48,7 @@ describe('cli', function() {
       return cli(['node', 'broccoli', 'build', 'dist', '--watch']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -140,6 +141,7 @@ describe('cli', function() {
           () =>
             chai.expect(spy).to.have.been.calledWith(
               sinon.match.instanceOf(Builder),
+              sinon.match.array,
               sinon.match.has(
                 'saneOptions',
                 sinon.match({
@@ -159,6 +161,7 @@ describe('cli', function() {
           () =>
             chai.expect(spy).to.have.been.calledWith(
               sinon.match.instanceOf(Builder),
+              sinon.match.array,
               sinon.match.has(
                 'saneOptions',
                 sinon.match({
@@ -176,6 +179,7 @@ describe('cli', function() {
         return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']).then(() =>
           chai.expect(spy).to.have.been.calledWith(
             sinon.match.instanceOf(Builder),
+            sinon.match.array,
             sinon.match.has(
               'saneOptions',
               sinon.match({
@@ -326,12 +330,12 @@ describe('cli', function() {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
         .value(() => ({ watcher: 'polling' }));
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       // --watch is passed so Watcher spy can be used
       return cli(['node', 'broccoli', 'serve']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -536,11 +540,11 @@ describe('cli', function() {
   context('with param --watcher', function() {
     it('creates watcher with sane options for watchman', function() {
       sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -554,11 +558,11 @@ describe('cli', function() {
     });
 
     it('creates watcher with sane options for node', function() {
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'node']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -572,11 +576,11 @@ describe('cli', function() {
     });
 
     it('creates watcher with sane options for polling', function() {
-      sinon.stub(broccoli, 'server').value({ serve() {} });
       const spy = createWatcherSpy();
       return cli(['node', 'broccoli', 'serve', '--watcher', 'polling']).then(() =>
         chai.expect(spy).to.have.been.calledWith(
           sinon.match.instanceOf(Builder),
+          sinon.match.array,
           sinon.match.has(
             'saneOptions',
             sinon.match({
@@ -591,16 +595,20 @@ describe('cli', function() {
   });
 });
 
+// TODO: remove these mocks and spys
 function createWatcherSpy() {
   const spy = sinon.spy();
   sinon.stub(broccoli, 'Watcher').value(
     class Watcher extends DummyWatcher {
-      constructor(builder, options) {
-        super(builder, options);
-        spy.call(null, builder, options);
+      constructor(builder, watchedSourceNodes, options) {
+        super(builder, watchedSourceNodes, options);
+        spy.call(null, builder, watchedSourceNodes, options);
       }
 
       start() {
+        return Promise.resolve();
+      }
+      quit() {
         return Promise.resolve();
       }
     }
