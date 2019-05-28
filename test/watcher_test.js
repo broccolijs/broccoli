@@ -3,7 +3,27 @@ import chai from 'chai';
 import sinonChai from 'sinon-chai';
 import Sinon from 'sinon';
 import Watcher from '../lib/watcher';
+import broccoli from '..';
+const Builder = broccoli.Builder;
+const multidepRequire = require('multidep')('test/multidep.json');
 import SourceNodeWrapper from '../lib/wrappers/source-node';
+
+const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
+const Merge = multidepRequire('broccoli-merge-trees', '4.1.0');
+
+function defer() {
+  let deferred = {};
+  let promise = new Promise(function(resolve, reject) {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  });
+  deferred.promise = promise;
+  return deferred;
+}
+
+function sleep() {
+  return new Promise(resolve => setTimeout(resolve, 10));
+}
 
 const expect = chai.expect;
 chai.use(sinonChai);
@@ -32,6 +52,9 @@ describe('Watcher', function() {
   const builder = {
     async build(_, buildAnnotation) {
       return buildAnnotation;
+    },
+    cancel() {
+      return Promise.resolve();
     },
   };
 
@@ -138,6 +161,65 @@ describe('Watcher', function() {
       expect(buildEndHandler).to.have.been.called;
       expect(builderBuild).to.have.been.called;
     });
+
+    it('on change, rebuild is invoked and cancel is invoked from the build', function() {
+      const pluginsCalled = {};
+
+      const waitForPlugin1 = defer();
+      const waitForPlugin2 = defer();
+
+      class Plugin1 extends Plugin {
+        constructor(inputNodes, options) {
+          super(inputNodes || [], options);
+        }
+
+        build() {
+          pluginsCalled['plugin1'] = pluginsCalled['plugin1'] ? pluginsCalled['plugin1'] + 1 : 1;
+
+          return waitForPlugin1.promise;
+        }
+      }
+
+      class Plugin2 extends Plugin {
+        constructor(inputNodes, options) {
+          super(inputNodes || [], options);
+        }
+
+        build() {
+          pluginsCalled['plugin2'] = pluginsCalled['plugin2'] ? pluginsCalled['plugin2'] + 1 : 1;
+
+          return waitForPlugin2.promise;
+        }
+      }
+
+      const plugin1 = new Plugin1();
+      const plugin2 = new Plugin2();
+      const builder = new Builder(Merge([plugin1, plugin2]));
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      watcher._ready = true;
+      watcher.start();
+
+      return sleep()
+        .then(() => {
+          const changedBuild = watcher._change('change', 'foo.js', 'root');
+
+          waitForPlugin1.resolve();
+          waitForPlugin2.resolve();
+
+          return changedBuild;
+        })
+        .then(() => {
+          expect(pluginsCalled['plugin1']).to.eq(1);
+          expect(pluginsCalled['plugin2']).to.eq(undefined);
+
+          return watcher.currentBuild;
+        })
+        .then(() => {
+          expect(pluginsCalled['plugin1']).to.eq(2);
+          expect(pluginsCalled['plugin2']).to.eq(1);
+        });
+    }).timeout(600000);
 
     it('does nothing if not ready', function() {
       const builderBuild = sinon.spy(builder, 'build');

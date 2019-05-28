@@ -123,6 +123,9 @@ class Watcher extends EventEmitter {
     this._rebuildScheduled = true;
 
     try {
+      // cancel the current builder and wait for it to finish the current plugin
+      await this.builder.cancel();
+
       // Wait for current build, and ignore build failure
       await this.currentBuild;
     } catch (e) {
