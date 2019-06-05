@@ -29,9 +29,11 @@ describe('Watcher', function() {
     watched: true,
   };
 
+  const buildResults = {};
+
   const builder = {
     build() {
-      return Promise.resolve();
+      return Promise.resolve(buildResults);
     },
   };
 
