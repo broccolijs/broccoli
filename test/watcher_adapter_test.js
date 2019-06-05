@@ -42,7 +42,6 @@ describe('WatcherAdapter', function() {
   describe('bindFileEvent', function() {
     const adapter = {
       emit() {},
-      options: {},
     };
 
     const watcher = {
