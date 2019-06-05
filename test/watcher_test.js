@@ -116,7 +116,9 @@ describe('Watcher', function() {
       return watcher._change('change', 'file.js', 'root').then(() => {
         expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
 
-        return watcher.currentBuild.then(() => {
+        return watcher.currentBuild.then(result => {
+          expect(result.filePath).to.equal('root/file.js');
+
           expect(debounceHandler).to.have.been.called;
           expect(buildStartHandler).to.have.been.called;
           expect(buildEndHandler).to.have.been.called;
@@ -148,6 +150,22 @@ describe('Watcher', function() {
       watcher._change('change', 'file.js', 'root');
       expect(changeHandler).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
       expect(builderBuild).to.not.have.been.called;
+    });
+
+    it('filePath is undefined on initial build', function() {
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      return watcher._build().then(result => {
+        expect(result.filePath).to.be.undefined;
+      });
+    });
+
+    it('filePath is set on rebuild', function() {
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      return watcher._build('root/file.js').then(result => {
+        expect(result.filePath).to.equal('root/file.js');
+      });
     });
   });
 
