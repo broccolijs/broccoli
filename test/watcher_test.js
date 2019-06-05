@@ -3,6 +3,7 @@
 const Watcher = require('../lib/watcher');
 const SourceNodeWrapper = require('../lib/wrappers/source-node');
 
+const path = require('path');
 const chai = require('chai');
 const expect = chai.expect;
 const sinonChai = require('sinon-chai');
@@ -117,7 +118,7 @@ describe('Watcher', function() {
         expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
 
         return watcher.currentBuild.then(result => {
-          expect(result.filePath).to.equal('root/file.js');
+          expect(result.filePath).to.equal(path.join('root', 'file.js'));
 
           expect(debounceHandler).to.have.been.called;
           expect(buildStartHandler).to.have.been.called;
@@ -164,7 +165,7 @@ describe('Watcher', function() {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       return watcher._build('root/file.js').then(result => {
-        expect(result.filePath).to.equal('root/file.js');
+        expect(result.filePath).to.equal(path.join('root', 'file.js'));
       });
     });
   });
