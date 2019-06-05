@@ -3,6 +3,7 @@
 const Watcher = require('../lib/watcher');
 const SourceNodeWrapper = require('../lib/wrappers/source-node');
 
+const path = require('path');
 const chai = require('chai');
 const expect = chai.expect;
 const sinonChai = require('sinon-chai');
@@ -29,9 +30,11 @@ describe('Watcher', function() {
     watched: true,
   };
 
+  const buildResults = {};
+
   const builder = {
     build() {
-      return Promise.resolve();
+      return Promise.resolve(buildResults);
     },
   };
 
@@ -114,7 +117,9 @@ describe('Watcher', function() {
       return watcher._change('change', 'file.js', 'root').then(() => {
         expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
 
-        return watcher.currentBuild.then(() => {
+        return watcher.currentBuild.then(result => {
+          expect(result.filePath).to.equal(path.join('root', 'file.js'));
+
           expect(debounceHandler).to.have.been.called;
           expect(buildStartHandler).to.have.been.called;
           expect(buildEndHandler).to.have.been.called;
@@ -146,6 +151,22 @@ describe('Watcher', function() {
       watcher._change('change', 'file.js', 'root');
       expect(changeHandler).to.not.have.been.calledWith('change', 'change', 'file.js', 'root');
       expect(builderBuild).to.not.have.been.called;
+    });
+
+    it('filePath is undefined on initial build', function() {
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      return watcher._build().then(result => {
+        expect(result.filePath).to.be.undefined;
+      });
+    });
+
+    it('filePath is set on rebuild', function() {
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      return watcher._build(path.join('root', 'file.js')).then(result => {
+        expect(result.filePath).to.equal(path.join('root', 'file.js'));
+      });
     });
   });
 
