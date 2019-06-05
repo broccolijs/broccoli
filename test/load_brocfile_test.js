@@ -51,7 +51,7 @@ describe('loadBrocfile', function() {
   });
 
   context('with invalid Brocfile.ts', function() {
-    this.slow(8000);
+    this.timeout(8000);
 
     it('throws an error for invalid syntax', function() {
       chai
@@ -61,7 +61,7 @@ describe('loadBrocfile', function() {
   });
 
   context('with Brocfile.ts', function() {
-    this.slow(8000);
+    this.timeout(8000);
 
     it('compiles and return tree definition', function() {
       process.chdir(projectPathTs);
