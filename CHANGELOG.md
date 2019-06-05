@@ -1,5 +1,9 @@
 # master
 
+# 3.0.1
+
+* [BUGFIX] ensure parity broccoli-sane-watcher the filePath property in the change event and the additional console logging from a sane event.
+
 # 3.0.0
 * Add rebuild memoization support behind feature flag (#396)
   * BROCCOLI_ENABLED_MEMOIZE=true to turn on
