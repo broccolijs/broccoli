@@ -164,7 +164,7 @@ describe('Watcher', function() {
     it('filePath is set on rebuild', function() {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      return watcher._build('root/file.js').then(result => {
+      return watcher._build(path.join('root', 'file.js')).then(result => {
         expect(result.filePath).to.equal(path.join('root', 'file.js'));
       });
     });
