@@ -1,5 +1,9 @@
 # master
 
+# 3.1.0
+
+* [Feature] use console-ui
+
 # 3.0.1
 
 * [BUGFIX] ensure parity broccoli-sane-watcher the filePath property in the change event and the additional console logging from a sane event.
