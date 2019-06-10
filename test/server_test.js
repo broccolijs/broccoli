@@ -11,6 +11,7 @@ const promiseFinally = require('promise.prototype.finally');
 const Server = require('../lib/server');
 const Watcher = require('../lib/watcher');
 const Builder = require('../lib/builder');
+const MockUI = require('console-ui/mock');
 
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 
@@ -51,9 +52,23 @@ describe('server', function() {
   });
 
   it('errors if port already in use', function() {
+    const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
-    const serverOne = new Server.Server(new Watcher(builder, []), '127.0.0.1', PORT, undefined);
-    const serverTwo = new Server.Server(new Watcher(builder, []), '127.0.0.1', PORT, undefined);
+    const serverOne = new Server.Server(
+      new Watcher(builder, []),
+      '127.0.0.1',
+      PORT,
+      require('connect'),
+      mockUI
+    );
+
+    const serverTwo = new Server.Server(
+      new Watcher(builder, []),
+      '127.0.0.1',
+      PORT,
+      require('connect'),
+      mockUI
+    );
 
     serverOne.start();
 
@@ -72,9 +87,10 @@ describe('server', function() {
   }).timeout(10000);
 
   it('buildSuccess is handled', function() {
+    const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder, []);
-    server = new Server.Server(watcher, '127.0.0.1', PORT);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
 
     const start = server.start();
 
@@ -91,6 +107,7 @@ describe('server', function() {
   });
 
   it('supports being provided a custom connect middleware root', function() {
+    const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder, []);
     let altConnectWasUsed = false;
@@ -105,7 +122,7 @@ describe('server', function() {
     }
 
     expect(altConnectWasUsed).to.eql(false);
-    server = new Server.Server(watcher, '127.0.0.1', PORT, altConnect);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, altConnect, mockUI);
     server.start();
     expect(altConnectWasUsed).to.eql(true);
   });
@@ -116,9 +133,10 @@ describe('server', function() {
       new Date('2018-07-27T17:25:23.102Z'),
       new Date('2018-07-27T17:23:02.000Z')
     );
+    const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/public'));
     const watcher = new Watcher(builder, []);
-    server = new Server.Server(watcher, '127.0.0.1', PORT);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
     server.start();
 
     return new Promise((resolve, reject) => {

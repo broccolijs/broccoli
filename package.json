@@ -32,6 +32,7 @@
     "broccoli-source": "^1.1.0",
     "commander": "^2.15.1",
     "connect": "^3.6.6",
+    "console-ui": "^3.0.4",
     "esm": "^3.2.4",
     "findup-sync": "^2.0.0",
     "handlebars": "^4.0.11",

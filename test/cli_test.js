@@ -14,6 +14,7 @@ const DummyWatcher = require('../lib/dummy-watcher');
 const broccoli = require('../lib/index');
 const cli = require('../lib/cli');
 const loadBrocfile = require('../lib/load_brocfile');
+const MockUI = require('console-ui/mock');
 
 chai.use(sinonChai);
 
@@ -98,25 +99,20 @@ describe('cli', function() {
       });
 
       it('errors if [target] is a parent directory', function() {
-        const consoleMock = sinon.mock(console);
-        consoleMock
-          .expects('error')
-          .once()
-          .withArgs('build directory can not be the current or direct parent directory: ../');
-        cli(['node', 'broccoli', 'build', '../']);
-        consoleMock.verify();
-        chai.expect(exitStub).to.be.calledWith(1);
+        const mockUI = new MockUI();
+        cli(['node', 'broccoli', 'build', '../'], mockUI);
+        chai
+          .expect(mockUI.errors)
+          .to.contain('build directory can not be the current or direct parent directory: ../');
       });
 
       // just to be safe ;)
       it('errors if [target] is a the root directory', function() {
-        const consoleMock = sinon.mock(console);
-        consoleMock
-          .expects('error')
-          .once()
-          .withArgs('build directory can not be the current or direct parent directory: /');
-        cli(['node', 'broccoli', 'build', '/']);
-        consoleMock.verify();
+        const mockUI = new MockUI();
+        cli(['node', 'broccoli', 'build', '/'], mockUI);
+        chai
+          .expect(mockUI.errors)
+          .to.contain('build directory can not be the current or direct parent directory: /');
         chai.expect(exitStub).to.be.calledWith(1);
       });
     });
@@ -307,13 +303,11 @@ describe('cli', function() {
         });
 
         it('outputs error reason to console', function() {
-          const consoleMock = sinon.mock(console);
-          consoleMock
-            .expects('error')
-            .once()
-            .withArgs('option --output-path and [target] cannot be passed at same time');
-          cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
-          consoleMock.verify();
+          const mockUI = new MockUI();
+          cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist'], mockUI);
+          chai
+            .expect(mockUI.errors)
+            .to.contain('option --output-path and [target] cannot be passed at same time');
         });
       });
     });
@@ -466,14 +460,11 @@ describe('cli', function() {
         });
 
         it('errors if [target] is a parent directory', function() {
-          const consoleMock = sinon.mock(console);
-          consoleMock
-            .expects('error')
-            .once()
-            .withArgs('build directory can not be the current or direct parent directory: ../');
-          cli(['node', 'broccoli', 'build', '../']);
-          consoleMock.verify();
-          chai.expect(exitStub).to.be.calledWith(1);
+          const mockUI = new MockUI();
+          cli(['node', 'broccoli', 'build', '../'], mockUI);
+          chai
+            .expect(mockUI.errors)
+            .to.contain('build directory can not be the current or direct parent directory: ../');
         });
       });
     });
