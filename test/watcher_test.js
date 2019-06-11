@@ -193,8 +193,8 @@ describe('Watcher', function() {
         expect(builderBuild.args[0][1]).to.deep.equal({
           type: 'rebuild',
           reason: 'watcher',
-          primaryFile: 'root/file.js',
-          changedFiles: ['root/file.js'],
+          primaryFile: path.join('root', 'file.js'),
+          changedFiles: [path.join('root', 'file.js')],
         });
       });
     });
