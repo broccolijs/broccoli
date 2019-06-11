@@ -168,6 +168,36 @@ describe('Watcher', function() {
         expect(result.filePath).to.equal(path.join('root', 'file.js'));
       });
     });
+
+    it('annotation is properly sent on initial build', function() {
+      const builderBuild = sinon.spy(builder, 'build');
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      return watcher._build().then(() => {
+        expect(builderBuild.args[0][1]).to.deep.equal({
+          type: 'initial',
+          reason: 'watcher',
+          primaryFile: undefined,
+          changedFiles: [],
+        });
+      });
+    });
+
+    it('annotation is properly sent on rebuild', function() {
+      const builderBuild = sinon.spy(builder, 'build');
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      watcher._changedFiles = [path.join('root', 'file.js')];
+
+      return watcher._build(path.join('root', 'file.js')).then(() => {
+        expect(builderBuild.args[0][1]).to.deep.equal({
+          type: 'rebuild',
+          reason: 'watcher',
+          primaryFile: 'root/file.js',
+          changedFiles: ['root/file.js'],
+        });
+      });
+    });
   });
 
   describe('error', function() {
