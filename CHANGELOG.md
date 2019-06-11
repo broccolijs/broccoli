@@ -1,5 +1,9 @@
 # master
 
+# 3.1.1
+
+* [BUGFIX] Add `annotation` object for broccoli-sane-watcher compatiblity
+
 # 3.1.0
 
 * [Feature] use console-ui
