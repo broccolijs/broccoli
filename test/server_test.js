@@ -13,6 +13,10 @@ const Watcher = require('../lib/watcher');
 const Builder = require('../lib/builder');
 const MockUI = require('console-ui/mock');
 
+const makePlugins = require('./plugins');
+const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
+const plugins = makePlugins(Plugin);
+
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
 
 chai.use(require('sinon-chai'));
@@ -105,6 +109,33 @@ describe('server', function() {
       expect(buildSuccessWasCalled).to.eql(1);
     });
   });
+
+  it('converts ANSI codes to HTML from the error stack', function() {
+    let error = new Error('whoops');
+    error.stack = `\u001b[35m102\u001b[39m\u001b[33m\u001b[0m`;
+
+    const mockUI = new MockUI();
+    const builder = new Builder(new plugins.Merge([new plugins.Failing(error)]));
+    const watcher = new Watcher(builder, []);
+
+    server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
+    server.start();
+
+    return new Promise((resolve, reject) => {
+      server.http.on('listening', resolve);
+      server.http.on('close', reject);
+      server.http.on('error', reject);
+    }).then(() => {
+      return got(`http://127.0.0.1:${PORT}/`).then(
+        () => {
+          throw new Error('should not be reached');
+        },
+        err => {
+          expect(err.body).to.include(`<span style="color:#ff00ff;">102</span>`);
+        }
+      );
+    });
+  }).timeout(5000);
 
   it('supports being provided a custom connect middleware root', function() {
     const mockUI = new MockUI();
