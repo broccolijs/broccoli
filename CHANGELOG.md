@@ -1,6 +1,8 @@
 # master
 
-# 3.1.1
+# 3.1.2
+
+* Enable colored syntax highlighting in error messages from babel ()#415)
 
 * [BUGFIX] Add `annotation` object for broccoli-sane-watcher compatiblity
 
