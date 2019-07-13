@@ -90,6 +90,39 @@ describe('server', function() {
     });
   }).timeout(10000);
 
+  it('starts with ssl if ssl option is passed', function() {
+    const mockUI = new MockUI();
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/ssl'));
+    const watcher = new Watcher(builder, []);
+
+    server = new Server.Server(
+      watcher,
+      '127.0.0.1',
+      PORT,
+      undefined,
+      mockUI,
+      true,
+      'test/fixtures/ssl/ssl/server.key',
+      'test/fixtures/ssl/ssl/server.crt'
+    );
+    server.start();
+
+    return new Promise((resolve, reject) => {
+      server.instance.on('listening', resolve);
+      server.instance.on('close', reject);
+      server.instance.on('error', reject);
+    }).then(() => {
+      return got(`https://127.0.0.1:${PORT}/`, { rejectUnauthorized: false }).then(
+        res => {
+          expect(res.statusCode).to.eql(200);
+        },
+        () => {
+          throw new Error('should not be reached');
+        }
+      );
+    });
+  }).timeout(5000);
+
   it('buildSuccess is handled', function() {
     const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
@@ -122,9 +155,9 @@ describe('server', function() {
     server.start();
 
     return new Promise((resolve, reject) => {
-      server.http.on('listening', resolve);
-      server.http.on('close', reject);
-      server.http.on('error', reject);
+      server.instance.on('listening', resolve);
+      server.instance.on('close', reject);
+      server.instance.on('error', reject);
     }).then(() => {
       return got(`http://127.0.0.1:${PORT}/`).then(
         () => {
@@ -171,9 +204,9 @@ describe('server', function() {
     server.start();
 
     return new Promise((resolve, reject) => {
-      server.http.on('listening', resolve);
-      server.http.on('close', reject);
-      server.http.on('error', reject);
+      server.instance.on('listening', resolve);
+      server.instance.on('close', reject);
+      server.instance.on('error', reject);
     }).then(() => {
       return got(`http://127.0.0.1:${PORT}/foo.txt`) // basic serving
         .then(res => {
