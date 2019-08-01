@@ -197,7 +197,6 @@ describe('Builder', function() {
               expect(barBuildSpy).to.have.been.calledOnce;
               expect(buildSpy).to.have.been.calledOnce;
 
-              // Now we simulate a rebuild (and the revisions have not changed)
               builder.nodeWrappers.find(wrap => wrap.outputPath === 'test/fixtures/basic').revise();
 
               return builder.build();
