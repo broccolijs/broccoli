@@ -1,8 +1,13 @@
 'use strict';
 
-const expect = require('chai').expect;
+const chai = require('chai');
+const sinonChai = require('sinon-chai');
+const sinon = require('sinon').createSandbox();
 const Node = require('../lib/wrappers/node');
 const TransformNode = require('../lib/wrappers/transform-node');
+const { expect } = chai;
+
+chai.use(sinonChai);
 
 describe('transform-node', function() {
   let transform;
@@ -73,5 +78,55 @@ describe('transform-node', function() {
     expect(transform.shouldBuild()).to.be.true;
     inputWrapperA.revise();
     expect(transform.shouldBuild()).to.be.true;
+  });
+
+  it('build should receive object if trackInputChanges is true', async function() {
+    const spy = sinon.spy();
+
+    transform.nodeInfo.build = spy;
+    transform.nodeInfo.trackInputChanges = true;
+
+    let inputWrapperA = new Node();
+    let inputWrapperB = new Node();
+
+    transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
+
+    await transform.build(); // initial build
+    chai.expect(spy).to.have.been.calledWith({
+      changedNodes: {
+        0: true,
+        1: true,
+      },
+    });
+
+    inputWrapperB.revise();
+
+    await transform.build();
+    chai.expect(spy).to.have.been.calledWith({
+      changedNodes: {
+        0: false,
+        1: true,
+      },
+    });
+
+    inputWrapperA.revise();
+    inputWrapperB.revise();
+
+    await transform.build();
+    chai.expect(spy).to.have.been.calledWith({
+      changedNodes: {
+        0: true,
+        1: true,
+      },
+    });
+
+    await transform.build();
+
+    chai.expect(spy).to.have.been.calledWith({
+      changedNodes: {
+        0: false,
+        1: false,
+      },
+    });
   });
 });
