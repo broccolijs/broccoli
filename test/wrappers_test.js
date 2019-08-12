@@ -93,20 +93,14 @@ describe('transform-node', function() {
 
     await transform.build(); // initial build
     chai.expect(spy).to.have.been.calledWith({
-      changedNodes: {
-        0: true,
-        1: true,
-      },
+      changedNodes: [true, true],
     });
 
     inputWrapperB.revise();
 
     await transform.build();
     chai.expect(spy).to.have.been.calledWith({
-      changedNodes: {
-        0: false,
-        1: true,
-      },
+      changedNodes: [false, true],
     });
 
     inputWrapperA.revise();
@@ -114,19 +108,13 @@ describe('transform-node', function() {
 
     await transform.build();
     chai.expect(spy).to.have.been.calledWith({
-      changedNodes: {
-        0: true,
-        1: true,
-      },
+      changedNodes: [true, true],
     });
 
     await transform.build();
 
     chai.expect(spy).to.have.been.calledWith({
-      changedNodes: {
-        0: false,
-        1: false,
-      },
+      changedNodes: [false, false],
     });
   });
 });
