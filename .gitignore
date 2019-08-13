@@ -2,3 +2,4 @@
 /npm-debug.log
 /test/multidep
 /test/fixtures/project/dist
+/dist

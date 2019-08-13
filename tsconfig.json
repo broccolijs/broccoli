@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "rootDir": "lib",
+    "outDir": "dist",
+    "declaration": false,
+    "strict": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "sourceMap": true,
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["types/*"]
+    },
+    "allowJs": true
+  },
+  "include": [
+    "lib/**/*"
+  ]
+}
