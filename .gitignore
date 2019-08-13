@@ -3,3 +3,5 @@
 /test/multidep
 /test/fixtures/project/dist
 /dist
+
+yarn-error.log

@@ -26,8 +26,8 @@
     "lint:fix": "eslint --fix lib test",
     "prepare": "yarn build",
     "pretest": "multidep test/multidep.json",
-    "test": "mocha",
-    "test:debug": "mocha --inspect-brk",
+    "test": "yarn build && mocha",
+    "test:debug": "yarn build && mocha --inspect-brk",
     "watch": "tsc --watch"
   },
   "dependencies": {
