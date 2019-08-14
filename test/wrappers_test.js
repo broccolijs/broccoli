@@ -138,7 +138,7 @@ describe('transform-node', function() {
     chai.expect(spy).to.have.been.calledWith();
 
     transform.nodeInfo.trackInputChanges = false;
- 
+
     await transform.build();
     chai.expect(spy).to.have.been.calledWith();
 
