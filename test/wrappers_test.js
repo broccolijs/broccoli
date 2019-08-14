@@ -91,7 +91,7 @@ describe('transform-node', function() {
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
-    await transform.build(); // initial build
+    await transform.build();
     chai.expect(spy).to.have.been.calledWith({
       changedNodes: [true, true],
     });
@@ -116,5 +116,35 @@ describe('transform-node', function() {
     chai.expect(spy).to.have.been.calledWith({
       changedNodes: [false, false],
     });
+  });
+
+  it('build should not receive an object if trackInputChanges is false / undefined', async function() {
+    const spy = sinon.spy();
+
+    transform.nodeInfo.build = spy;
+    // transform.nodeInfo.trackInputChanges is undefined
+
+    let inputWrapperA = new Node();
+    let inputWrapperB = new Node();
+
+    transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
+
+    await transform.build();
+    chai.expect(spy).to.have.been.calledWith();
+
+    inputWrapperB.revise();
+
+    await transform.build();
+    chai.expect(spy).to.have.been.calledWith();
+
+    transform.nodeInfo.trackInputChanges = false;
+ 
+    await transform.build();
+    chai.expect(spy).to.have.been.calledWith();
+
+    inputWrapperB.revise();
+
+    await transform.build();
+    chai.expect(spy).to.have.been.calledWith();
   });
 });
