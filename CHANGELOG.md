@@ -1,8 +1,16 @@
 # master
 
+# 3.2.0
+
+* Add input node change tracking (#419)
+* Initial typescript conversion (#422)
+* Fixup cli usage information (#421)
+* Use a more appropriate data structure for nodeWrappers (#418)
+* Support serving over HTTPS (#417)
+
 # 3.1.2
 
-* Enable colored syntax highlighting in error messages from babel ()#415)
+* Enable colored syntax highlighting in error messages from babel (#415)
 
 * [BUGFIX] Add `annotation` object for broccoli-sane-watcher compatiblity
 
