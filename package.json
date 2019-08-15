@@ -13,18 +13,23 @@
   "homepage": "https://github.com/broccolijs/broccoli",
   "license": "MIT",
   "author": "Jo Liss <joliss42@gmail.com>",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/broccolijs/broccoli"
   },
   "scripts": {
+    "build": "tsc && yarn html",
+    "clean": "rm -rf dist",
+    "html": "copyfiles -u 1 lib/templates/*.html ./dist",
     "lint": "eslint lib test",
     "lint:fix": "eslint --fix lib test",
+    "prepare": "yarn build",
     "pretest": "multidep test/multidep.json",
-    "test": "mocha",
-    "test:debug": "mocha --inspect-brk"
+    "test": "yarn build && mocha",
+    "test:debug": "yarn build && mocha --inspect-brk",
+    "watch": "tsc --watch"
   },
   "dependencies": {
     "ansi-html": "^0.0.7",
@@ -51,8 +56,10 @@
     "watch-detector": "^0.1.0"
   },
   "devDependencies": {
+    "@types/node": "^12.7.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "copyfiles": "^2.1.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-mocha": "^5.0.0",
     "eslint-plugin-node": "^6.0.1",
@@ -73,5 +80,8 @@
   },
   "engines": {
     "node": "8.* || >= 10.*"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
