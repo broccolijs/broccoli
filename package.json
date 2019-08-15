@@ -20,8 +20,9 @@
     "url": "https://github.com/broccolijs/broccoli"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && yarn html",
     "clean": "rm -rf dist",
+    "html": "copyfiles -u 1 lib/templates/*.html ./dist",
     "lint": "eslint lib test",
     "lint:fix": "eslint --fix lib test",
     "prepare": "yarn build",
@@ -58,6 +59,7 @@
     "@types/node": "^12.7.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "copyfiles": "^2.1.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-mocha": "^5.0.0",
     "eslint-plugin-node": "^6.0.1",
