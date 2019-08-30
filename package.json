@@ -27,7 +27,7 @@
     "lint:fix": "eslint --fix lib test",
     "prepare": "yarn build",
     "pretest": "multidep test/multidep.json",
-    "test": "yarn build && mocha",
+    "test": "yarn build && mocha -r ts-node/register",
     "test:debug": "yarn build && mocha --inspect-brk",
     "watch": "tsc --watch"
   },

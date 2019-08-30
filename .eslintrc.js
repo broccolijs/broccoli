@@ -15,6 +15,9 @@ module.exports = {
     'no-process-exit': 'off',
     'object-shorthand': 'error',
     'prettier/prettier': ['error', require('./prettier.config')],
+    "node/no-missing-require": ["error", {
+      "tryExtensions": ['.js', '.json', '.node', '.ts']
+    }]
   },
   overrides: [
     {
