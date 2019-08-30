@@ -35,7 +35,7 @@
     "ansi-html": "^0.0.7",
     "broccoli-node-info": "^2.1.0",
     "broccoli-slow-trees": "^3.0.1",
-    "broccoli-source": "^1.1.0",
+    "broccoli-source": "^3.0.0",
     "commander": "^2.15.1",
     "connect": "^3.6.6",
     "console-ui": "^3.0.4",

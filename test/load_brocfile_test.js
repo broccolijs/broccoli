@@ -3,12 +3,12 @@
 const loadBrocfile = require('../lib/load_brocfile');
 const chai = require('chai');
 const esmRequire = require('esm')(module);
-//const BroccoliSource = require('broccoli-source');
+const BroccoliSource = require('broccoli-source');
 
 const projectPath = 'test/fixtures/project';
 const projectPathEsm = 'test/fixtures/project-esm';
-//const projectPathTs = 'test/fixtures/project-ts';
-//const projectPathTsConfig = 'test/fixtures/project-ts-tsconfig';
+const projectPathTs = 'test/fixtures/project-ts';
+const projectPathTsConfig = 'test/fixtures/project-ts-tsconfig';
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
 const brocfileFunctionFixture = require('../' + projectPath + '/Brocfile-Function.js');
 const brocfileEsmFixture = esmRequire('../' + projectPathEsm + '/Brocfile.js');
@@ -50,33 +50,33 @@ describe('loadBrocfile', function() {
     });
   });
 
-  // context('with invalid Brocfile.ts', function() {
-  //   this.timeout(8000);
+  context('with invalid Brocfile.ts', function() {
+    this.timeout(8000);
 
-  //   it('throws an error for invalid syntax', function() {
-  //     chai
-  //       .expect(() => loadBrocfile({ brocfilePath: projectPathTs + '/Brocfile-invalid.ts' }))
-  //       .to.throw(Error, /TS2322:.*Type '123' is not assignable to type 'String'/);
-  //   });
-  // });
+    it('throws an error for invalid syntax', function() {
+      chai
+        .expect(() => loadBrocfile({ brocfilePath: projectPathTs + '/Brocfile-invalid.ts' }))
+        .to.throw(Error, /TS2322:.*Type '123' is not assignable to type 'String'/);
+    });
+  });
 
-  // context('with Brocfile.ts', function() {
-  //   this.timeout(8000);
+  context('with Brocfile.ts', function() {
+    this.timeout(8000);
 
-  //   it('compiles and return tree definition', function() {
-  //     process.chdir(projectPathTs);
-  //     const brocfile = loadBrocfile();
-  //     chai.expect(brocfile).to.be.a('function');
-  //     chai.expect(brocfile()).to.be.an.instanceof(BroccoliSource.UnwatchedDir);
-  //   });
+    it('compiles and return tree definition', function() {
+      process.chdir(projectPathTs);
+      const brocfile = loadBrocfile();
+      chai.expect(brocfile).to.be.a('function');
+      chai.expect(brocfile()).to.be.an.instanceof(BroccoliSource.UnwatchedDir);
+    });
 
-  //   it('uses the project tsconfig.json', function() {
-  //     process.chdir(projectPathTsConfig);
-  //     const brocfile = loadBrocfile();
-  //     chai.expect(brocfile).to.be.a('function');
-  //     chai.expect(brocfile({ env: 'subdir' })).to.equal(brocfileFixture);
-  //   });
-  // });
+    it.skip('uses the project tsconfig.json', function() {
+      process.chdir(projectPathTsConfig);
+      const brocfile = loadBrocfile();
+      chai.expect(brocfile).to.be.a('function');
+      chai.expect(brocfile({ env: 'subdir' })).to.equal(brocfileFixture);
+    });
+  });
 
   context('with Brocfile.js, called in subfolder', function() {
     beforeEach(function() {
