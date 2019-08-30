@@ -1,6 +1,7 @@
+import TransformNodeWrapper from '../lib/wrappers/transform-node';
+import SourceNodeWrapper from '../lib/wrappers/source-node';
+
 const WatcherAdapter = require('../lib/watcher_adapter');
-const TransformNodeWrapper = require('../lib/wrappers/transform-node');
-const SourceNodeWrapper = require('../lib/wrappers/source-node');
 const bindFileEvent = WatcherAdapter.bindFileEvent;
 const fs = require('fs');
 const chai = require('chai');

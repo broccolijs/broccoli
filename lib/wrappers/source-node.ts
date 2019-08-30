@@ -1,8 +1,13 @@
 const NodeWrapper = require('./node');
 const fs = require('fs');
+import * as fs from 'fs';
+import { SourceNodeInfo } from 'broccoli-node-api';
+import NodeWrapper from './node';
 import undefinedToNull from '../utils/undefined-to-null';
 
-module.exports = class SourceNodeWrapper extends NodeWrapper {
+export default class SourceNodeWrapper extends NodeWrapper {
+  nodeInfo!: SourceNodeInfo;
+
   setup(/* features */) {}
   build() {
     // We only check here that the sourceDirectory exists and is a directory

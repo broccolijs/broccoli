@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@types/node": "^12.7.1",
+    "broccoli-node-api": "^1.7.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "copyfiles": "^2.1.1",
