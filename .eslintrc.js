@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   parserOptions: {
     ecmaVersion: 2018,
+    sourceTyp: 'module' ,
   },
   plugins: ['node', 'prettier'],
   extends: ['eslint:recommended', 'plugin:node/recommended'],
@@ -9,7 +10,6 @@ module.exports = {
     node: true,
   },
   rules: {
-    strict: 'error',
     'no-var': 'error',
     'no-console': 'off',
     'no-process-exit': 'off',

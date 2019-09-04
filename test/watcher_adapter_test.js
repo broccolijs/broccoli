@@ -1,5 +1,3 @@
-'use strict';
-
 const WatcherAdapter = require('../lib/watcher_adapter');
 const TransformNodeWrapper = require('../lib/wrappers/transform-node');
 const SourceNodeWrapper = require('../lib/wrappers/source-node');
