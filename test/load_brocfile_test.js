@@ -1,5 +1,3 @@
-'use strict';
-
 const loadBrocfile = require('../lib/load_brocfile');
 const chai = require('chai');
 const esmRequire = require('esm')(module);

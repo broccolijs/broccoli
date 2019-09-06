@@ -1,5 +1,3 @@
-'use strict';
-
 const WatchDetector = require('watch-detector');
 const chai = require('chai');
 const childProcess = require('child_process');
