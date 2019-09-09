@@ -1,8 +1,14 @@
 'use strict';
 
+import HeimdallNode from '../../types/heimdalljs';
 const calculateSummary = require('./calculate-summary');
 
-function ellipsize(string, desiredLength) {
+interface ConsoleUI {
+  writeLine(...msg: string[]): void;
+  writeError(msg: string): void;
+}
+
+function ellipsize(string: any, desiredLength: any) {
   if (string.length > desiredLength) {
     return string.slice(0, desiredLength - 3) + '...';
   } else {
@@ -10,7 +16,7 @@ function ellipsize(string, desiredLength) {
   }
 }
 
-module.exports = function printSlowNodes(tree, factor, ui) {
+module.exports = function printSlowNodes(tree: HeimdallNode, factor: number, ui: ConsoleUI) {
   try {
     const summary = calculateSummary(tree);
     const pcThreshold = factor || 0.05;
@@ -62,7 +68,7 @@ module.exports = function printSlowNodes(tree, factor, ui) {
   }
 };
 
-function pad(str, len, char, dir) {
+function pad(str: string, len: number, char?: string, dir?: 'left' | 'both') {
   if (!char) {
     char = ' ';
   }

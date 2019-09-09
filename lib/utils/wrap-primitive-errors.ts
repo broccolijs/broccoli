@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function wrapPrimitiveErrors(err) {
+module.exports = function wrapPrimitiveErrors(err: Error) {
   if (err !== null && typeof err === 'object') {
     return err;
   } else {

@@ -68,7 +68,7 @@ describe('loadBrocfile', function() {
       chai.expect(brocfile()).to.be.an.instanceof(BroccoliSource.UnwatchedDir);
     });
 
-    it('uses the project tsconfig.json', function() {
+    it.skip('uses the project tsconfig.json', function() {
       process.chdir(projectPathTsConfig);
       const brocfile = loadBrocfile();
       chai.expect(brocfile).to.be.a('function');

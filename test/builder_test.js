@@ -340,7 +340,7 @@ describe('Builder', function() {
     it('records string (watched) source directories', function() {
       builder = new FixtureBuilder('test/fixtures/basic');
 
-      expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
+      expect(builder.watchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
       expect(builder.unwatchedPaths).to.deep.equal([]);
 
       return expect(builder.build()).to.eventually.deep.equal({
@@ -353,7 +353,7 @@ describe('Builder', function() {
 
       builder = new FixtureBuilder(new plugins.Merge([src, src]));
 
-      expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
+      expect(builder.watchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
     });
 
     it("fails construction when a watched source directory doesn't exist", function() {
@@ -1176,8 +1176,8 @@ describe('Builder', function() {
             {
               _id: 1,
               id: {
-                name: 'test/fixtures/basic',
-                label: 'WatchedDir (test/fixtures/basic; string node)',
+                name: path.resolve('test/fixtures/basic'),
+                label: `WatchedDir (${path.resolve('test/fixtures/basic')}; string node)`,
                 broccoliNode: true,
                 broccoliId: 0,
                 broccoliCachedNode: false,
@@ -1214,8 +1214,8 @@ describe('Builder', function() {
             {
               _id: 6,
               id: {
-                name: 'test/fixtures/basic',
-                label: 'WatchedDir (test/fixtures/basic; string node)',
+                name: path.resolve('test/fixtures/basic'),
+                label: `WatchedDir (${path.resolve('test/fixtures/basic')}; string node)`,
                 broccoliNode: true,
                 broccoliId: 0,
                 broccoliCachedNode: true,
@@ -1252,8 +1252,8 @@ describe('Builder', function() {
             {
               _id: 7,
               id: {
-                name: 'test/fixtures/basic',
-                label: 'WatchedDir (test/fixtures/basic; string node)',
+                name: path.resolve('test/fixtures/basic'),
+                label: `WatchedDir (${path.resolve('test/fixtures/basic')}; string node)`,
                 broccoliNode: true,
                 broccoliId: 0,
                 broccoliCachedNode: true,
