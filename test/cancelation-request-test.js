@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 const CancelationRequest = require('../lib/cancelation-request');
-const CancelationError = require('../lib/errors/cancelation');
+import CancelationError from '../lib/errors/cancelation';
 
 chai.use(chaiAsPromised);
 

@@ -1,8 +1,30 @@
-const BuilderError = require('./builder');
+import BuilderError from './builder';
+import NodeWrapper from '../wrappers/node';
 import wrapPrimitiveErrors from '../utils/wrap-primitive-errors';
 
-module.exports = class BuildError extends BuilderError {
-  constructor(originalError, nodeWrapper) {
+interface BroccoliPayloadError {
+  originalError: Error;
+  originalMessage: string,
+  nodeId: number;
+  nodeLabel: string;
+  nodeName: string;
+  nodeAnnotation: string | undefined | null;
+  instantiationStack: string;
+  // error location (if any)
+  location: {
+    file: string;
+    treeDir: string;
+    line: number;
+    column: number;
+  },
+}
+
+export default class BuildError extends BuilderError {
+  isSilent!: boolean;
+  isCancellation!: boolean;
+  broccoliPayload!: BroccoliPayloadError;
+
+  constructor(originalError: any, nodeWrapper?: NodeWrapper) {
     if (nodeWrapper == null) {
       // for Chai
       super();

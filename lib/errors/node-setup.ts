@@ -1,8 +1,9 @@
-const BuilderError = require('./builder');
+import BuilderError from './builder';
+import NodeWrapper from '../wrappers/node';
 import wrapPrimitiveErrors from '../utils/wrap-primitive-errors';
 
-module.exports = class NodeSetupError extends BuilderError {
-  constructor(originalError, nodeWrapper) {
+export default class NodeSetupError extends BuilderError {
+  constructor(originalError: Error, nodeWrapper?: NodeWrapper) {
     if (nodeWrapper == null) {
       // Chai calls new NodeSetupError() :(
       super();

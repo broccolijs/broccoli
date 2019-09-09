@@ -7,7 +7,7 @@ const sinon = require('sinon').createSandbox();
 const sinonChai = require('sinon-chai');
 
 const Builder = require('../lib/builder');
-const BuilderError = require('../lib/errors/builder');
+import BuilderError from '../lib/errors/builder';
 const DummyWatcher = require('../lib/dummy-watcher');
 const broccoli = require('../lib/index');
 const cli = require('../lib/cli');
