@@ -10,7 +10,6 @@ interface BroccoliPayloadError {
   nodeName: string;
   nodeAnnotation: string | undefined | null;
   instantiationStack: string;
-  // error location (if any)
   location: {
     file: string;
     treeDir: string;
