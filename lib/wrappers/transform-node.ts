@@ -1,14 +1,14 @@
+import fs from 'fs';
+import rimraf from 'rimraf';
 import undefinedToNull from '../utils/undefined-to-null';
-
 import NodeWrapper from './node';
-import { TransformNodeInfo } from 'broccoli-node-api';
-const fs = require('fs');
-const rimraf = require('rimraf');
+import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
+
 const logger = require('heimdalljs-logger')('broccoli:transform-node');
 
 export default class TransformNodeWrapper extends NodeWrapper {
   inputRevisions!: WeakMap<any, { revision: number, changed: boolean }>;
-  callbackObject: any;
+  callbackObject!: CallbackObject;
   inputPaths!: string[];
   nodeInfo!: TransformNodeInfo;
 
@@ -99,8 +99,9 @@ export default class TransformNodeWrapper extends NodeWrapper {
       // Build time in milliseconds
       this.buildState.selfTime = 1000 * (now[0] - startTime[0] + (now[1] - startTime[1]) / 1e9);
       this.buildState.totalTime = this.buildState.selfTime;
+
       for (let i = 0; i < this.inputNodeWrappers.length; i++) {
-        this.buildState.totalTime += this.inputNodeWrappers[i].buildState.totalTime;
+        this.buildState.totalTime += this.inputNodeWrappers[i].buildState.totalTime || 0;
       }
 
       if (this.buildState.selfTime >= 100) {

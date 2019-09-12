@@ -14,7 +14,7 @@ export default class NodeWrapper {
   cachePath!: string;
   outputPath!: string;
   nodeInfo!: NodeInfo;
-  inputNodeWrappers!: any[];
+  inputNodeWrappers!: NodeWrapper[];
 
   constructor() {
     this.buildState = {};

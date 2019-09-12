@@ -1,6 +1,4 @@
-const NodeWrapper = require('./node');
-const fs = require('fs');
-import * as fs from 'fs';
+import fs from 'fs';
 import { SourceNodeInfo } from 'broccoli-node-api';
 import NodeWrapper from './node';
 import undefinedToNull from '../utils/undefined-to-null';
