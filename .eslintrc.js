@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   parserOptions: {
     ecmaVersion: 2018,
-    sourceTyp: 'module',
+    sourceType: 'module',
   },
   plugins: ['node', 'prettier'],
   extends: ['eslint:recommended', 'plugin:node/recommended'],
@@ -15,9 +15,10 @@ module.exports = {
     'no-process-exit': 'off',
     'object-shorthand': 'error',
     'prettier/prettier': ['error', require('./prettier.config')],
-    "node/no-missing-require": ["error", {
-      "tryExtensions": ['.js', '.json', '.node', '.ts']
-    }]
+    'node/no-missing-require': ['error', {
+      "tryExtensions": ['.js', '.json', '.node', '.ts'],
+    }],
+    'node/no-unsupported-features': 'off',
   },
   overrides: [
     {

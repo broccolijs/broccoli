@@ -1,5 +1,3 @@
-'use strict';
-
 import HeimdallNode from '../../types/heimdalljs';
 
 interface BaseNode {
@@ -31,7 +29,7 @@ function normalizeTimes(n: GroupedNode) {
   n.totalSelfTime = n.totalSelfTime / 1e6;
 }
 
-module.exports = function calculateSummary(tree: HeimdallNode) {
+export default function calculateSummary(tree: HeimdallNode) {
   let totalTime = 0;
   let nodes: BaseNode[] = [];
   let groupedNodes: GroupedNode[] = [];
