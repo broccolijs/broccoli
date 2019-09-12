@@ -1,4 +1,4 @@
-export default {
+export = {
   get Builder() {
     return require('./builder');
   },
@@ -9,15 +9,15 @@ export default {
     return require('./server');
   },
   get getMiddleware() {
-    return require('./middleware');
+    return require('./middleware').default;
   },
   get Watcher() {
-    return require('./watcher');
+    return require('./watcher').default;
   },
   get WatcherAdapter() {
-    return require('./watcher_adapter');
+    return require('./watcher_adapter').default;
   },
   get cli() {
-    return require('./cli');
+    return require('./cli').default;
   },
 };

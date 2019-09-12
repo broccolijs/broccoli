@@ -1,13 +1,15 @@
-const chai = require('chai');
+import chai from 'chai';
+import Sinon from 'sinon';
+import got from 'got';
+import fs from 'fs';
+import promiseFinally from 'promise.prototype.finally';
+import Watcher from '../lib/watcher';
+
 const expect = chai.expect;
 const multidepRequire = require('multidep')('test/multidep.json');
-const sinon = require('sinon').createSandbox();
-const got = require('got');
-const fs = require('fs');
-const promiseFinally = require('promise.prototype.finally');
+const sinon = Sinon.createSandbox();
 
 const Server = require('../lib/server');
-const Watcher = require('../lib/watcher');
 const Builder = require('../lib/builder');
 const MockUI = require('console-ui/mock');
 

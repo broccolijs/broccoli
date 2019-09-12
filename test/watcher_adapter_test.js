@@ -1,14 +1,14 @@
+import fs from 'fs';
+import chai from 'chai';
+import sinonChai from 'sinon-chai';
+import Sinon from 'sinon';
 import TransformNodeWrapper from '../lib/wrappers/transform-node';
 import SourceNodeWrapper from '../lib/wrappers/source-node';
+import WatcherAdapter, { bindFileEvent } from '../lib/watcher_adapter';
 
-const WatcherAdapter = require('../lib/watcher_adapter');
-const bindFileEvent = WatcherAdapter.bindFileEvent;
-const fs = require('fs');
-const chai = require('chai');
 const expect = chai.expect;
-const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
-const sinon = require('sinon').createSandbox();
+const sinon = Sinon.createSandbox();
 
 describe('WatcherAdapter', function() {
   afterEach(function() {

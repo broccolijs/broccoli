@@ -1,12 +1,13 @@
+import path from 'path';
+import chai from 'chai';
+import sinonChai from 'sinon-chai';
+import Sinon from 'sinon';
+import Watcher from '../lib/watcher';
 import SourceNodeWrapper from '../lib/wrappers/source-node';
 
-const Watcher = require('../lib/watcher');
-const path = require('path');
-const chai = require('chai');
 const expect = chai.expect;
-const sinonChai = require('sinon-chai');
 chai.use(sinonChai);
-const sinon = require('sinon').createSandbox();
+const sinon = Sinon.createSandbox();
 
 describe('Watcher', function() {
   let watcher;

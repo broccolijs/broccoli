@@ -171,7 +171,7 @@ export default function broccoliCLI(args: string[], ui = new UI()) {
           watcher.quit();
         }
       });
-      watcher.on('buildFailure', (err: any) => {
+      watcher.on('buildFailure', (err: Error) => {
         ui.writeLine('build failure', 'ERROR');
         ui.writeError(err);
       });
@@ -183,10 +183,10 @@ export default function broccoliCLI(args: string[], ui = new UI()) {
       process.on('SIGINT', cleanupAndExit);
       process.on('SIGTERM', cleanupAndExit);
 
-      actionPromise = promiseFinally(watcher.start().catch((err: any) => ui.writeError(err)), () => {
+      actionPromise = promiseFinally(watcher.start().catch((err: Error) => ui.writeError(err)), () => {
         builder.cleanup();
         process.exit(0);
-      }).catch((err: any) => {
+      }).catch((err: Error) => {
         ui.writeLine('Cleanup error:', 'ERROR');
         ui.writeError(err);
         process.exit(1);

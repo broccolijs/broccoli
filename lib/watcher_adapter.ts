@@ -1,15 +1,27 @@
+import sane from 'sane';
+import { EventEmitter } from 'events';
 import SourceNode from './wrappers/source-node';
+import SourceNodeWrapper from './wrappers/source-node';
+import TransformNodeWrapper from './wrappers/transform-node';
 
-const EventEmitter = require('events').EventEmitter;
-const sane = require('sane');
 const logger = require('heimdalljs-logger')('broccoli:watcherAdapter');
 
-function defaultFilterFunction(name) {
+interface WatcherAdapterOptions extends sane.Options {
+  filter?: any;
+}
+
+function defaultFilterFunction(name: string) {
   return /^[^.]/.test(name);
 }
 
-function bindFileEvent(adapter, watcher, node, event) {
-  watcher.on(event, (filepath, root) => {
+export function bindFileEvent(
+  adapter: WatcherAdapter, 
+  watcher: sane.Watcher, 
+  node: TransformNodeWrapper | SourceNodeWrapper, 
+  event: 'change' | 'add' | 'delete'
+) {
+  // @ts-ignore
+  watcher.on(event, (filepath: string, root: string) => {
     logger.debug(event, root + '/' + filepath);
     logger.debug(`revise called on node [${node.id}]`);
     node.revise();
@@ -17,8 +29,12 @@ function bindFileEvent(adapter, watcher, node, event) {
   });
 }
 
-module.exports = class WatcherAdapter extends EventEmitter {
-  constructor(watchedNodes, options) {
+export default class WatcherAdapter extends EventEmitter {
+  watchers: sane.Watcher[];
+  watchedNodes: SourceNodeWrapper[];
+  options: WatcherAdapterOptions;
+
+  constructor(watchedNodes: SourceNodeWrapper[], options: sane.Options = {}) {
     super();
     if (!Array.isArray(watchedNodes)) {
       throw new TypeError(
@@ -34,15 +50,15 @@ module.exports = class WatcherAdapter extends EventEmitter {
       }
     }
     this.watchedNodes = watchedNodes;
-    this.options = options || {};
+    this.options = options;
     this.options.filter = this.options.filter || defaultFilterFunction;
     this.watchers = [];
   }
 
   watch() {
-    let watchers = this.watchedNodes.map(node => {
+    let watchers = this.watchedNodes.map((node: SourceNodeWrapper) => {
       const watchedPath = node.nodeInfo.sourceDirectory;
-      const watcher = new sane(watchedPath, this.options);
+      const watcher = sane(watchedPath, this.options);
       this.watchers.push(watcher);
       bindFileEvent(this, watcher, node, 'change');
       bindFileEvent(this, watcher, node, 'add');
@@ -54,7 +70,7 @@ module.exports = class WatcherAdapter extends EventEmitter {
       }).then(() => {
         watcher.removeAllListeners('ready');
         watcher.removeAllListeners('error');
-        watcher.on('error', err => {
+        watcher.on('error', (err: Error) => {
           logger.debug('error', err);
           this.emit('error', err);
         });
@@ -66,9 +82,10 @@ module.exports = class WatcherAdapter extends EventEmitter {
 
   quit() {
     let closing = this.watchers.map(
-      watcher =>
+      (watcher: sane.Watcher) => 
         new Promise((resolve, reject) =>
-          watcher.close(err => {
+          // @ts-ignore
+          watcher.close((err: any) => {
             if (err) reject(err);
             else resolve();
           })
@@ -78,5 +95,3 @@ module.exports = class WatcherAdapter extends EventEmitter {
     return Promise.all(closing).then(() => {});
   }
 };
-
-module.exports.bindFileEvent = bindFileEvent;
