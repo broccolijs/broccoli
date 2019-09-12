@@ -1,6 +1,6 @@
-const Watcher = require('../lib/watcher');
-const SourceNodeWrapper = require('../lib/wrappers/source-node');
+import SourceNodeWrapper from '../lib/wrappers/source-node';
 
+const Watcher = require('../lib/watcher');
 const path = require('path');
 const chai = require('chai');
 const expect = chai.expect;

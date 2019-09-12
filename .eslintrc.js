@@ -16,7 +16,7 @@ module.exports = {
     'object-shorthand': 'error',
     'prettier/prettier': ['error', require('./prettier.config')],
     'node/no-missing-require': ['error', {
-      "tryExtensions": ['.js', '.json', '.node', '.ts'],
+      'tryExtensions': ['.js', '.json', '.node', '.ts'],
     }],
     'node/no-unsupported-features': 'off',
   },

@@ -1,8 +1,9 @@
+import Node from '../lib/wrappers/node';
+import TransformNode from '../lib/wrappers/transform-node';
+
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
 const sinon = require('sinon').createSandbox();
-const Node = require('../lib/wrappers/node');
-const TransformNode = require('../lib/wrappers/transform-node');
 const { expect } = chai;
 
 chai.use(sinonChai);
