@@ -1,4 +1,4 @@
-export default function wrapPrimitiveErrors(err: Error) {
+export default function wrapPrimitiveErrors(err: Error): Error {
   if (err !== null && typeof err === 'object') {
     return err;
   } else {
