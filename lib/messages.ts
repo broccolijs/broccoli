@@ -1,7 +1,7 @@
 import printSlowNodes from './utils/slow-trees';
 
-module.exports = {
-  onBuildSuccess(builder, ui) {
+export default {
+  onBuildSuccess(builder: any, ui: any) {
     printSlowNodes(builder.outputNodeWrapper.__heimdall__, 0.05, ui);
     ui.writeLine(
       'Built - ' +

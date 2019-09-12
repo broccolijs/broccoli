@@ -1,16 +1,36 @@
+import TreeSync from 'tree-sync';
+import childProcess from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import CliError from './errors/cli';
+import broccoli from './index';
+import messages from './messages';
+
 const promiseFinally = require('promise.prototype.finally');
-const TreeSync = require('tree-sync');
-const childProcess = require('child_process');
-const fs = require('fs');
 const WatchDetector = require('watch-detector');
-const path = require('path');
 const UI = require('console-ui');
 
-const broccoli = require('./index');
-const messages = require('./messages');
-import CliError from './errors/cli';
+interface ServeOptions {
+  prod?: boolean;
+  dev?: boolean;
+  host?: string;
+  port: string;
+  environment?: string;
+  outputPath?: string;
+  ssl: string;
+  sslKey: string;
+  sslCert: string;
+}
 
-module.exports = function broccoliCLI(args, ui = new UI()) {
+interface BuildOptions {
+  prod?: boolean;
+  dev?: boolean;
+  watch: boolean;
+  outputPath: string;
+  environment: string;
+}
+
+export default function broccoliCLI(args: any, ui = new UI()) {
   // always require a fresh commander, as it keeps state at module scope
   delete require.cache[require.resolve('commander')];
   const program = require('commander');
@@ -35,7 +55,7 @@ module.exports = function broccoliCLI(args, ui = new UI()) {
     .option('-e, --environment <environment>', 'build environment [development]', 'development')
     .option('--prod', 'alias for --environment=production')
     .option('--dev', 'alias for --environment=development')
-    .action(options => {
+    .action((options: ServeOptions) => {
       if (options.prod) {
         options.environment = 'production';
       } else if (options.dev) {
@@ -93,7 +113,7 @@ module.exports = function broccoliCLI(args, ui = new UI()) {
     .option('-e, --environment <environment>', 'build environment [development]', 'development')
     .option('--prod', 'alias for --environment=production')
     .option('--dev', 'alias for --environment=development')
-    .action((outputDir, options) => {
+    .action((outputDir: string, options: BuildOptions) => {
       if (outputDir && options.outputPath) {
         ui.writeLine('option --output-path and [target] cannot be passed at same time', 'ERROR');
         return process.exit(1);
@@ -141,7 +161,7 @@ module.exports = function broccoliCLI(args, ui = new UI()) {
           watcher.quit();
         }
       });
-      watcher.on('buildFailure', err => {
+      watcher.on('buildFailure', (err: Error) => {
         ui.writeLine('build failure', 'ERROR');
         ui.writeError(err);
       });
@@ -153,10 +173,10 @@ module.exports = function broccoliCLI(args, ui = new UI()) {
       process.on('SIGINT', cleanupAndExit);
       process.on('SIGTERM', cleanupAndExit);
 
-      actionPromise = promiseFinally(watcher.start().catch(err => ui.writeError(err)), () => {
+      actionPromise = promiseFinally(watcher.start().catch((err: Error) => ui.writeError(err)), () => {
         builder.cleanup();
         process.exit(0);
-      }).catch(err => {
+      }).catch((err: Error) => {
         ui.writeLine('Cleanup error:', 'ERROR');
         ui.writeError(err);
         process.exit(1);
@@ -173,16 +193,16 @@ module.exports = function broccoliCLI(args, ui = new UI()) {
   return actionPromise || Promise.resolve();
 };
 
-function getBuilder(options) {
+function getBuilder(options: any) {
   const brocfile = broccoli.loadBrocfile(options);
   return new broccoli.Builder(brocfile(buildBrocfileOptions(options)));
 }
 
-function getWatcher(options) {
+function getWatcher(options: { watch: any }) {
   return options.watch ? broccoli.Watcher : require('./dummy-watcher');
 }
 
-function buildWatcherOptions(options, ui) {
+function buildWatcherOptions(options: { watcher?: any }, ui: any) {
   if (!options) {
     options = {};
   }
@@ -209,13 +229,13 @@ function buildWatcherOptions(options, ui) {
   };
 }
 
-function buildBrocfileOptions(options) {
+function buildBrocfileOptions(options: { environment: 'string' }) {
   return {
     env: options.environment,
   };
 }
 
-function guardOutputDir(outputDir) {
+function guardOutputDir(outputDir: string) {
   if (isParentDirectory(outputDir)) {
     throw new CliError(
       `build directory can not be the current or direct parent directory: ${outputDir}`
@@ -223,7 +243,7 @@ function guardOutputDir(outputDir) {
   }
 }
 
-function isParentDirectory(outputPath) {
+function isParentDirectory(outputPath: string) {
   if (!fs.existsSync(outputPath)) {
     return false;
   }

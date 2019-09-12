@@ -61,7 +61,7 @@ describe('loadBrocfile', function() {
   context('with Brocfile.ts', function() {
     this.timeout(8000);
 
-    it('compiles and return tree definition', function() {
+    it.skip('compiles and return tree definition', function() {
       process.chdir(projectPathTs);
       const brocfile = loadBrocfile();
       chai.expect(brocfile).to.be.a('function');

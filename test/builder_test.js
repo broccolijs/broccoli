@@ -3,7 +3,7 @@ const os = require('os');
 const path = require('path');
 const tmp = require('tmp');
 const promiseFinally = require('promise.prototype.finally');
-const broccoli = require('..');
+import broccoli from '..';
 const makePlugins = require('./plugins');
 const Builder = broccoli.Builder;
 const fixturify = require('fixturify');
