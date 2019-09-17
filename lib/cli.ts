@@ -5,32 +5,42 @@ import path from 'path';
 import CliError from './errors/cli';
 import broccoli from './index';
 import messages from './messages';
+import ConsoleUI from '../types/console-ui';
 
 const promiseFinally = require('promise.prototype.finally');
 const WatchDetector = require('watch-detector');
 const UI = require('console-ui');
 
 interface ServeOptions {
-  prod?: boolean;
-  dev?: boolean;
-  host?: string;
+  host: string;
   port: string;
-  environment?: string;
-  outputPath?: string;
-  ssl: string;
+  ssl: boolean;
   sslKey: string;
   sslCert: string;
+  brocfilePath?: string;
+  outputPath?: string;
+  cwd?: string;
+  noWatch?: boolean;
+  watcher?: string;
+  environment: string;
+  prod?: boolean;
+  dev?: boolean;
+
+  watch: boolean; // TODO not sure if this is ever set?
 }
 
 interface BuildOptions {
+  brocfilePath?: string;
+  outputPath?: string;
+  cwd?: string;
+  watch?: boolean;
+  watcher?: string;
+  environment: string;
   prod?: boolean;
   dev?: boolean;
-  watch: boolean;
-  outputPath: string;
-  environment: string;
 }
 
-export default function broccoliCLI(args: any, ui = new UI()) {
+export default function broccoliCLI(args: string[], ui = new UI()) {
   // always require a fresh commander, as it keeps state at module scope
   delete require.cache[require.resolve('commander')];
   const program = require('commander');
@@ -193,16 +203,16 @@ export default function broccoliCLI(args: any, ui = new UI()) {
   return actionPromise || Promise.resolve();
 };
 
-function getBuilder(options: any) {
+function getBuilder(options: { environment: string }) {
   const brocfile = broccoli.loadBrocfile(options);
   return new broccoli.Builder(brocfile(buildBrocfileOptions(options)));
 }
 
-function getWatcher(options: { watch: any }) {
+function getWatcher(options: { watch?: boolean }) {
   return options.watch ? broccoli.Watcher : require('./dummy-watcher');
 }
 
-function buildWatcherOptions(options: { watcher?: any }, ui: any) {
+function buildWatcherOptions(options: { watcher?: string }, ui: ConsoleUI) {
   if (!options) {
     options = {};
   }
@@ -229,7 +239,7 @@ function buildWatcherOptions(options: { watcher?: any }, ui: any) {
   };
 }
 
-function buildBrocfileOptions(options: { environment: 'string' }) {
+function buildBrocfileOptions(options: { environment: string }) {
   return {
     env: options.environment,
   };

@@ -1,10 +1,6 @@
 import HeimdallNode from '../../types/heimdalljs';
 import calculateSummary from './calculate-summary';
-
-interface ConsoleUI {
-  writeLine(...msg: string[]): void;
-  writeError(msg: string): void;
-}
+import UI from '../../types/console-ui';
 
 function ellipsize(string: string, desiredLength: number) {
   if (string.length > desiredLength) {
@@ -14,7 +10,7 @@ function ellipsize(string: string, desiredLength: number) {
   }
 }
 
-export default function printSlowNodes(tree: HeimdallNode, factor: number, ui: ConsoleUI) {
+export default function printSlowNodes(tree: HeimdallNode, factor: number, ui: UI) {
   try {
     const summary = calculateSummary(tree);
     const pcThreshold = factor || 0.05;
