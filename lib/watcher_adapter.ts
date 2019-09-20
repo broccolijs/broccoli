@@ -7,7 +7,7 @@ import TransformNodeWrapper from './wrappers/transform-node';
 const logger = require('heimdalljs-logger')('broccoli:watcherAdapter');
 
 interface WatcherAdapterOptions extends sane.Options {
-  filter?: any;
+  filter?: (name: string) => boolean;
 }
 
 function defaultFilterFunction(name: string) {
