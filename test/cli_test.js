@@ -9,8 +9,8 @@ const sinonChai = require('sinon-chai');
 const Builder = require('../lib/builder');
 import BuilderError from '../lib/errors/builder';
 const DummyWatcher = require('../lib/dummy-watcher');
-const broccoli = require('../lib/index');
-const cli = require('../lib/cli');
+import broccoli from '../lib/index';
+import cli from '../lib/cli';
 const loadBrocfile = require('../lib/load_brocfile');
 const MockUI = require('console-ui/mock');
 
