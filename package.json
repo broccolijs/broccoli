@@ -32,7 +32,6 @@
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "@types/sane": "^2.0.0",
     "ansi-html": "^0.0.7",
     "broccoli-node-info": "^2.1.0",
     "broccoli-slow-trees": "^3.0.1",
@@ -60,6 +59,7 @@
     "@types/node": "^12.7.1",
     "@types/promise.prototype.finally": "^2.0.3",
     "@types/rimraf": "^2.0.2",
+    "@types/sane": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "broccoli-node-api": "^1.7.0",
