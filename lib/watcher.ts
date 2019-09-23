@@ -17,7 +17,7 @@ interface WatcherOptions {
 // WatcherAdapter handles I/O via the sane package, and could be pluggable in
 // principle.
 
-export default class Watcher extends EventEmitter {
+class Watcher extends EventEmitter {
   _changedFiles: string[];
   _quitting?: boolean; // is this ever set
   _rebuildScheduled: boolean;
@@ -211,3 +211,5 @@ export default class Watcher extends EventEmitter {
     return this._quittingPromise;
   }
 };
+
+export = Watcher;

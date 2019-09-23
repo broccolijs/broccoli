@@ -2,7 +2,7 @@ import sane from 'sane';
 import { EventEmitter } from 'events';
 import SourceNode from './wrappers/source-node';
 import SourceNodeWrapper from './wrappers/source-node';
-import TransformNodeWrapper from './wrappers/transform-node';
+import bindFileEvent from './utils/bind-file-event';
 
 const logger = require('heimdalljs-logger')('broccoli:watcherAdapter');
 
@@ -14,22 +14,7 @@ function defaultFilterFunction(name: string) {
   return /^[^.]/.test(name);
 }
 
-export function bindFileEvent(
-  adapter: WatcherAdapter, 
-  watcher: sane.Watcher, 
-  node: TransformNodeWrapper | SourceNodeWrapper, 
-  event: 'change' | 'add' | 'delete'
-) {
-  // @ts-ignore
-  watcher.on(event, (filepath: string, root: string) => {
-    logger.debug(event, root + '/' + filepath);
-    logger.debug(`revise called on node [${node.id}]`);
-    node.revise();
-    adapter.emit('change', event, filepath, root);
-  });
-}
-
-export default class WatcherAdapter extends EventEmitter {
+class WatcherAdapter extends EventEmitter {
   watchers: sane.Watcher[];
   watchedNodes: SourceNodeWrapper[];
   options: WatcherAdapterOptions;
@@ -95,3 +80,5 @@ export default class WatcherAdapter extends EventEmitter {
     return Promise.all(closing).then(() => {});
   }
 };
+
+export = WatcherAdapter;

@@ -40,7 +40,7 @@ interface BuildOptions {
   dev?: boolean;
 }
 
-export default function broccoliCLI(args: string[], ui = new UI()) {
+export = function broccoliCLI(args: string[], ui = new UI()) {
   // always require a fresh commander, as it keeps state at module scope
   delete require.cache[require.resolve('commander')];
   const program = require('commander');

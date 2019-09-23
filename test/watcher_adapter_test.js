@@ -4,7 +4,8 @@ import sinonChai from 'sinon-chai';
 import Sinon from 'sinon';
 import TransformNodeWrapper from '../lib/wrappers/transform-node';
 import SourceNodeWrapper from '../lib/wrappers/source-node';
-import WatcherAdapter, { bindFileEvent } from '../lib/watcher_adapter';
+import WatcherAdapter from '../lib/watcher_adapter';
+import bindFileEvent from '../lib/utils/bind-file-event';
 
 const expect = chai.expect;
 chai.use(sinonChai);

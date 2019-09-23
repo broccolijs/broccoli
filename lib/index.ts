@@ -1,23 +1,30 @@
 export = {
   get Builder() {
+    debugger;
     return require('./builder');
   },
   get loadBrocfile() {
+    debugger;
     return require('./load_brocfile');
   },
   get server() {
+    debugger;
     return require('./server');
   },
   get getMiddleware() {
-    return require('./middleware').default;
+    debugger;
+    return require('./middleware');
   },
   get Watcher() {
-    return require('./watcher').default;
+    debugger;
+    return require('./watcher');
   },
   get WatcherAdapter() {
-    return require('./watcher_adapter').default;
+    debugger;
+    return require('./watcher_adapter');
   },
   get cli() {
-    return require('./cli').default;
+    debugger;
+    return require('./cli');
   },
 };
