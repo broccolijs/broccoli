@@ -3,12 +3,14 @@ import rimraf from 'rimraf';
 import undefinedToNull from '../utils/undefined-to-null';
 import NodeWrapper from './node';
 import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
+import OutputWrapper from './output';
 
+const FSMerger = require('fs-merger');
 const logger = require('heimdalljs-logger')('broccoli:transform-node');
 
 export default class TransformNodeWrapper extends NodeWrapper {
   inputRevisions!: WeakMap<any, { revision: number, changed: boolean }>;
-  callbackObject!: CallbackObject;
+  callbackObject!: CallbackObject  & { input?: object, output?: object };
   inputPaths!: string[];
   nodeInfo!: TransformNodeInfo;
 
@@ -18,7 +20,16 @@ export default class TransformNodeWrapper extends NodeWrapper {
       outputPath: this.outputPath,
       cachePath: this.cachePath,
     });
-    this.callbackObject = this.nodeInfo.getCallbackObject();
+
+    if (this.nodeInfo.inoutFacade) {
+      this.callbackObject = {
+        ...this.nodeInfo.getCallbackObject(),
+        input: new FSMerger(this.nodeInfo.inputNodes),
+        output: new OutputWrapper(this.outputPath)
+      };
+    } else {
+      this.callbackObject = this.nodeInfo.getCallbackObject();
+    }
 
     // This weakmap holds references from inputNode --> last known revision #
     // If the any inputNode's ref does not match what is stored in here then we

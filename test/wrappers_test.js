@@ -1,9 +1,12 @@
 import Node from '../lib/wrappers/node';
 import TransformNode from '../lib/wrappers/transform-node';
+import OutputWrapper from '../lib/wrappers/output';
 
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
 const sinon = require('sinon').createSandbox();
+const tmp = require('tmp');
+const fs = require('fs');
 const { expect } = chai;
 
 chai.use(sinonChai);
@@ -145,5 +148,40 @@ describe('transform-node', function() {
 
     await transform.build();
     chai.expect(spy).to.have.been.calledWith();
+  });
+});
+
+describe('output-wrapper', function() {
+  let output, temp;
+
+  beforeEach(() => {
+    temp = tmp.dirSync();
+    output = new OutputWrapper(temp.name);
+  });
+
+  it('should write to given location', function() {
+    output.fs.writeFileSync('test.md', 'test');
+    let content = fs.readFileSync(`${temp.name}/test.md`, 'UTF-8');
+    expect(content).to.be.equal('test');
+  });
+
+  it(`should not crash if the dir strutcture doesn't exist`, function() {
+    output.fs.writeFileSync('test/test.md', 'test');
+    let content = fs.readFileSync(`${temp.name}/test/test.md`, 'UTF-8');
+    expect(content).to.be.equal('test');
+  });
+
+  it(`accepts absolute path as well`, function() {
+    output.fs.writeFileSync(`${temp.name}/test.md`, 'test');
+    let content = fs.readFileSync(`${temp.name}/test.md`, 'UTF-8');
+    expect(content).to.be.equal('test');
+  });
+
+  it(`should allow other fs operations too`, function() {
+    output.fs.writeFileSync('test.md', 'test');
+    let content = output.fs.existsSync('test.md');
+    expect(content, 'existsSync should work').to.be.true;
+    content = output.fs.readFileSync('test.md', 'utf-8');
+    expect(content, 'readFileSync should work').to.be.equal('test');
   });
 });
