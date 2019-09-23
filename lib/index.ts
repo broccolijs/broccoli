@@ -1,4 +1,4 @@
-export default {
+export = {
   get Builder() {
     return require('./builder');
   },

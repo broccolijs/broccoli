@@ -1,15 +1,40 @@
-const path = require('path');
-const promiseFinally = require('promise.prototype.finally');
-const EventEmitter = require('events').EventEmitter;
-const WatcherAdapter = require('./watcher_adapter');
+import path from 'path';
+import sane from 'sane';
+import { EventEmitter } from 'events';
+import WatcherAdapter from './watcher_adapter';
+import promiseFinally from 'promise.prototype.finally';
+import SourceNodeWrapper from './wrappers/source-node';
+
 const logger = require('heimdalljs-logger')('broccoli:watcher');
+
+interface WatcherOptions {
+  debounce?: number;
+  watcherAdapter?: WatcherAdapter;
+  saneOptions?: sane.Options;
+}
 
 // This Watcher handles all the Broccoli logic, such as debouncing. The
 // WatcherAdapter handles I/O via the sane package, and could be pluggable in
 // principle.
 
-module.exports = class Watcher extends EventEmitter {
-  constructor(builder, watchedNodes, options = {}) {
+class Watcher extends EventEmitter {
+  _changedFiles: string[];
+  _quitting?: boolean; // is this ever set
+  _rebuildScheduled: boolean;
+  _ready: boolean;
+  _quittingPromise: Promise<void> | null;
+  _lifetime: {
+    promise?: Promise<void>,
+    resolve?: (value: any) => void;
+    reject?: (error: any) => void;
+  } | null;
+
+  options: WatcherOptions;
+  currentBuild: null | Promise<void | null>;
+  watcherAdapter: WatcherAdapter;
+  builder: any;
+
+  constructor(builder: any, watchedNodes: SourceNodeWrapper[], options: WatcherOptions = {}) {
     super();
     this.options = options;
     if (this.options.debounce == null) {
@@ -32,7 +57,8 @@ module.exports = class Watcher extends EventEmitter {
       throw new Error('Watcher.prototype.start() must not be called more than once');
     }
 
-    let lifetime = (this._lifetime = {});
+    this._lifetime = {};
+    let lifetime = this._lifetime;
     lifetime.promise = new Promise((resolve, reject) => {
       lifetime.resolve = resolve;
       lifetime.reject = reject;
@@ -55,7 +81,7 @@ module.exports = class Watcher extends EventEmitter {
     return this._lifetime.promise;
   }
 
-  _change(event, filePath, root) {
+  _change(event: 'change', filePath: string, root: string) {
     this._changedFiles.push(path.join(root, filePath));
     if (!this._ready) {
       logger.debug('change', 'ignored: before ready');
@@ -92,7 +118,7 @@ module.exports = class Watcher extends EventEmitter {
       });
   }
 
-  _build(filePath) {
+  _build(filePath?: string) {
     logger.debug('buildStart');
     this.emit('buildStart');
 
@@ -111,7 +137,7 @@ module.exports = class Watcher extends EventEmitter {
     // currentBuild, their callback will come after our events have
     // triggered, because we registered our callback first.
     buildPromise.then(
-      (results = {}) => {
+      (results: { filePath?: string } = {}) => {
         const hrend = process.hrtime(hrstart);
         logger.debug('Build execution time: %ds %dms', hrend[0], Math.round(hrend[1] / 1e6));
         logger.debug('buildSuccess');
@@ -125,7 +151,7 @@ module.exports = class Watcher extends EventEmitter {
         this._changedFiles = [];
         this.emit('buildSuccess', results);
       },
-      err => {
+      (err: Error) => {
         this._changedFiles = [];
         logger.debug('buildFailure');
         this.emit('buildFailure', err);
@@ -134,7 +160,7 @@ module.exports = class Watcher extends EventEmitter {
     return buildPromise;
   }
 
-  _error(err) {
+  _error(err: any) {
     if (this._quittingPromise) {
       logger.debug('error', 'ignored: already quitting');
       return this._quittingPromise;
@@ -144,7 +170,11 @@ module.exports = class Watcher extends EventEmitter {
     this.emit('error', err);
     return this._quit()
       .catch(() => {})
-      .then(() => this._lifetime.reject(err));
+      .then(() => {
+        if (this._lifetime && typeof this._lifetime.reject === 'function') {
+          this._lifetime.reject(err) 
+        }
+      });
   }
 
   quit() {
@@ -155,7 +185,7 @@ module.exports = class Watcher extends EventEmitter {
 
     let quitting = this._quit();
 
-    if (this._lifetime) {
+    if (this._lifetime && typeof this._lifetime.resolve === 'function') {
       this._lifetime.resolve(quitting);
       return this._lifetime.promise;
     } else {
@@ -181,3 +211,5 @@ module.exports = class Watcher extends EventEmitter {
     return this._quittingPromise;
   }
 };
+
+export = Watcher;
