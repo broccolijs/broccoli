@@ -22,11 +22,9 @@ export default class TransformNodeWrapper extends NodeWrapper {
     });
 
     if (this.nodeInfo.inoutFacade) {
-      this.callbackObject = {
-        ...this.nodeInfo.getCallbackObject(),
-        input: new FSMerger(this.nodeInfo.inputNodes),
-        output: new OutputWrapper(this.outputPath)
-      };
+      this.callbackObject = this.nodeInfo.getCallbackObject();
+      this.callbackObject.input = new FSMerger(this.nodeInfo.inputNodes),
+      this.callbackObject.output = new OutputWrapper(this.outputPath)
     } else {
       this.callbackObject = this.nodeInfo.getCallbackObject();
     }
