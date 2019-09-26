@@ -4,6 +4,7 @@ const path = require('path');
 const tmp = require('tmp');
 const promiseFinally = require('promise.prototype.finally');
 import broccoli from '..';
+import BuilderError from '../lib/errors/build';
 const makePlugins = require('./plugins');
 const Builder = broccoli.Builder;
 const fixturify = require('fixturify');
@@ -654,7 +655,7 @@ describe('Builder', function() {
               throw new Error('Expected an error');
             },
             err => {
-              expect(err).to.be.an.instanceof(Builder.BuildError);
+              expect(err.constructor.name).to.equal(BuilderError.name);
               expect(err.stack).to.equal(originalError.stack, 'preserves original stack');
 
               expect(err.message).to.match(

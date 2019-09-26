@@ -1,27 +1,32 @@
-import NodeWrapper from './wrappers/node';
+import fs from 'fs';
+import tmp from 'tmp';
+import path from 'path';
+import { WatchedDir } from 'broccoli-source';
 import TransformNodeWrapper from './wrappers/transform-node';
 import SourceNodeWrapper from './wrappers/source-node';
-
-const promiseFinally = require('promise.prototype.finally');
-const path = require('path');
-const fs = require('fs');
-const EventEmitter = require('events').EventEmitter;
-const tmp = require('tmp');
-const heimdall = require('heimdalljs');
-const underscoreString = require('underscore.string');
-const WatchedDir = require('broccoli-source').WatchedDir;
-const broccoliNodeInfo = require('broccoli-node-info');
-
 import BuilderError from './errors/builder';
 import NodeSetupError from './errors/node-setup';
 import BuildError from './errors/build';
 import CancelationRequest from './cancelation-request';
 import Cancelation from './errors/cancelation';
-const logger = require('heimdalljs-logger')('broccoli:builder');
 import filterMap from './utils/filter-map';
+import promiseFinally from 'promise.prototype.finally';
+import { EventEmitter } from 'events';
+import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
+
+const heimdall = require('heimdalljs');
+const underscoreString = require('underscore.string');
+const broccoliNodeInfo = require('broccoli-node-info');
+const logger = require('heimdalljs-logger')('broccoli:builder');
 
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup();
+
+interface BuilderOptions {
+  tmpdir?: string | null;
+}
+
+type NodeWrappers = TransformNodeWrapper | SourceNodeWrapper;
 
 // For an explanation and reference of the API that we use to communicate with
 // nodes (__broccoliFeatures__ and __broccoliGetInfo__), see
@@ -44,10 +49,21 @@ tmp.setGracefulCleanup();
 // versions. Backwards compatibility is only guaranteed for plugins, so any
 // plugin that works with Broccoli 1.0 will work with 1.x.
 
-module.exports = class Builder extends EventEmitter {
-  constructor(outputNode, options) {
+class Builder extends EventEmitter {
+  outputNode: Node;
+  tmpdir?: string | null;
+  unwatchedPaths: string[];
+  watchedPaths: string[];
+  _nodeWrappers: Map<TransformNode | SourceNode, NodeWrappers>;
+  outputNodeWrapper: NodeWrappers;
+  _cancelationRequest: any;
+  outputPath: string;
+  buildId: number;
+  builderTmpDir!: string;
+  builderTmpDirCleanup!: any;
+
+  constructor(outputNode: Node, options: BuilderOptions = {}) {
     super();
-    if (options == null) options = {};
 
     this.outputNode = outputNode;
     this.tmpdir = options.tmpdir; // can be null
@@ -143,7 +159,7 @@ module.exports = class Builder extends EventEmitter {
       () => {
         let buildsSkipped = filterMap(
           this._nodeWrappers.values(),
-          nw => nw.buildState.built === false
+          (nw: NodeWrappers) => nw.buildState.built === false
         ).length;
         logger.debug(`Total nodes skipped: ${buildsSkipped} out of ${this._nodeWrappers.size}`);
 
@@ -168,9 +184,7 @@ module.exports = class Builder extends EventEmitter {
 
   // This method recursively traverses the node graph and returns a nodeWrapper.
   // The nodeWrapper graph parallels the node graph 1:1.
-  makeNodeWrapper(node, _stack) {
-    if (_stack == null) _stack = [];
-
+  makeNodeWrapper(node: Node, _stack: any = []) {
     let wrapper = this._nodeWrappers.get(node);
     if (wrapper !== undefined) {
       return wrapper;
@@ -208,7 +222,7 @@ module.exports = class Builder extends EventEmitter {
 
     // We start constructing the nodeWrapper here because we'll need the partial
     // nodeWrapper for the _stack. Later we'll add more properties.
-    const nodeWrapper =
+    const nodeWrapper: any =
       nodeInfo.nodeType === 'transform' ? new TransformNodeWrapper() : new SourceNodeWrapper();
     nodeWrapper.nodeInfo = nodeInfo;
     nodeWrapper.originalNode = originalNode;
@@ -223,7 +237,7 @@ module.exports = class Builder extends EventEmitter {
           cycleMessage += _stack[j].label + ' -> ';
         }
         cycleMessage += nodeWrapper.label;
-        throw new this.constructor.BuilderError(cycleMessage);
+        throw new BuilderError(cycleMessage);
       }
     }
 
@@ -232,7 +246,7 @@ module.exports = class Builder extends EventEmitter {
     let inputNodeWrappers = [];
     if (nodeInfo.nodeType === 'transform') {
       const newStack = _stack.concat([nodeWrapper]);
-      inputNodeWrappers = nodeInfo.inputNodes.map(inputNode => {
+      inputNodeWrappers = nodeInfo.inputNodes.map((inputNode: Node) => {
         return this.makeNodeWrapper(inputNode, newStack);
       });
     } else {
@@ -262,7 +276,7 @@ module.exports = class Builder extends EventEmitter {
   }
 
   get watchedSourceNodeWrappers() {
-    return filterMap(this._nodeWrappers.values(), nw => {
+    return filterMap(this._nodeWrappers.values(), (nw: NodeWrappers) => {
       return nw.nodeInfo.nodeType === 'source' && nw.nodeInfo.watched;
     });
   }
@@ -274,10 +288,10 @@ module.exports = class Builder extends EventEmitter {
       try {
         isDirectory = fs.statSync(this.watchedPaths[i]).isDirectory();
       } catch (err) {
-        throw new this.constructor.BuilderError('Directory not found: ' + this.watchedPaths[i]);
+        throw new BuilderError('Directory not found: ' + this.watchedPaths[i]);
       }
       if (!isDirectory) {
-        throw new this.constructor.BuilderError('Not a directory: ' + this.watchedPaths[i]);
+        throw new BuilderError('Not a directory: ' + this.watchedPaths[i]);
       }
     }
   }
@@ -300,6 +314,7 @@ module.exports = class Builder extends EventEmitter {
     //     in-2 -> ...
     //   02-otherplugin/
     //     ...
+    // @ts-ignore
     const tmpobj = tmp.dirSync({
       prefix: 'broccoli-',
       unsafeCleanup: true,
@@ -311,7 +326,7 @@ module.exports = class Builder extends EventEmitter {
 
     for (let nodeWrapper of this._nodeWrappers.values()) {
       if (nodeWrapper.nodeInfo.nodeType === 'transform') {
-        nodeWrapper.inputPaths = nodeWrapper.inputNodeWrappers.map(nw => nw.outputPath);
+        (nodeWrapper as TransformNodeWrapper).inputPaths = nodeWrapper.inputNodeWrappers.map((nw: any) => nw.outputPath);
         nodeWrapper.outputPath = this.mkTmpDir(nodeWrapper, 'out');
 
         if (nodeWrapper.nodeInfo.needsCache) {
@@ -328,7 +343,7 @@ module.exports = class Builder extends EventEmitter {
   // Create temporary directory, like
   // /tmp/broccoli-9rLfJh/out-067-merge_trees_vendor_packages
   // type is 'out' or 'cache'
-  mkTmpDir(nodeWrapper, type) {
+  mkTmpDir(nodeWrapper: NodeWrappers, type: 'out' | 'cache') {
     let nameAndAnnotation =
       nodeWrapper.nodeInfo.name + ' ' + (nodeWrapper.nodeInfo.annotation || '');
     // slugify turns fooBar into foobar, so we call underscored first to
@@ -392,7 +407,7 @@ module.exports = class Builder extends EventEmitter {
     });
   }
 
-  buildHeimdallTree(outputNodeWrapper) {
+  buildHeimdallTree(outputNodeWrapper: any) {
     if (!outputNodeWrapper.__heimdall__) {
       return;
     }
@@ -409,13 +424,13 @@ module.exports = class Builder extends EventEmitter {
   }
 };
 
-function reparentNodes(outputNodeWrapper) {
+function reparentNodes(outputNodeWrapper: any) {
   // reparent heimdall nodes according to input nodes
   const seen = new Set();
   const queue = [outputNodeWrapper];
   let node;
   let parent;
-  let stack = [];
+  let stack: any = [];
   while ((node = queue.pop()) !== undefined) {
     if (parent === node) {
       parent = stack.pop();
@@ -451,7 +466,7 @@ function reparentNodes(outputNodeWrapper) {
 
 function aggregateTime() {
   let queue = [heimdall.current];
-  let stack = [];
+  let stack: any = [];
   let parent;
   let node;
   while ((node = queue.pop()) !== undefined) {
@@ -475,10 +490,4 @@ function aggregateTime() {
   }
 }
 
-module.exports.BuilderError = BuilderError;
-module.exports.InvalidNodeError = broccoliNodeInfo.InvalidNodeError;
-module.exports.NodeSetupError = NodeSetupError;
-module.exports.BuildError = BuildError;
-module.exports.NodeWrapper = NodeWrapper;
-module.exports.TransformNodeWrapper = TransformNodeWrapper;
-module.exports.SourceNodeWrapper = SourceNodeWrapper;
+export = Builder;

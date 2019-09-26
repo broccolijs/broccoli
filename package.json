@@ -28,7 +28,7 @@
     "prepare": "yarn build",
     "pretest": "multidep test/multidep.json",
     "test": "yarn build && mocha -r ts-node/register",
-    "test:debug": "yarn build && mocha --inspect-brk",
+    "test:debug": "yarn build && mocha --inspect-brk -r ts-node/register",
     "watch": "tsc --watch"
   },
   "dependencies": {
@@ -56,10 +56,13 @@
     "watch-detector": "^0.1.0"
   },
   "devDependencies": {
+    "@types/findup-sync": "^2.0.2",
+    "@types/mime-types": "^2.1.0",
     "@types/node": "^12.7.1",
     "@types/promise.prototype.finally": "^2.0.3",
     "@types/rimraf": "^2.0.2",
     "@types/sane": "^2.0.0",
+    "@types/tmp": "^0.1.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "broccoli-node-api": "^1.7.0",
