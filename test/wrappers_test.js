@@ -149,6 +149,42 @@ describe('transform-node', function() {
     await transform.build();
     chai.expect(spy).to.have.been.calledWith();
   });
+
+  describe('fsFacade', function() {
+    it('should respect the fsFacade flag set to false', function() {
+      expect(transform.callbackObject.hasOwnProperty('input')).to.be.false;
+    });
+
+    it('should respect the fsFacade flag set to true', function() {
+      transform.nodeInfo = {
+        setup() {},
+        fsFacade: true,
+        getCallbackObject() {
+          return this;
+        },
+        build() {},
+      };
+      transform.setup();
+      expect(transform.callbackObject.hasOwnProperty('input')).to.be.true;
+      expect(transform.callbackObject.hasOwnProperty('output')).to.be.true;
+    });
+
+    it('has fs operations as function in callbackObject', function() {
+      transform.nodeInfo = {
+        setup() {},
+        fsFacade: true,
+        getCallbackObject() {
+          return this;
+        },
+        build() {},
+      };
+      transform.setup();
+      expect(transform.callbackObject.input.F_OK).to.be.equal(fs.F_OK);
+      expect(transform.callbackObject.output.F_OK).to.be.equal(fs.F_OK);
+      expect(typeof transform.callbackObject.input.readFileSync).to.be.equal('function');
+      expect(typeof transform.callbackObject.output.writeFileSync).to.be.equal('function');
+    });
+  });
 });
 
 describe('output-wrapper', function() {
@@ -156,32 +192,45 @@ describe('output-wrapper', function() {
 
   beforeEach(() => {
     temp = tmp.dirSync();
-    output = new OutputWrapper(temp.name);
+    let node = {
+      outputPath: temp.name,
+    };
+    output = new OutputWrapper(node).fs;
   });
 
   it('should write to given location', function() {
-    output.fs.writeFileSync('test.md', 'test');
+    output.writeFileSync('test.md', 'test');
     let content = fs.readFileSync(`${temp.name}/test.md`, 'UTF-8');
     expect(content).to.be.equal('test');
   });
 
-  it(`should not crash if the dir strutcture doesn't exist`, function() {
-    output.fs.writeFileSync('test/test.md', 'test');
-    let content = fs.readFileSync(`${temp.name}/test/test.md`, 'UTF-8');
-    expect(content).to.be.equal('test');
-  });
-
   it(`accepts absolute path as well`, function() {
-    output.fs.writeFileSync(`${temp.name}/test.md`, 'test');
+    output.writeFileSync(`${temp.name}/test.md`, 'test');
     let content = fs.readFileSync(`${temp.name}/test.md`, 'UTF-8');
     expect(content).to.be.equal('test');
   });
 
   it(`should allow other fs operations too`, function() {
-    output.fs.writeFileSync('test.md', 'test');
+    output.writeFileSync('test.md', 'test');
     let content = output.fs.existsSync('test.md');
     expect(content, 'existsSync should work').to.be.true;
     content = output.fs.readFileSync('test.md', 'utf-8');
     expect(content, 'readFileSync should work').to.be.equal('test');
+  });
+
+  it(`should not throw if the dir strutcture doesn't exist and attempt to write`, function() {
+    output.writeFileSync('test/test.md', 'test');
+    let content = fs.readFileSync(`${temp.name}/test/test.md`, 'UTF-8');
+    expect(content).to.be.equal('test');
+  });
+
+  it(`should throw if the dir strutcture doesn't exist and attempt to read`, function() {
+    expect(() => output.readFileSync('test/test.md')).to.throw(
+      /ENOENT: no such file or directory,/
+    );
+  });
+
+  it(`should return _root value`, function() {
+    expect(output._root).to.be.equal(temp.name);
   });
 });

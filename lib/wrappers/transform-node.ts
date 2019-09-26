@@ -21,10 +21,10 @@ export default class TransformNodeWrapper extends NodeWrapper {
       cachePath: this.cachePath,
     });
 
-    if (this.nodeInfo.inoutFacade) {
+    if (this.nodeInfo.fsFacade) {
       this.callbackObject = this.nodeInfo.getCallbackObject();
-      this.callbackObject.input = new FSMerger(this.nodeInfo.inputNodes),
-      this.callbackObject.output = new OutputWrapper(this.outputPath)
+      this.callbackObject.input = new FSMerger(this.nodeInfo.inputNodes).fs,
+      this.callbackObject.output = new OutputWrapper(this).fs
     } else {
       this.callbackObject = this.nodeInfo.getCallbackObject();
     }
