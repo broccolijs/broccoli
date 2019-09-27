@@ -1380,10 +1380,10 @@ fs-extra@^8.0.1, fs-extra@^8.1.0:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
-fs-merger@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/fs-merger/-/fs-merger-2.0.0.tgz#160b8da06c282c9e0aea0beff75954388bcdbe94"
-  integrity sha512-U1MBENBZ8Gh068up9TF61YByL/19WcvEvT2GSfCOBqFnxkd5msIDrEZQKLrez3qdaa9tiSXv46WT4SIX8BHleA==
+fs-merger@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/fs-merger/-/fs-merger-2.0.1.tgz#7b5af7f15bab1c43ad54459ee648246b2f83e1c2"
+  integrity sha512-3QhfxfbpAIEVr8WENsV+22FwsGKqX1byIdr92+6Uwki7eoG/V2VSrkWAoNxp4x+wtZHlyAb5yVSc42GoWSTrjQ==
   dependencies:
     fs-extra "^8.0.1"
     fs-tree-diff "^2.0.1"
