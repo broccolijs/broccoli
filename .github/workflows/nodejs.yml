@@ -28,7 +28,7 @@ jobs:
       run: yarn install
       
     - name: lint
-      run: yarn lint:js
-      
+      run: yarn lint
+
     - name: test
       run: yarn test
