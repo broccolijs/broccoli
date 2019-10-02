@@ -177,7 +177,7 @@ class Watcher extends EventEmitter {
       });
   }
 
-  quit() {
+  quit(): Promise<void> {
     if (this._quittingPromise) {
       logger.debug('quit', 'ignored: already quitting');
       return this._quittingPromise;
@@ -187,7 +187,7 @@ class Watcher extends EventEmitter {
 
     if (this._lifetime && typeof this._lifetime.resolve === 'function') {
       this._lifetime.resolve(quitting);
-      return this._lifetime.promise;
+      return this._lifetime.promise!;
     } else {
       return quitting;
     }

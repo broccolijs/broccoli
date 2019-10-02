@@ -1,9 +1,10 @@
-const path = require('path');
-const fs = require('fs');
-
-const handlebars = require('handlebars');
-const url = require('url');
-const mime = require('mime-types');
+import fs from 'fs';
+import url from 'url';
+import path from 'path';
+import mime from 'mime-types';
+import handlebars from 'handlebars';
+import Watcher from './watcher';
+import BuildError from './errors/build';
 const resolvePath = require('resolve-path');
 const ansiHTML = require('ansi-html');
 // Resets foreground and background colors to black
@@ -19,6 +20,11 @@ const dirTemplate = handlebars.compile(
   fs.readFileSync(path.resolve(__dirname, 'templates/dir.html')).toString()
 );
 
+interface MiddlewareOptions {
+  autoIndex?: boolean;
+  liveReloadPath?: string;
+}
+
 // You must call watcher.start() before you call `getMiddleware`
 //
 // This middleware is for development use only. It hasn't been reviewed
@@ -27,13 +33,12 @@ const dirTemplate = handlebars.compile(
 // Supported options:
 //   autoIndex (default: true) - set to false to disable directory listings
 //   liveReloadPath - LiveReload script URL for error pages
-module.exports = function getMiddleware(watcher, options) {
-  if (options == null) options = {};
+export = function getMiddleware(watcher: Watcher, options: MiddlewareOptions = {}) {
   if (options.autoIndex == null) options.autoIndex = true;
 
   const outputPath = path.resolve(watcher.builder.outputPath);
 
-  return function broccoliMiddleware(request, response, next) {
+  return function broccoliMiddleware(request: any, response: any, next: any) {
     if (watcher.currentBuild == null) {
       throw new Error('Waiting for initial build to start');
     }
@@ -41,8 +46,8 @@ module.exports = function getMiddleware(watcher, options) {
       .then(
         () => {
           const urlObj = url.parse(request.url);
-          let pathname = urlObj.pathname;
-          let filename, stat, lastModified, buffer;
+          let pathname = urlObj.pathname || '';
+          let filename: string, stat, lastModified, buffer;
 
           try {
             filename = decodeURIComponent(pathname);
@@ -141,7 +146,7 @@ module.exports = function getMiddleware(watcher, options) {
           response.writeHead(200);
           response.end(buffer);
         },
-        buildError => {
+        (buildError: any) => {
           // All errors thrown from builder.build() are guaranteed to be
           // Builder.BuildError instances.
           const context = {
@@ -154,6 +159,6 @@ module.exports = function getMiddleware(watcher, options) {
           response.end(errorTemplate(context));
         }
       )
-      .catch(err => err.stack);
+      .catch((err: any) => err.stack);
   };
 };

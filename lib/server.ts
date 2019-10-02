@@ -1,14 +1,31 @@
-const promiseFinally = require('promise.prototype.finally');
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
+import promiseFinally from 'promise.prototype.finally';
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
 import messages from './messages';
-const middleware = require('./middleware');
-const EventEmitter = require('events');
+import middleware from './middleware';
+import EventEmitter from 'events';
+import Watcher from './watcher';
+import UI from '../types/console-ui';
 
 class Server extends EventEmitter {
-  constructor(watcher, host, port, connect = require('connect'), ui, ssl, sslKey, sslCert) {
+  _watcher: Watcher;
+  _builder: any;
+  _host: string;
+  _port: number;
+  _ssl: boolean;
+  _sslKey: string;
+  _sslCert: string;
+  _connect: any;
+  _url: string;
+  app: null | any;
+  instance: null | any | http.Server;
+  _boundStop: any;
+  _started: boolean;
+  ui: any;
+
+  constructor(watcher: Watcher, host: string, port: string, connect = require('connect'), ui: UI, ssl: boolean, sslKey: string, sslCert: string) {
     super();
 
     this._watcher = watcher;
@@ -74,7 +91,7 @@ class Server extends EventEmitter {
         resolve(this._watcher.start());
       });
 
-      this.instance.on('error', error => {
+      this.instance.on('error', (error: any) => {
         if (error.code !== 'EADDRINUSE') {
           throw error;
         }
@@ -92,7 +109,7 @@ class Server extends EventEmitter {
         messages.onBuildSuccess(this._builder, this.ui);
       });
 
-      this._watcher.on('buildFailure', err => {
+      this._watcher.on('buildFailure', (err: any) => {
         this.emit('buildFailure');
         this.ui.writeLine('build failure', 'ERROR');
         this.ui.writeError(err);
@@ -112,21 +129,21 @@ class Server extends EventEmitter {
     if (this.instance) {
       this.instance.close();
     }
-
+    
     return this._watcher.quit().then(() => this._builder.cleanup());
   }
 }
 
-exports.serve = function serve(
-  watcher,
-  host,
-  port,
+function serve(
+  watcher: Watcher,
+  host: string,
+  port: string,
   _connect = require('connect'),
   _process = process,
-  ui,
-  ssl,
-  sslKey,
-  sslCert
+  ui: UI,
+  ssl: boolean,
+  sslKey: string,
+  sslCert: string
 ) {
   const server = new Server(watcher, host, port, _connect, ui, ssl, sslKey, sslCert);
 
@@ -140,4 +157,7 @@ exports.serve = function serve(
     });
 };
 
-exports.Server = Server;
+export = {
+  Server,
+  serve
+}

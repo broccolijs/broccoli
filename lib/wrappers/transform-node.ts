@@ -12,7 +12,6 @@ export default class TransformNodeWrapper extends NodeWrapper {
   inputPaths!: string[];
   nodeInfo!: TransformNodeInfo;
 
-
   setup(features: any) {
     this.nodeInfo.setup(features, {
       inputPaths: this.inputPaths,

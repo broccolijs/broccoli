@@ -1,6 +1,11 @@
-const path = require('path');
-const findup = require('findup-sync');
+import path from 'path';
+import findup from 'findup-sync';
 const esmRequire = require('esm')(module);
+
+interface LoadBrocfileOptions {
+  brocfilePath?: string;
+  cwd?: string;
+}
 
 /**
  * Require a brocfile via either ESM or TypeScript
@@ -8,7 +13,7 @@ const esmRequire = require('esm')(module);
  * @param {String} brocfilePath The path to the brocfile
  * @returns {*}
  */
-function requireBrocfile(brocfilePath) {
+function requireBrocfile(brocfilePath: string) {
   let brocfile;
 
   if (brocfilePath.match(/\.ts$/)) {
@@ -42,11 +47,7 @@ function requireBrocfile(brocfilePath) {
   return brocfile;
 }
 
-module.exports = function loadBrocfile(options) {
-  if (!options) {
-    options = {};
-  }
-
+export = function loadBrocfile(options: LoadBrocfileOptions = {}) {
   let brocfilePath;
   if (options.brocfilePath) {
     brocfilePath = path.resolve(options.brocfilePath);
