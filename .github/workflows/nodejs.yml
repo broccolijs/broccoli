@@ -20,9 +20,7 @@ jobs:
         version: ${{ matrix.node_version }}
   
     - name:  install yarn
-      run: |
-        curl -o- -L https://yarnpkg.com/install.sh | bash
-        export PATH=$HOME/.yarn/bin:$PATH
+      run: npm install -g yarn
 
     - name: install dependencies
       run: yarn install
