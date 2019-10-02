@@ -179,8 +179,6 @@ describe('transform-node', function() {
         build() {},
       };
       transform.setup();
-      expect(transform.callbackObject.input.F_OK).to.be.equal(fs.F_OK);
-      expect(transform.callbackObject.output.F_OK).to.be.equal(fs.F_OK);
       expect(typeof transform.callbackObject.input.readFileSync).to.be.equal('function');
       expect(typeof transform.callbackObject.output.writeFileSync).to.be.equal('function');
     });
@@ -195,7 +193,7 @@ describe('output-wrapper', function() {
     let node = {
       outputPath: temp.name,
     };
-    output = new OutputWrapper(node).fs;
+    output = OutputWrapper(node);
   });
 
   it('should write to given location', function() {
@@ -204,33 +202,27 @@ describe('output-wrapper', function() {
     expect(content).to.be.equal('test');
   });
 
-  it(`accepts absolute path as well`, function() {
-    output.writeFileSync(`${temp.name}/test.md`, 'test');
-    let content = fs.readFileSync(`${temp.name}/test.md`, 'UTF-8');
-    expect(content).to.be.equal('test');
+  it(`throws actionable error when absolute path is provided`, function() {
+    expect(() => output.writeFileSync(`${temp.name}/test.md`, 'test')).to.throw(
+      `Relative path is expected, path ${temp.name}/test.md is an absolute path. outputPath gets prefixed to the reltivePath provided`
+    );
   });
 
-  it(`should allow other fs operations too`, function() {
-    output.writeFileSync('test.md', 'test');
-    let content = output.fs.existsSync('test.md');
-    expect(content, 'existsSync should work').to.be.true;
-    content = output.fs.readFileSync('test.md', 'utf-8');
-    expect(content, 'readFileSync should work').to.be.equal('test');
+  it(`should not allow other fs operations`, function() {
+    expect(() => output.writevSync('test.md', 'test')).to.throw(
+      `Operation writevSync is not whitelisted to use. Whietlisted operations are readFileSync,existsSync,lstatSync,readdirSync,statSync,writeFileSync,appendFileSync,rmdirSync,mkdirSync`
+    );
   });
 
-  it(`should not throw if the dir strutcture doesn't exist and attempt to write`, function() {
-    output.writeFileSync('test/test.md', 'test');
-    let content = fs.readFileSync(`${temp.name}/test/test.md`, 'UTF-8');
-    expect(content).to.be.equal('test');
+  it(`should throw if the dir strutcture doesn't exist and attempt to write`, function() {
+    expect(() => output.writeFileSync('test/test.md', 'test')).to.throw(
+      /.*no such file or directory.*/
+    );
   });
 
   it(`should throw if the dir strutcture doesn't exist and attempt to read`, function() {
     expect(() => output.readFileSync('test/test.md')).to.throw(
       /ENOENT: no such file or directory,/
     );
-  });
-
-  it(`should return _root value`, function() {
-    expect(output._root).to.be.equal(temp.name);
   });
 });

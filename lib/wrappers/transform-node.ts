@@ -24,7 +24,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
     if (this.nodeInfo.fsFacade) {
       this.callbackObject = this.nodeInfo.getCallbackObject();
       this.callbackObject.input = new FSMerger(this.nodeInfo.inputNodes).fs,
-      this.callbackObject.output = new OutputWrapper(this).fs
+      this.callbackObject.output = OutputWrapper(this);
     } else {
       this.callbackObject = this.nodeInfo.getCallbackObject();
     }
