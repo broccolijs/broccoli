@@ -20,7 +20,8 @@ export default class TransformNodeWrapper extends NodeWrapper {
       outputPath: this.outputPath,
       cachePath: this.cachePath,
     });
-
+    //adding ts-ignore for now. Should be removed later when new version of broccoli-node-api is released
+    // @ts-ignore
     if (this.nodeInfo.fsFacade) {
       this.callbackObject = this.nodeInfo.getCallbackObject();
       this.callbackObject.input = new FSMerger(this.nodeInfo.inputNodes).fs,

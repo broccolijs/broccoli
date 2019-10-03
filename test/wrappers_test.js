@@ -204,13 +204,13 @@ describe('output-wrapper', function() {
 
   it(`throws actionable error when absolute path is provided`, function() {
     expect(() => output.writeFileSync(`${temp.name}/test.md`, 'test')).to.throw(
-      `Relative path is expected, path ${temp.name}/test.md is an absolute path. outputPath gets prefixed to the reltivePath provided`
+      `Relative path is expected, path ${temp.name}/test.md is an absolute path.`
     );
   });
 
   it(`should not allow other fs operations`, function() {
     expect(() => output.writevSync('test.md', 'test')).to.throw(
-      `Operation writevSync is not whitelisted to use. Whietlisted operations are readFileSync,existsSync,lstatSync,readdirSync,statSync,writeFileSync,appendFileSync,rmdirSync,mkdirSync`
+      `Operation writevSync is not allowed to use. Allowed operations are readFileSync,existsSync,lstatSync,readdirSync,statSync,writeFileSync,appendFileSync,rmdirSync,mkdirSync`
     );
   });
 

@@ -6,14 +6,14 @@ const logger = require('heimdalljs-logger')('broccoli:outputWrapper');
 
 const WHITELISTEDOPERATION = new Set([
   'readFileSync',
-'existsSync',
-'lstatSync',
-'readdirSync',
-'statSync',
-'writeFileSync',
-'appendFileSync',
-'rmdirSync',
-'mkdirSync'
+  'existsSync',
+  'lstatSync',
+  'readdirSync',
+  'statSync',
+  'writeFileSync',
+  'appendFileSync',
+  'rmdirSync',
+  'mkdirSync'
 ]);
 
 export default function OutputWrapper (node: TransformNodeWrapper) {
@@ -22,7 +22,7 @@ export default function OutputWrapper (node: TransformNodeWrapper) {
       return function() {
         let [relativePath] = arguments;
         if (isAbsolute(relativePath)) {
-          throw new Error(`Relative path is expected, path ${relativePath} is an absolute path. outputPath gets prefixed to the reltivePath provided.`);
+          throw new Error(`Relative path is expected, path ${relativePath} is an absolute path.`);
         }
         let outputPath = node.outputPath + '/' + relativePath;
         if(WHITELISTEDOPERATION.has(propertyName)) {
@@ -30,7 +30,7 @@ export default function OutputWrapper (node: TransformNodeWrapper) {
           logger.debug(`[operation:${propertyName}] at ${outputPath}`);
           return target[propertyName](...arguments);
         } else {
-          throw new Error(`Operation ${propertyName} is not whitelisted to use. Whietlisted operations are ${Array.from(WHITELISTEDOPERATION).toString()}`);
+          throw new Error(`Operation ${propertyName} is not allowed to use. Allowed operations are ${Array.from(WHITELISTEDOPERATION).toString()}`);
         }
       }
     }
