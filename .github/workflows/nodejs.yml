@@ -33,7 +33,7 @@ jobs:
         version: ${{ matrix.node_version }}
   
     - name:  install yarn
-      run: npm install -g yarn
+      run: npm install -g yarn cross-env
 
     - name: install dependencies
       run: yarn install --frozen-lockfile
