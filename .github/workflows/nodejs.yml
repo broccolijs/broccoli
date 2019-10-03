@@ -39,4 +39,4 @@ jobs:
       run: yarn install --frozen-lockfile
 
     - name: test
-      run: CI=true yarn test
+      run: cross-env CI=true yarn test
