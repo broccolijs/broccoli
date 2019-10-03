@@ -1,10 +1,23 @@
 name: CI
 
-on: [push]
+on:
+  pull_request:
+  push:
+    # filtering branches here, prevents duplicate builds from pull_request and push
+    branches: 
+      - master
+      - 'v*'
+    # always run CI for tags
+    tags:
+      - '*'
+      
+  # early issue detection, run CI weekly on Sundays  
+  schedule:
+  - cron:  '0 6 * * 0'
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
+    name: Test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -23,7 +36,7 @@ jobs:
       run: npm install -g yarn
 
     - name: install dependencies
-      run: yarn install
+      run: yarn install --frozen-lockfile
 
     - name: test
       run: yarn test
