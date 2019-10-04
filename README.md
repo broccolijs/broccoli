@@ -2,7 +2,7 @@
 
 <img src="logo/broccoli-logo.generated.png" align="right" height="150">
 
-[![Build Status](https://github.com/broccolijs/broccoli/workflows/nodejs/badge.svg)
+[![Build Status](https://github.com/broccolijs/broccoli/workflows/CI/badge.svg)](https://github.com/broccolijs/broccoli/actions)
 
 A fast, reliable asset pipeline, supporting constant-time rebuilds and compact
 build definitions. Comparable to the Rails asset pipeline in scope, though it
