@@ -41,7 +41,6 @@
     "console-ui": "^3.0.4",
     "esm": "^3.2.4",
     "findup-sync": "^2.0.0",
-    "fs-extra": "^8.1.0",
     "fs-merger": "^2.0.2",
     "handlebars": "^4.0.11",
     "heimdalljs": "^0.2.6",
