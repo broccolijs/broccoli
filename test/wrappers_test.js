@@ -1,6 +1,6 @@
 import Node from '../lib/wrappers/node';
 import TransformNode from '../lib/wrappers/transform-node';
-import OutputWrapper from '../lib/wrappers/output';
+import buidlOutputWrapper from '../lib/wrappers/output';
 
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
@@ -186,14 +186,14 @@ describe('transform-node', function() {
 });
 
 describe('output-wrapper', function() {
-  let output, temp;
+  let output, temp, node;
 
   beforeEach(() => {
     temp = tmp.dirSync();
-    let node = {
+    node = {
       outputPath: temp.name,
     };
-    output = OutputWrapper(node);
+    output = buidlOutputWrapper(node);
   });
 
   it('should write to given location', function() {
@@ -205,6 +205,12 @@ describe('output-wrapper', function() {
   it(`throws actionable error when absolute path is provided`, function() {
     expect(() => output.writeFileSync(`${temp.name}/test.md`, 'test')).to.throw(
       `Relative path is expected, path ${temp.name}/test.md is an absolute path.`
+    );
+  });
+
+  it(`throws actionable error when relative path is traverses above outputPath`, function() {
+    expect(() => output.writeFileSync(`../../../test.md`, 'test')).to.throw(
+      `Traversing above the outputPath is not allowed. Relative path ../../../test.md traverses beyond ${node.outputPath}`
     );
   });
 

@@ -3,7 +3,7 @@ import rimraf from 'rimraf';
 import undefinedToNull from '../utils/undefined-to-null';
 import NodeWrapper from './node';
 import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
-import OutputWrapper from './output';
+import buidlOutputWrapper from './output';
 
 const FSMerger = require('fs-merger');
 const logger = require('heimdalljs-logger')('broccoli:transform-node');
@@ -21,13 +21,11 @@ export default class TransformNodeWrapper extends NodeWrapper {
       cachePath: this.cachePath,
     });
     //adding ts-ignore for now. Should be removed later when new version of broccoli-node-api is released
+    this.callbackObject = this.nodeInfo.getCallbackObject();
     // @ts-ignore
     if (this.nodeInfo.fsFacade) {
-      this.callbackObject = this.nodeInfo.getCallbackObject();
       this.callbackObject.input = new FSMerger(this.nodeInfo.inputNodes).fs,
-      this.callbackObject.output = OutputWrapper(this);
-    } else {
-      this.callbackObject = this.nodeInfo.getCallbackObject();
+      this.callbackObject.output = buidlOutputWrapper(this);
     }
 
     // This weakmap holds references from inputNode --> last known revision #
