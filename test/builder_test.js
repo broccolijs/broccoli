@@ -315,10 +315,12 @@ describe('Builder', function() {
     multidepRequire.forEachVersion('broccoli-source', function(version, broccoliSource) {
       describe('broccoli-source ' + version, function() {
         it('records unwatched source directories', function() {
-          builder = new FixtureBuilder(new broccoliSource.UnwatchedDir('test/fixtures/basic'));
+          builder = new FixtureBuilder(
+            new broccoliSource.UnwatchedDir(path.resolve('test/fixtures/basic'))
+          );
 
           expect(builder.watchedPaths).to.deep.equal([]);
-          expect(builder.unwatchedPaths).to.deep.equal(['test/fixtures/basic']);
+          expect(builder.unwatchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
 
           return expect(builder.build()).to.eventually.deep.equal({
             'foo.txt': 'OK',
@@ -326,9 +328,11 @@ describe('Builder', function() {
         });
 
         it('records watched source directories', function() {
-          builder = new FixtureBuilder(new broccoliSource.WatchedDir('test/fixtures/basic'));
+          builder = new FixtureBuilder(
+            new broccoliSource.WatchedDir(path.resolve('test/fixtures/basic'))
+          );
 
-          expect(builder.watchedPaths).to.deep.equal(['test/fixtures/basic']);
+          expect(builder.watchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
           expect(builder.unwatchedPaths).to.deep.equal([]);
 
           return expect(builder.build()).to.eventually.deep.equal({
