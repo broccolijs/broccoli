@@ -34,6 +34,7 @@
   "dependencies": {
     "ansi-html": "^0.0.7",
     "broccoli-node-info": "^2.1.0",
+    "broccoli-output-wrapper": "^1.0.0",
     "broccoli-slow-trees": "^3.0.1",
     "broccoli-source": "^3.0.0",
     "commander": "^2.15.1",
@@ -41,6 +42,7 @@
     "console-ui": "^3.0.4",
     "esm": "^3.2.4",
     "findup-sync": "^2.0.0",
+    "fs-merger": "^2.0.3",
     "handlebars": "^4.0.11",
     "heimdalljs": "^0.2.6",
     "heimdalljs-logger": "^0.1.9",
