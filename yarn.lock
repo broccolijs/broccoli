@@ -427,10 +427,10 @@ broccoli-node-info@^2.1.0:
   resolved "https://registry.yarnpkg.com/broccoli-node-info/-/broccoli-node-info-2.1.0.tgz#ca84560e8570ff78565bea1699866ddbf58ad644"
   integrity sha512-l6qDuboJThHfRVVWQVaTs++bFdrFTP0gJXgsWenczc1PavRVUmL1Eyb2swTAXXMpDOnr2zhNOBLx4w9AxkqbPQ==
 
-broccoli-output-wrapper@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/broccoli-output-wrapper/-/broccoli-output-wrapper-1.0.0.tgz#a40287dfdc4afc1b287692df0824ba4b523498bc"
-  integrity sha512-NLCHXI0Cl7Q5FcmqiKcpUs2faqGzNT/dX5WSVXkq5p3zhGUY0Tw0r88W/k1ZYePR/LktN2HkWiZtNUBHMA2tjw==
+broccoli-output-wrapper@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/broccoli-output-wrapper/-/broccoli-output-wrapper-1.0.2.tgz#ca55e2790e1d9d191f82c611962e1f3f7218c5ff"
+  integrity sha512-RC1MoNHGeujEfA+4tpTzzM0ASyBn4BmOvSyVDgbEj6ULE7ossbfhmcz3o/Sdzzx5tfTB0iuCYxfSzcR4CrbaVw==
   dependencies:
     heimdalljs-logger "^0.1.10"
 
@@ -1387,16 +1387,17 @@ fs-extra@^8.0.1:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
-fs-merger@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/fs-merger/-/fs-merger-2.0.3.tgz#d54b7569ea56e23c92cd5759ffec63d7aafcfa86"
-  integrity sha512-flpjMdSrLXjM1BJ6dYkNEeXHt+Tf90Dxg1FAwSRjBce3ei1qIL1FCyAU5+ECsYJs/HareMnxICl83awT/bAQeA==
+fs-merger@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/fs-merger/-/fs-merger-2.1.2.tgz#7a09323d097f3a8d9ace01ea3f6ebee3c1912879"
+  integrity sha512-OPrFh8uGxY2ATc0j6VGF7FaNFI5vqZ11wcPl3D/d//K9XY5Us2JFU3gB+2LJV6Lp6ypabo2KnPscXD2qptfl7g==
   dependencies:
+    broccoli-node-api "^1.7.0"
     broccoli-node-info "^2.1.0"
     fs-extra "^8.0.1"
     fs-tree-diff "^2.0.1"
     rimraf "^2.6.3"
-    walk-sync "^1.1.3"
+    walk-sync "^2.0.2"
 
 fs-tree-diff@^0.5.6:
   version "0.5.9"
@@ -2138,11 +2139,19 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-matcher-collection@^1.0.0, matcher-collection@^1.0.4, matcher-collection@^1.1.1:
+matcher-collection@^1.0.0, matcher-collection@^1.0.4:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/matcher-collection/-/matcher-collection-1.1.2.tgz#1076f506f10ca85897b53d14ef54f90a5c426838"
   integrity sha512-YQ/teqaOIIfUHedRam08PB3NK7Mjct6BvzRnJmpGDm8uFXpNr1sbY4yuflI5JcEs6COpYA0FpRQhSDBf1tT95g==
   dependencies:
+    minimatch "^3.0.2"
+
+matcher-collection@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/matcher-collection/-/matcher-collection-2.0.1.tgz#90be1a4cf58d6f2949864f65bb3b0f3e41303b29"
+  integrity sha512-daE62nS2ZQsDg9raM0IlZzLmI2u+7ZapXBwdoeBUKAYERPDDIc0qNqA8E0Rp2D+gspKR7BgIFP52GeujaGXWeQ==
+  dependencies:
+    "@types/minimatch" "^3.0.3"
     minimatch "^3.0.2"
 
 micromatch@^3.0.4, micromatch@^3.1.4:
@@ -3411,14 +3420,14 @@ walk-sync@^0.3.3:
     ensure-posix-path "^1.0.0"
     matcher-collection "^1.0.0"
 
-walk-sync@^1.1.3:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/walk-sync/-/walk-sync-1.1.4.tgz#81049f3d8095479b49574cfa5f558d7a252b127d"
-  integrity sha512-nowc9thB/Jg0KW4TgxoRjLLYRPvl3DB/98S89r4ZcJqq2B0alNcKDh6pzLkBSkPMzRSMsJghJHQi79qw0YWEkA==
+walk-sync@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/walk-sync/-/walk-sync-2.0.2.tgz#5ea8a28377c8be68c92d50f4007ea381725da14b"
+  integrity sha512-dCZkrxfHjPn7tIvdYrX3uMD/R0beVrHpA8lROQ5wWrl8psJgR6xwCkwqTFes0dNujbS2o/ITpvSYgIFsLsf13A==
   dependencies:
     "@types/minimatch" "^3.0.3"
     ensure-posix-path "^1.1.0"
-    matcher-collection "^1.1.1"
+    matcher-collection "^2.0.0"
 
 walker@~1.0.5:
   version "1.0.7"
