@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
+    "composite": true,
     "rootDir": "lib",
     "outDir": "dist",
-    "declaration": false,
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
