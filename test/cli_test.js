@@ -189,16 +189,16 @@ describe('cli', function() {
 
     context('with param --brocfile-path', function() {
       it('closes process on completion', function() {
-        return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
-          () => chai.expect(exitStub).to.be.calledWith(0)
+        return cli('node broccoli build dist --brocfile-path ../Brocfile.js'.split(' ')).then(() =>
+          chai.expect(exitStub).to.be.calledWith(0)
         );
       });
 
       it('loads brocfile from a path', function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
-        return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
-          () => chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'))
+        return cli('node broccoli build dist --brocfile-path ../Brocfile.js'.split(' ')).then(() =>
+          chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'))
         );
       });
 
