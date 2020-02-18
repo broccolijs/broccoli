@@ -27,13 +27,6 @@ interface BuilderOptions {
 
 type NodeWrappers = TransformNodeWrapper | SourceNodeWrapper;
 
-// This can be await'ed to force everything that follows to run in the next tick.
-function forceAsync(): Promise<void> {
-  return new Promise((resolve) => {
-    resolve();
-  });
-}
-
 // For an explanation and reference of the API that we use to communicate with
 // nodes (__broccoliFeatures__ and __broccoliGetInfo__), see
 // https://github.com/broccolijs/broccoli/blob/master/docs/node-api.md
@@ -104,10 +97,10 @@ class Builder extends EventEmitter {
     }
   }
 
-  build() {
+  async build() {
     // return this.buildPromise();
     if (this._cancelationRequest) {
-      return Promise.reject(new BuilderError('Cannot start a build if one is already running'));
+      throw new BuilderError('Cannot start a build if one is already running');
     }
     let promise = this._buildAsync();
     this._cancelationRequest = new CancelationRequest(promise);
@@ -128,7 +121,7 @@ class Builder extends EventEmitter {
       nw.buildState = {};
     }
 
-    await forceAsync(); // run the remaining code in the next tick.
+    await Promise.resolve(); // run the remaining code in the next tick.
 
     try {
       // Build each node
