@@ -540,9 +540,10 @@ describe('Builder', function() {
       tmpdir = tmpObj.name;
       tmpRemoveCallback = tmpObj.removeCallback;
     });
-    afterEach(() => {
+
+    afterEach(async () => {
       if (builder) {
-        builder.cleanup();
+        await builder.cleanup();
         builder = null;
       }
       tmpRemoveCallback();
