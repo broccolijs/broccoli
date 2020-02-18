@@ -35,7 +35,7 @@ describe('cancelation-request', function() {
     });
   });
 
-  it('.cancel (with CancelationErrort rejection)', function() {
+  it('.cancel (with CancelationError rejection)', function() {
     let request = new CancelationRequest(Promise.reject(new CancelationError()));
 
     return request.cancel();

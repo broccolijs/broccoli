@@ -10,7 +10,6 @@ import BuildError from './errors/build';
 import CancelationRequest from './cancelation-request';
 import Cancelation from './errors/cancelation';
 import filterMap from './utils/filter-map';
-import promiseFinally from 'promise.prototype.finally';
 import { EventEmitter } from 'events';
 import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
 
@@ -27,6 +26,13 @@ interface BuilderOptions {
 }
 
 type NodeWrappers = TransformNodeWrapper | SourceNodeWrapper;
+
+// This can be await'ed to force everything that follows to run in the next tick.
+function forceAsync(): Promise<void> {
+  return new Promise((resolve) => {
+    resolve();
+  });
+}
 
 // For an explanation and reference of the API that we use to communicate with
 // nodes (__broccoliFeatures__ and __broccoliGetInfo__), see
@@ -56,11 +62,11 @@ class Builder extends EventEmitter {
   watchedPaths: string[];
   _nodeWrappers: Map<TransformNode | SourceNode, NodeWrappers>;
   outputNodeWrapper: NodeWrappers;
-  _cancelationRequest: any;
+  _cancelationRequest: CancelationRequest | null;
   outputPath: string;
   buildId: number;
   builderTmpDir!: string;
-  builderTmpDirCleanup!: any;
+  builderTmpDirCleanup!: () => void;
 
   constructor(outputNode: Node, options: BuilderOptions = {}) {
     super();
@@ -84,7 +90,7 @@ class Builder extends EventEmitter {
 
     this.setupTmpDirs();
     this.setupHeimdall();
-    this._cancelationRequest = undefined;
+    this._cancelationRequest = null;
 
     // Now that temporary directories are set up, we need to run the rest of the
     // constructor in a try/catch block to clean them up if necessary.
@@ -98,74 +104,67 @@ class Builder extends EventEmitter {
     }
   }
 
+  build() {
+    // return this.buildPromise();
+    if (this._cancelationRequest) {
+      return Promise.reject(new BuilderError('Cannot start a build if one is already running'));
+    }
+    let promise = this._buildAsync();
+    this._cancelationRequest = new CancelationRequest(promise);
+    return promise;
+  }
+
   // Trigger a (re)build.
   //
   // Returns a promise that resolves when the build has finished. If there is a
   // build error, the promise is rejected with a Builder.BuildError instance.
   // This method will never throw, and it will never be rejected with anything
   // other than a BuildError.
-  build() {
-    if (this._cancelationRequest) {
-      return Promise.reject(new BuilderError('Cannot start a build if one is already running'));
-    }
-
-    let promise = Promise.resolve();
-
+  private async _buildAsync() {
     this.buildId++;
 
+    // Wipe all buildState objects at the beginning of the build
     for (const nw of this._nodeWrappers.values()) {
-      // Wipe all buildState objects at the beginning of the build
       nw.buildState = {};
-
-      promise = promise.then(() => {
-        let needsEndNode = false;
-        // We use a nested .then/.catch so that the .catch can only catch errors
-        // from this node, but not from previous nodes.
-        return promiseFinally(
-          Promise.resolve()
-            .then(() => this._cancelationRequest.throwIfRequested())
-            .then(() => {
-              this.emit('beginNode', nw);
-              needsEndNode = true;
-            })
-            .then(() => nw.build()),
-          () => {
-            if (needsEndNode) {
-              this.emit('endNode', nw);
-            }
-          }
-        )
-          .then(() => this._cancelationRequest.throwIfRequested())
-          .catch(err => {
-            if (Cancelation.isCancelationError(err)) {
-              throw err;
-            } else {
-              throw new BuildError(err, nw);
-            }
-          });
-      });
     }
 
-    this._cancelationRequest = new CancelationRequest(promise);
+    await forceAsync(); // run the remaining code in the next tick.
 
-    return promiseFinally(
-      promise
-        .then(() => {
-          return this.outputNodeWrapper;
-        })
-        .then(outputNodeWrapper => {
-          this.buildHeimdallTree(outputNodeWrapper);
-        }),
-      () => {
-        let buildsSkipped = filterMap(
-          this._nodeWrappers.values(),
-          (nw: NodeWrappers) => nw.buildState.built === false
-        ).length;
-        logger.debug(`Total nodes skipped: ${buildsSkipped} out of ${this._nodeWrappers.size}`);
-
-        this._cancelationRequest = null;
+    try {
+      // Build each node
+      for (const nw of this._nodeWrappers.values()) {
+        this._cancelationRequest && this._cancelationRequest.throwIfRequested()
+        try {
+          try {
+            this.emit('beginNode', nw);
+            await nw.build();
+          } finally {
+            this.emit('endNode', nw);
+          }
+        } catch (err) {
+           // Not clear whether .build() is supposed to be able to throw a
+           // cancellation error or not but the promise version allowed it.
+          if (Cancelation.isCancelationError(err)) {
+            throw err;
+          } else {
+            throw new BuildError(err, nw);
+          }
+        }
+        this._cancelationRequest && this._cancelationRequest.throwIfRequested()
       }
-    );
+
+      this.buildHeimdallTree(this.outputNodeWrapper);
+
+      let buildsSkipped = 0;
+      for (let nw of this._nodeWrappers.values()) {
+        if (!nw.buildState.built) {
+          buildsSkipped++;
+        }
+      }
+      logger.debug(`Total nodes skipped: ${buildsSkipped} out of ${this._nodeWrappers.size}`);
+    } finally {
+      this._cancelationRequest = null;
+    }
   }
 
   cancel() {
@@ -178,8 +177,12 @@ class Builder extends EventEmitter {
   }
 
   // Destructor-like method. Waits on current node to finish building, then cleans up temp directories
-  cleanup() {
-    return promiseFinally(this.cancel(), () => this.builderTmpDirCleanup());
+  async cleanup() {
+    try {
+      return this.cancel();
+    } finally {
+      this.builderTmpDirCleanup()
+    }
   }
 
   // This method recursively traverses the node graph and returns a nodeWrapper.
