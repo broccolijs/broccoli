@@ -27,8 +27,8 @@
     "lint:fix": "eslint --fix lib test",
     "prepare": "yarn build",
     "pretest": "multidep test/multidep.json",
-    "test": "yarn build && mocha -r ts-node/register -r source-map-support/register",
-    "test:debug": "yarn build && mocha --inspect-brk -r ts-node/register -r source-map-support/register",
+    "test": "yarn build && mocha -r ts-node/register -r test/utils/throw-on-unhandled -r source-map-support/register",
+    "test:debug": "yarn build && mocha --inspect-brk -r ts-node/register -r source-map-support/register -r test/utils/throw-on-unhandled",
     "watch": "tsc --watch"
   },
   "dependencies": {
