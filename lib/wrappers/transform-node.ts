@@ -64,53 +64,48 @@ export default class TransformNodeWrapper extends NodeWrapper {
     return false;
   }
 
-  build() {
-    let startTime: [number, number];
+  async build() {
+    let startTime = process.hrtime();
 
-    return new Promise(resolve => {
-      startTime = process.hrtime();
+    if (!this.shouldBuild()) {
+      this.buildState.built = false;
+      return // Noop the build since inputs did not change
+    }
 
-      if (!this.shouldBuild()) {
-        this.buildState.built = false;
-        return resolve(); // Noop the build since inputs did not change
-      }
+    if (!this.nodeInfo.persistentOutput) {
+      rimraf.sync(this.outputPath);
+      fs.mkdirSync(this.outputPath);
+    }
 
-      if (!this.nodeInfo.persistentOutput) {
-        rimraf.sync(this.outputPath);
-        fs.mkdirSync(this.outputPath);
-      }
+    if (this.nodeInfo.trackInputChanges === true) {
+      let changed = this.inputNodeWrappers.map(
+        wrapper => this.inputRevisions.get(wrapper)!.changed
+      );
 
-      if (this.nodeInfo.trackInputChanges === true) {
-        let changed = this.inputNodeWrappers.map(
-          wrapper => this.inputRevisions.get(wrapper)!.changed
-        );
+      await this.callbackObject.build({ changedNodes: changed });
+    } else {
+      await this.callbackObject.build();
+    }
 
-        resolve(this.callbackObject.build({ changedNodes: changed }));
-      } else {
-        resolve(this.callbackObject.build());
-      }
+    this.revise();
+    const now = process.hrtime();
+    const endTime = process.hrtime(startTime);
 
-      this.revise();
-    }).then(() => {
-      const now = process.hrtime();
-      const endTime = process.hrtime(startTime);
+    // Build time in milliseconds
+    this.buildState.selfTime = 1000 * (now[0] - startTime[0] + (now[1] - startTime[1]) / 1e9);
+    this.buildState.totalTime = this.buildState.selfTime;
 
-      // Build time in milliseconds
-      this.buildState.selfTime = 1000 * (now[0] - startTime[0] + (now[1] - startTime[1]) / 1e9);
-      this.buildState.totalTime = this.buildState.selfTime;
+    for (let i = 0; i < this.inputNodeWrappers.length; i++) {
+      this.buildState.totalTime += this.inputNodeWrappers[i].buildState.totalTime || 0;
+    }
 
-      for (let i = 0; i < this.inputNodeWrappers.length; i++) {
-        this.buildState.totalTime += this.inputNodeWrappers[i].buildState.totalTime || 0;
-      }
-
-      if (this.buildState.selfTime >= 100) {
-        logger.debug(
-          `Node build execution time: %ds %dms`,
-          endTime[0],
-          Math.round(endTime[1] / 1e6)
-        );
-      }
-    });
+    if (this.buildState.selfTime >= 100) {
+      logger.debug(
+        `Node build execution time: %ds %dms`,
+        endTime[0],
+        Math.round(endTime[1] / 1e6)
+      );
+    }
   }
 
   toString() {

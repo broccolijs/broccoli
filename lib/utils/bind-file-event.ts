@@ -6,9 +6,9 @@ import WatcherAdapter from '../watcher_adapter';
 const logger = require('heimdalljs-logger')('broccoli:watcherAdapter');
 
 export default function bindFileEvent(
-  adapter: WatcherAdapter, 
-  watcher: sane.Watcher, 
-  node: TransformNodeWrapper | SourceNodeWrapper, 
+  adapter: WatcherAdapter,
+  watcher: sane.Watcher,
+  node: TransformNodeWrapper | SourceNodeWrapper,
   event: 'change' | 'add' | 'delete'
 ) {
   // @ts-ignores

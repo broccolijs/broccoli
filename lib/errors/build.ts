@@ -18,7 +18,7 @@ interface BroccoliPayloadError {
   },
 }
 
-class BuildError extends BuilderError {
+export default class BuildError extends BuilderError {
   isSilent!: boolean;
   isCancellation!: boolean;
   broccoliPayload!: BroccoliPayloadError;
@@ -88,5 +88,3 @@ class BuildError extends BuilderError {
     };
   }
 };
-
-export = BuildError

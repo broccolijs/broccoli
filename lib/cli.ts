@@ -7,7 +7,6 @@ import broccoli from './index';
 import messages from './messages';
 import ConsoleUI from '../types/console-ui';
 
-const promiseFinally = require('promise.prototype.finally');
 const WatchDetector = require('watch-detector');
 const UI = require('console-ui');
 
@@ -183,24 +182,32 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
       process.on('SIGINT', cleanupAndExit);
       process.on('SIGTERM', cleanupAndExit);
 
-      actionPromise = promiseFinally(watcher.start().catch((err: any) => ui.writeError(err)), () => {
-        builder.cleanup();
-        process.exit(0);
-      }).catch((err: any) => {
-        ui.writeLine('Cleanup error:', 'ERROR');
-        ui.writeError(err);
-        process.exit(1);
-      });
+      actionPromise = (async () => {
+        try {
+          await watcher.start();
+        } catch (e) {
+          ui.writeError(e);
+        } finally {
+          try {
+            builder.cleanup();
+            process.exit(0);
+          } catch (e) {
+            ui.writeLine('Cleanup error:', 'ERROR');
+            ui.writeError(e);
+            process.exit(1);
+          }
+        }
+      })();
     });
 
   program.parse(args || process.argv);
 
-  if (!actionPromise) {
+  if (actionPromise) {
+    return actionPromise;
+  } else {
     program.outputHelp();
-    return process.exit(1);
+    process.exit(1);
   }
-
-  return actionPromise || Promise.resolve();
 };
 
 function getBuilder(options: { environment: string }) {

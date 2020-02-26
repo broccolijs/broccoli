@@ -105,7 +105,7 @@ class Builder extends EventEmitter {
       throw new BuilderError('Cannot start a build if one is already running');
     }
 
-    let pendingWork = Promise.resolve();
+    let pipeline = Promise.resolve();
 
     this.buildId++;
 
@@ -113,7 +113,14 @@ class Builder extends EventEmitter {
       // Wipe all buildState objects at the beginning of the build
       nw.buildState = {};
 
-      pendingWork = pendingWork.then(async () => {
+      // the build is two passes, first we create a promise chain representing
+      // the complete build, then we pass that terminal promises which
+      // represents the build to the CancelationRequest, after which the build
+      // itself begins.
+      //
+      // 1. build up a promise chain, which represents the complete build
+      pipeline = pipeline.then(async () => {
+        // 3. begin next build step
         this._cancelationRequest.throwIfRequested();
         this.emit('beginNode', nw);
         try {
@@ -121,15 +128,23 @@ class Builder extends EventEmitter {
           this.emit('endNode', nw);
         } catch (e) {
           this.emit('endNode', nw);
+          // wrap the error which occurred from a node wrappers build with
+          // additional build information. This includes which build step
+          // caused the error, and where that build step was instantiated.
           throw new BuildError(e, nw);
         }
       });
     }
 
-    this._cancelationRequest = new CancelationRequest(pendingWork);
+    // 2. Create CancelationRequest which waits on the complete build itself
+    // This allows us to initiate a cancellation, but wait until any
+    // un-cancelable work completes before canceling. This allows us to safely
+    // wait until cancelation is complete before performance actions such as
+    // cleanup, or restarting the build itself.
+    this._cancelationRequest = new CancelationRequest(pipeline);
 
     try {
-      await pendingWork;
+      await pipeline;
       this._cancelationRequest.throwIfRequested();
       this.buildHeimdallTree(this.outputNodeWrapper);
     } finally {
@@ -217,8 +232,8 @@ class Builder extends EventEmitter {
       }
     }
 
-    // For 'transform' nodes, recurs into the input nodes; for 'source' nodes,
-    // record paths.
+    // For 'transform' nodes, recursively enter into the input nodes; for
+    // 'source' nodes, record paths.
     let inputNodeWrappers = [];
     if (nodeInfo.nodeType === 'transform') {
       const newStack = _stack.concat([nodeWrapper]);
@@ -294,7 +309,7 @@ class Builder extends EventEmitter {
     const tmpObj = tmp.dirSync({
       prefix: 'broccoli-',
       unsafeCleanup: true,
-      dir: this.tmpdir ? this.tmpdir : undefined,
+      dir: this.tmpdir,
     });
 
     this.builderTmpDir = tmpObj.name;
@@ -398,7 +413,7 @@ class Builder extends EventEmitter {
   get features() {
     return broccoliNodeInfo.features;
   }
-};
+}
 
 function reParentNodes(outputNodeWrapper: any) {
   // re-parent heimdall nodes according to input nodes

@@ -9,7 +9,7 @@ export default class Cancelation extends Error {
 
   constructor(message = '') {
     super(message);
-    
+
     this.isCancelation = true;
     this.isSilent = true;
   }

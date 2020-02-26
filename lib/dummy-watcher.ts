@@ -8,7 +8,7 @@ class Watcher extends EventEmitter {
     resolve?: (value?: any) => void;
     reject?: (error?: any) => void;
   };
-  
+
   constructor(builder: any) {
     super();
     this.builder = builder;

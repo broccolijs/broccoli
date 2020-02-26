@@ -2,7 +2,6 @@ import path from 'path';
 import sane from 'sane';
 import { EventEmitter } from 'events';
 import WatcherAdapter from './watcher_adapter';
-import promiseFinally from 'promise.prototype.finally';
 import SourceNodeWrapper from './wrappers/source-node';
 
 const logger = require('heimdalljs-logger')('broccoli:watcher');
@@ -122,9 +121,9 @@ class Watcher extends EventEmitter {
     logger.debug('buildStart');
     this.emit('buildStart');
 
-    const hrstart = process.hrtime();
+    const start = process.hrtime();
 
-    // This is to maintain backwards compatiblity with broccoli-sane-watcher
+    // This is to maintain backwards compatibility with broccoli-sane-watcher
     let annotation = {
       type: filePath ? 'rebuild' : 'initial',
       reason: 'watcher',
@@ -138,11 +137,11 @@ class Watcher extends EventEmitter {
     // triggered, because we registered our callback first.
     buildPromise.then(
       (results: { filePath?: string } = {}) => {
-        const hrend = process.hrtime(hrstart);
-        logger.debug('Build execution time: %ds %dms', hrend[0], Math.round(hrend[1] / 1e6));
+        const end = process.hrtime(start);
+        logger.debug('Build execution time: %ds %dms', end[0], Math.round(end[1] / 1e6));
         logger.debug('buildSuccess');
 
-        // This property is added to keep compatiblity for ember-cli
+        // This property is added to keep compatibility for ember-cli
         // as it relied on broccoli-sane-watcher to add it:
         // https://github.com/ember-cli/broccoli-sane-watcher/blob/48860/index.js#L92-L95
         //
@@ -160,7 +159,7 @@ class Watcher extends EventEmitter {
     return buildPromise;
   }
 
-  _error(err: any) {
+  async _error(err: any) {
     if (this._quittingPromise) {
       logger.debug('error', 'ignored: already quitting');
       return this._quittingPromise;
@@ -168,13 +167,16 @@ class Watcher extends EventEmitter {
 
     logger.debug('error', err);
     this.emit('error', err);
-    return this._quit()
-      .catch(() => {})
-      .then(() => {
-        if (this._lifetime && typeof this._lifetime.reject === 'function') {
-          this._lifetime.reject(err) 
-        }
-      });
+
+    try {
+      await this._quit();
+    } catch (e) {
+      // ignore errors that occur during quitting
+    }
+
+    if (this._lifetime && typeof this._lifetime.reject === 'function') {
+      this._lifetime.reject(err);
+    }
   }
 
   quit(): Promise<void> {
@@ -197,19 +199,22 @@ class Watcher extends EventEmitter {
     logger.debug('quitStart');
     this.emit('quitStart');
 
-    this._quittingPromise = promiseFinally(
-      promiseFinally(Promise.resolve().then(() => this.watcherAdapter.quit()), () => {
-        // Wait for current build, and ignore build failure
-        return Promise.resolve(this.currentBuild).catch(() => {});
-      }),
-      () => {
+    this._quittingPromise = (async () => {
+      try {
+        await this.watcherAdapter.quit();
+      } finally {
+        try {
+          await this.currentBuild;
+        } catch (e) {
+          // Wait for current build, and ignore build failure
+        }
         logger.debug('quitEnd');
         this.emit('quitEnd');
       }
-    );
+    })();
 
     return this._quittingPromise;
   }
-};
+}
 
 export = Watcher;

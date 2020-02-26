@@ -2,7 +2,6 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import tmp from 'tmp';
-const promiseFinally = require('promise.prototype.finally');
 import broccoli from '..';
 import BuilderError from '../lib/errors/build';
 const makePlugins = require('./plugins');
@@ -994,14 +993,11 @@ describe('Builder', function() {
       // 3. wait for the build settle
       //   (stepB and stepC should not have run)
 
-      await expect(
-        promiseFinally(pipeline.build(), () => {
-          expect(stepA.buildCount).to.eql(1, 'stepA.buildCount');
-          expect(stepB.buildCount).to.eql(0, 'stepB.buildCount');
-          expect(stepC.buildCount).to.eql(0, 'stepC.buildCount');
-        })
-      ).to.eventually.be.rejectedWith('Build Canceled');
+      await expect(pipeline.build()).to.eventually.be.rejectedWith('Build Canceled');
 
+      expect(stepA.buildCount).to.eql(1, 'stepA.buildCount');
+      expect(stepB.buildCount).to.eql(0, 'stepB.buildCount');
+      expect(stepC.buildCount).to.eql(0, 'stepC.buildCount');
       // build #2
       await pipeline.build();
 
