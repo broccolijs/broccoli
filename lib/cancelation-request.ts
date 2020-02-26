@@ -1,7 +1,7 @@
 import CancelationError from './errors/cancelation';
 
-class CancelationRequest {
-  _pendingWork: Promise<void>
+export default class CancelationRequest {
+  _pendingWork: Promise<void>;
   _canceling: Promise<void> | null;
 
   constructor(pendingWork: Promise<void>) {
@@ -37,6 +37,4 @@ class CancelationRequest {
     });
     return this._canceling;
   }
-};
-
-export = CancelationRequest;
+}
