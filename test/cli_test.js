@@ -1,19 +1,20 @@
-const WatchDetector = require('watch-detector');
-const chai = require('chai');
-const childProcess = require('child_process');
-const fs = require('fs');
-const rimraf = require('rimraf');
-const sinon = require('sinon').createSandbox();
-const sinonChai = require('sinon-chai');
-
-const Builder = require('../lib/builder');
+import chai from 'chai';
+import fs from 'fs';
+import rimraf from 'rimraf';
+import childProcess from 'child_process';
+import Sinon from 'sinon';
+import sinonChai from 'sinon-chai';
+import Builder from '../lib/builder';
 import BuilderError from '../lib/errors/builder';
-const DummyWatcher = require('../lib/dummy-watcher');
+import DummyWatcher from '../lib/dummy-watcher';
 import broccoli from '../lib/index';
 import cli from '../lib/cli';
-const loadBrocfile = require('../lib/load_brocfile');
-const MockUI = require('console-ui/mock');
+import loadBrocfile from '../lib/load_brocfile';
 
+import MockUI from 'console-ui/mock';
+import WatchDetector from 'watch-detector';
+
+const sinon = Sinon.createSandbox();
 chai.use(sinonChai);
 
 describe('cli', function() {
@@ -38,46 +39,42 @@ describe('cli', function() {
       rimraf.sync('dist');
     });
 
-    it('creates watcher with sane options', function() {
+    it('creates watcher with sane options', async function() {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
         .value(() => ({ watcher: 'polling' }));
       const spy = createWatcherSpy();
       // --watch is passed so Watcher spy can be used
-      return cli(['node', 'broccoli', 'build', 'dist', '--watch']).then(() =>
-        chai.expect(spy).to.have.been.calledWith(
-          sinon.match.instanceOf(Builder),
-          sinon.match.array,
-          sinon.match.has(
-            'saneOptions',
-            sinon.match({
-              poll: true,
-              watchman: false,
-              node: false,
-            })
-          )
+      await cli(['node', 'broccoli', 'build', 'dist', '--watch']);
+      chai.expect(spy).to.have.been.calledWith(
+        sinon.match.instanceOf(Builder),
+        sinon.match.array,
+        sinon.match.has(
+          'saneOptions',
+          sinon.match({
+            poll: true,
+            watchman: false,
+            node: false,
+          })
         )
       );
     });
 
     context('on successful build', function() {
-      it('cleanups tmp files', function() {
+      it('cleanups tmp files', async function() {
         const cleanup = sinon.spy(Builder.prototype, 'cleanup');
-        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
-          chai.expect(cleanup).to.be.calledOnce;
-        });
+        await cli(['node', 'broccoli', 'build', 'dist']);
+        chai.expect(cleanup).to.be.calledOnce;
       });
 
-      it('closes process on completion', function() {
-        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
-          chai.expect(exitStub).to.be.calledWith(0);
-        });
+      it('closes process on completion', async function() {
+        await cli(['node', 'broccoli', 'build', 'dist']);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('creates output folder', function() {
-        return cli(['node', 'broccoli', 'build', 'dist']).then(() => {
-          chai.expect(fs.existsSync('dist')).to.be.true;
-        });
+      it('creates output folder', async function() {
+        await cli(['node', 'broccoli', 'build', 'dist']);
+        chai.expect(fs.existsSync('dist')).to.be.true;
       });
     });
 
@@ -86,14 +83,14 @@ describe('cli', function() {
         rimraf.sync('dist');
       });
 
-      it('removes existing files', function() {
+      it('removes existing files', async function() {
         fs.mkdirSync('dist');
         fs.writeFileSync('dist/foo.txt', 'foo');
 
-        return cli(['node', 'broccoli', 'build']).then(() => {
-          chai.expect(fs.existsSync('dist')).to.be.true;
-          chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
-        });
+        await cli(['node', 'broccoli', 'build']);
+
+        chai.expect(fs.existsSync('dist')).to.be.true;
+        chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
       });
 
       it('errors if [target] is a parent directory', function() {
@@ -123,88 +120,80 @@ describe('cli', function() {
     });
 
     context('with param --watcher', function() {
-      it('closes process on completion', function() {
-        return cli(['node', 'broccoli', 'build', 'dist', '--watcher', 'polling']).then(() =>
-          chai.expect(exitStub).to.be.calledWith(0)
-        );
+      it('closes process on completion', async function() {
+        await cli(['node', 'broccoli', 'build', 'dist', '--watcher', 'polling']);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('creates watcher with sane options for polling', function() {
+      it('creates watcher with sane options for polling', async function() {
         const spy = createWatcherSpy();
-        return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'polling']).then(
-          () =>
-            chai.expect(spy).to.have.been.calledWith(
-              sinon.match.instanceOf(Builder),
-              sinon.match.array,
-              sinon.match.has(
-                'saneOptions',
-                sinon.match({
-                  poll: true,
-                  watchman: false,
-                  node: false,
-                })
-              )
-            )
+        await cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'polling']);
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.array,
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: true,
+              watchman: false,
+              node: false,
+            })
+          )
         );
       });
 
-      it('creates watcher with sane options for watchman', function() {
+      it('creates watcher with sane options for watchman', async function() {
         sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
         const spy = createWatcherSpy();
-        return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'watchman']).then(
-          () =>
-            chai.expect(spy).to.have.been.calledWith(
-              sinon.match.instanceOf(Builder),
-              sinon.match.array,
-              sinon.match.has(
-                'saneOptions',
-                sinon.match({
-                  poll: false,
-                  watchman: true,
-                  node: false,
-                })
-              )
-            )
+        await cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'watchman']);
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.array,
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: false,
+              watchman: true,
+              node: false,
+            })
+          )
         );
       });
 
-      it('creates watcher with sane options for node', function() {
+      it('creates watcher with sane options for node', async function() {
         const spy = createWatcherSpy();
-        return cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']).then(() =>
-          chai.expect(spy).to.have.been.calledWith(
-            sinon.match.instanceOf(Builder),
-            sinon.match.array,
-            sinon.match.has(
-              'saneOptions',
-              sinon.match({
-                poll: false,
-                watchman: false,
-                node: true,
-              })
-            )
+        await cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']);
+        chai.expect(spy).to.have.been.calledWith(
+          sinon.match.instanceOf(Builder),
+          sinon.match.array,
+          sinon.match.has(
+            'saneOptions',
+            sinon.match({
+              poll: false,
+              watchman: false,
+              node: true,
+            })
           )
         );
       });
     });
 
     context('with param --brocfile-path', function() {
-      it('closes process on completion', function() {
-        return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
-          () => chai.expect(exitStub).to.be.calledWith(0)
-        );
+      it('closes process on completion', async function() {
+        await cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('loads brocfile from a path', function() {
+      it('loads brocfile from a path', async function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
-        return cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']).then(
-          () => chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'))
-        );
+        await cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'));
       });
 
       context('and with param --cwd', function() {
-        it('closes process on completion', function() {
-          return cli([
+        it('closes process on completion', async function() {
+          await cli([
             'node',
             'broccoli',
             'build',
@@ -213,9 +202,8 @@ describe('cli', function() {
             '..',
             '--brocfile-path',
             '../../empty/Brocfile.js',
-          ]).then(() => {
-            chai.expect(exitStub).to.be.calledWith(0);
-          });
+          ]);
+          chai.expect(exitStub).to.be.calledWith(0);
         });
       });
     });
@@ -229,69 +217,61 @@ describe('cli', function() {
     });
 
     context('with param --environment', function() {
-      it('defaults to --environment=development: { env: "development" }', function() {
+      it('defaults to --environment=development: { env: "development" }', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'))
-        );
+        await cli(['node', 'broccoli', 'build', 'dist']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('with --environment=production passes { env: "production" }', function() {
+      it('with --environment=production passes { env: "production" }', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist', '--environment=production']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
-        );
+        await cli(['node', 'broccoli', 'build', 'dist', '--environment=production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('with -e production passes { env: "production" }', function() {
+      it('with -e production passes { env: "production" }', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist', '-e', 'production']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
-        );
+        await cli(['node', 'broccoli', 'build', 'dist', '-e', 'production']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('aliases --dev to --environment=development', function() {
+      it('aliases --dev to --environment=development', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist', '--dev']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'))
-        );
+        await cli(['node', 'broccoli', 'build', 'dist', '--dev']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('aliases --prod to --environment=production', function() {
+      it('aliases --prod to --environment=production', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        return cli(['node', 'broccoli', 'build', 'dist', '--prod']).then(() =>
-          chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'))
-        );
+        await cli(['node', 'broccoli', 'build', 'dist', '--prod']);
+        chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
     });
 
-    it('supports `b` alias', function() {
-      return cli(['node', 'broccoli', 'b']).then(() => {
-        chai.expect(exitStub).to.be.calledWith(0);
-      });
+    it('supports `b` alias', async function() {
+      await cli(['node', 'broccoli', 'b']);
+      chai.expect(exitStub).to.be.calledWith(0);
     });
 
     context('with param --output-path', function() {
-      it('closes process on completion', function() {
-        return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
-          chai.expect(exitStub).to.be.calledWith(0);
-        });
+      it('closes process on completion', async function() {
+        await cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('creates output folder', function() {
-        return cli(['node', 'broccoli', 'build', '--output-path', 'dist']).then(() => {
-          chai.expect(fs.existsSync('dist')).to.be.true;
-        });
+      it('creates output folder', async function() {
+        await cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
+        chai.expect(fs.existsSync('dist')).to.be.true;
       });
 
       context('and with [target]', function() {
@@ -318,24 +298,23 @@ describe('cli', function() {
       server = sinon.mock(broccoli.server);
     });
 
-    it('creates watcher with sane options', function() {
+    it('creates watcher with sane options', async function() {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
         .value(() => ({ watcher: 'polling' }));
       const spy = createWatcherSpy();
       // --watch is passed so Watcher spy can be used
-      return cli(['node', 'broccoli', 'serve']).then(() =>
-        chai.expect(spy).to.have.been.calledWith(
-          sinon.match.instanceOf(Builder),
-          sinon.match.array,
-          sinon.match.has(
-            'saneOptions',
-            sinon.match({
-              poll: true,
-              watchman: false,
-              node: false,
-            })
-          )
+      await cli(['node', 'broccoli', 'serve']);
+      chai.expect(spy).to.have.been.calledWith(
+        sinon.match.instanceOf(Builder),
+        sinon.match.array,
+        sinon.match.has(
+          'saneOptions',
+          sinon.match({
+            poll: true,
+            watchman: false,
+            node: false,
+          })
         )
       );
     });
@@ -358,45 +337,45 @@ describe('cli', function() {
       server.verify();
     });
 
-    it('starts server with given ip adress', function() {
+    it('starts server with given ip address', async function() {
       server.expects('serve').withArgs(sinon.match.any, '192.168.2.123', sinon.match.number);
-      cli(['node', 'broccoli', 'serve', '--host', '192.168.2.123']);
+      await cli(['node', 'broccoli', 'serve', '--host', '192.168.2.123']);
       server.verify();
     });
 
-    it('converts port to a number and starts the server at given port', function() {
+    it('converts port to a number and starts the server at given port', async function() {
       server
         .expects('serve')
         .once()
         .withArgs(sinon.match.any, sinon.match.string, 1234);
-      cli(['node', 'broccoli', 'serve', '--port', '1234']);
+      await cli(['node', 'broccoli', 'serve', '--port', '1234']);
       server.verify();
     });
 
-    it('converts port to a number and starts the server at given port and host', function() {
+    it('converts port to a number and starts the server at given port and host', async function() {
       server
         .expects('serve')
         .once()
         .withArgs(sinon.match.any, '192.168.2.123', 1234);
-      cli(['node', 'broccoli', 'serve', '--port=1234', '--host=192.168.2.123']);
+      await cli(['node', 'broccoli', 'serve', '--port=1234', '--host=192.168.2.123']);
       server.verify();
     });
 
     context('with param --brocfile-path', function() {
-      it('starts serve', function() {
+      it('starts serve', async function() {
         server
           .expects('serve')
           .once()
           .withArgs(sinon.match.any, sinon.match.string, sinon.match.number);
-        cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
+        await cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
         server.verify();
       });
 
-      it('loads brocfile from a path', function() {
+      it('loads brocfile from a path', async function() {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
-        cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
+        await cli(['node', 'broccoli', 'serve', '--brocfile-path', '../Brocfile.js']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'));
       });
     });
@@ -457,9 +436,9 @@ describe('cli', function() {
           });
         });
 
-        it('errors if [target] is a parent directory', function() {
+        it('errors if [target] is a parent directory', async function() {
           const mockUI = new MockUI();
-          cli(['node', 'broccoli', 'build', '../'], mockUI);
+          await cli(['node', 'broccoli', 'build', '../'], mockUI);
           chai
             .expect(mockUI.errors)
             .to.contain('build directory can not be the current or direct parent directory: ../');
@@ -468,123 +447,119 @@ describe('cli', function() {
     });
 
     context('with param --no-watch', function() {
-      it('should start a server with default values', function() {
+      it('should start a server with default values', async function() {
         server
           .expects('serve')
           .once()
           .withArgs(sinon.match.instanceOf(DummyWatcher), sinon.match.string, sinon.match.number);
-        cli(['node', 'broccoli', 'serve', '--no-watch']);
+        await cli(['node', 'broccoli', 'serve', '--no-watch']);
         server.verify();
       });
     });
 
     context('with param --environment', function() {
-      it('defaults to --environment=development: { env: "development" }', function() {
+      it('defaults to --environment=development: { env: "development" }', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        cli(['node', 'broccoli', 'serve']);
+        await cli(['node', 'broccoli', 'serve']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('with --environment=production passes { env: "production" }', function() {
+      it('with --environment=production passes { env: "production" }', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        cli(['node', 'broccoli', 'serve', '--environment=production']);
+        await cli(['node', 'broccoli', 'serve', '--environment=production']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('with -e production passes { env: "production" }', function() {
+      it('with -e production passes { env: "production" }', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        cli(['node', 'broccoli', 'serve', '-e', 'production']);
+        await cli(['node', 'broccoli', 'serve', '-e', 'production']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('aliases --dev to --environment=development', function() {
+      it('aliases --dev to --environment=development', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        cli(['node', 'broccoli', 'serve', '--dev']);
+        await cli(['node', 'broccoli', 'serve', '--dev']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('aliases --prod to --environment=production', function() {
+      it('aliases --prod to --environment=production', async function() {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
-        cli(['node', 'broccoli', 'serve', '--prod']);
+        await cli(['node', 'broccoli', 'serve', '--prod']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
     });
   });
 
   context('with param --watcher', function() {
-    it('creates watcher with sane options for watchman', function() {
+    it('creates watcher with sane options for watchman', async function() {
       sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
       const spy = createWatcherSpy();
-      return cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']).then(() =>
-        chai.expect(spy).to.have.been.calledWith(
-          sinon.match.instanceOf(Builder),
-          sinon.match.array,
-          sinon.match.has(
-            'saneOptions',
-            sinon.match({
-              poll: false,
-              watchman: true,
-              node: false,
-            })
-          )
+      await cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']);
+      chai.expect(spy).to.have.been.calledWith(
+        sinon.match.instanceOf(Builder),
+        sinon.match.array,
+        sinon.match.has(
+          'saneOptions',
+          sinon.match({
+            poll: false,
+            watchman: true,
+            node: false,
+          })
         )
       );
     });
 
-    it('creates watcher with sane options for node', function() {
+    it('creates watcher with sane options for node', async function() {
       const spy = createWatcherSpy();
-      return cli(['node', 'broccoli', 'serve', '--watcher', 'node']).then(() =>
-        chai.expect(spy).to.have.been.calledWith(
-          sinon.match.instanceOf(Builder),
-          sinon.match.array,
-          sinon.match.has(
-            'saneOptions',
-            sinon.match({
-              poll: false,
-              watchman: false,
-              node: true,
-            })
-          )
+      await cli(['node', 'broccoli', 'serve', '--watcher', 'node']);
+      chai.expect(spy).to.have.been.calledWith(
+        sinon.match.instanceOf(Builder),
+        sinon.match.array,
+        sinon.match.has(
+          'saneOptions',
+          sinon.match({
+            poll: false,
+            watchman: false,
+            node: true,
+          })
         )
       );
     });
 
-    it('creates watcher with sane options for polling', function() {
+    it('creates watcher with sane options for polling', async function() {
       const spy = createWatcherSpy();
-      return cli(['node', 'broccoli', 'serve', '--watcher', 'polling']).then(() =>
-        chai.expect(spy).to.have.been.calledWith(
-          sinon.match.instanceOf(Builder),
-          sinon.match.array,
-          sinon.match.has(
-            'saneOptions',
-            sinon.match({
-              poll: true,
-              watchman: false,
-              node: false,
-            })
-          )
+      await cli(['node', 'broccoli', 'serve', '--watcher', 'polling']);
+      chai.expect(spy).to.have.been.calledWith(
+        sinon.match.instanceOf(Builder),
+        sinon.match.array,
+        sinon.match.has(
+          'saneOptions',
+          sinon.match({
+            poll: true,
+            watchman: false,
+            node: false,
+          })
         )
       );
     });
   });
 });
 
-// TODO: remove these mocks and spys
 function createWatcherSpy() {
   const spy = sinon.spy();
   sinon.stub(broccoli, 'Watcher').value(
@@ -594,12 +569,8 @@ function createWatcherSpy() {
         spy.call(null, builder, watchedSourceNodes, options);
       }
 
-      start() {
-        return Promise.resolve();
-      }
-      quit() {
-        return Promise.resolve();
-      }
+      async start() {}
+      async quit() {}
     }
   );
   return spy;

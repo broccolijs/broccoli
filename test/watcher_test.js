@@ -32,8 +32,8 @@ describe('Watcher', function() {
   const buildResults = {};
 
   const builder = {
-    build() {
-      return Promise.resolve(buildResults);
+    async build() {
+      return buildResults;
     },
   };
 
@@ -44,7 +44,7 @@ describe('Watcher', function() {
   };
 
   describe('start', function() {
-    it('sets up event handlers, watchedPaths, and builds', function() {
+    it('sets up event handlers, watchedPaths, and builds', async function() {
       const builderBuild = sinon.spy(builder, 'build');
 
       const watchedNodes = [watchedNodeBasic];
@@ -59,12 +59,11 @@ describe('Watcher', function() {
       expect(adapterOn).to.have.been.calledWith('change');
       expect(adapterOn).to.have.been.calledWith('error');
 
-      return watcher.currentBuild.then(() => {
-        expect(adapterWatch).to.have.been.called;
-        expect(trigger).to.have.been.calledWith('buildStart');
-        expect(trigger).to.have.been.calledWith('buildSuccess');
-        expect(builderBuild).to.have.been.called;
-      });
+      await watcher.currentBuild;
+      expect(adapterWatch).to.have.been.called;
+      expect(trigger).to.have.been.calledWith('buildStart');
+      expect(trigger).to.have.been.calledWith('buildSuccess');
+      expect(builderBuild).to.have.been.called;
     });
 
     it('throws error if called twice', function() {
@@ -75,7 +74,7 @@ describe('Watcher', function() {
       );
     });
 
-    it('calls error if build rejects', function() {
+    it('calls error if build rejects', async function() {
       const watcher = new Watcher(
         {
           nodeWrappers: [],
@@ -91,15 +90,18 @@ describe('Watcher', function() {
 
       watcher.start();
 
-      return watcher.currentBuild.catch(error => {
-        expect(error).to.equal('fail');
+      try {
+        await watcher.currentBuild;
+        expect.fail();
+      } catch (e) {
+        expect(e).to.equal('fail');
         expect(failHandler).to.be.have.been.calledWith('fail');
-      });
+      }
     });
   });
 
   describe('change', function() {
-    it('on change, rebuild is invoked', function() {
+    it('on change, rebuild is invoked', async function() {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -113,18 +115,16 @@ describe('Watcher', function() {
       watcher.on('buildSuccess', buildEndHandler);
 
       watcher._ready = true;
-      return watcher._change('change', 'file.js', 'root').then(() => {
-        expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
+      await watcher._change('change', 'file.js', 'root');
+      expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
 
-        return watcher.currentBuild.then(result => {
-          expect(result.filePath).to.equal(path.join('root', 'file.js'));
+      const result = await watcher.currentBuild;
+      expect(result.filePath).to.equal(path.join('root', 'file.js'));
 
-          expect(debounceHandler).to.have.been.called;
-          expect(buildStartHandler).to.have.been.called;
-          expect(buildEndHandler).to.have.been.called;
-          expect(builderBuild).to.have.been.called;
-        });
-      });
+      expect(debounceHandler).to.have.been.called;
+      expect(buildStartHandler).to.have.been.called;
+      expect(buildEndHandler).to.have.been.called;
+      expect(builderBuild).to.have.been.called;
     });
 
     it('does nothing if not ready', function() {
@@ -152,33 +152,30 @@ describe('Watcher', function() {
       expect(builderBuild).to.not.have.been.called;
     });
 
-    it('filePath is undefined on initial build', function() {
+    it('filePath is undefined on initial build', async function() {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      return watcher._build().then(result => {
-        expect(result.filePath).to.be.undefined;
-      });
+      const result = await watcher._build();
+      expect(result.filePath).to.be.undefined;
     });
 
-    it('filePath is set on rebuild', function() {
+    it('filePath is set on rebuild', async function() {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      return watcher._build(path.join('root', 'file.js')).then(result => {
-        expect(result.filePath).to.equal(path.join('root', 'file.js'));
-      });
+      const result = await watcher._build(path.join('root', 'file.js'));
+      expect(result.filePath).to.equal(path.join('root', 'file.js'));
     });
 
-    it('annotation is properly sent on initial build', function() {
+    it('annotation is properly sent on initial build', async function() {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      return watcher._build().then(() => {
-        expect(builderBuild.args[0][1]).to.deep.equal({
-          type: 'initial',
-          reason: 'watcher',
-          primaryFile: undefined,
-          changedFiles: [],
-        });
+      await watcher._build();
+      expect(builderBuild.args[0][1]).to.deep.equal({
+        type: 'initial',
+        reason: 'watcher',
+        primaryFile: undefined,
+        changedFiles: [],
       });
     });
 

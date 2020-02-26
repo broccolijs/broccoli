@@ -1,7 +1,7 @@
-const loadBrocfile = require('../lib/load_brocfile');
-const chai = require('chai');
+import loadBrocfile from '../lib/load_brocfile';
+import chai from 'chai';
 const esmRequire = require('esm')(module);
-const BroccoliSource = require('broccoli-source');
+import BroccoliSource from 'broccoli-source';
 
 const projectPath = 'test/fixtures/project';
 const projectPathEsm = 'test/fixtures/project-esm';

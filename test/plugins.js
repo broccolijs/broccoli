@@ -1,5 +1,6 @@
-const fs = require('fs');
-const symlinkOrCopySync = require('symlink-or-copy').sync;
+import fs from 'fs';
+import symlinkOrCopy from 'symlink-or-copy';
+const symlinkOrCopySync = symlinkOrCopy.sync;
 
 // Create various test plugins subclassing from Plugin. Wrapped in a function
 // to allow for testing against different Plugin versions.
@@ -52,7 +53,7 @@ module.exports = function(Plugin) {
     }
   };
 
-  // Plugin for testing asynchrony. buildFinished is a deferred (RSVP.defer()).
+  // Plugin for testing async behavior. buildFinished is a deferred (RSVP.defer()).
   // The build will stall until you call node.finishBuild().
   // To wait until the build starts, chain on node.buildStarted.
   // Don't build more than once.
