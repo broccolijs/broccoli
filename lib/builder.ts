@@ -309,7 +309,7 @@ class Builder extends EventEmitter {
     const tmpObj = tmp.dirSync({
       prefix: 'broccoli-',
       unsafeCleanup: true,
-      dir: this.tmpdir,
+      dir: this.tmpdir || undefined,
     });
 
     this.builderTmpDir = tmpObj.name;

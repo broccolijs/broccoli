@@ -89,7 +89,7 @@
     "source-map-support": "^0.5.16",
     "symlink-or-copy": "^1.2.0",
     "ts-node": "^8.0.3",
-    "typescript": "^3.6.3"
+    "typescript": "~3.8.0"
   },
   "engines": {
     "node": "8.* || >= 10.*"
