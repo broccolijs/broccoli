@@ -141,7 +141,7 @@ describe('server', function() {
     const watcher = new Watcher(builder, []);
 
     server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
-    server.start();
+    server.start().catch(() => {});
 
     await new Promise((resolve, reject) => {
       server.instance.on('listening', resolve);

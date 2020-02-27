@@ -145,7 +145,6 @@ class Builder extends EventEmitter {
 
     try {
       await pipeline;
-      this._cancelationRequest.throwIfRequested();
       this.buildHeimdallTree(this.outputNodeWrapper);
     } finally {
       let buildsSkipped = filterMap(

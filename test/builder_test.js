@@ -920,7 +920,7 @@ describe('Builder', function() {
       await wait();
 
       const next = Promise.all([
-        expect(build).to.eventually.be.rejectedWith('Build Canceled'),
+        expect(build).to.eventually.be.fulfilled,
         pipeline.cancel(),
         expect(pipeline.build()).to.eventually.be.rejectedWith(
           'Cannot start a build if one is already running'
