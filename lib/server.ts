@@ -1,4 +1,3 @@
-import promiseFinally from 'promise.prototype.finally';
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
@@ -55,7 +54,7 @@ class Server extends EventEmitter {
     }
   }
 
-  start() {
+  async start() {
     if (this._started) {
       throw new Error('Watcher.prototype.start() must not be called more than once');
     }
@@ -116,7 +115,11 @@ class Server extends EventEmitter {
       });
     });
 
-    return promiseFinally(promise, () => this.stop());
+    try {
+      await promise;
+    } finally {
+      await this.stop();
+    }
   }
 
   _detachListeners() {
@@ -124,13 +127,13 @@ class Server extends EventEmitter {
     process.removeListener('SIGTERM', this._boundStop);
   }
 
-  stop() {
+  async stop() {
     this._detachListeners();
     if (this.instance) {
       this.instance.close();
     }
-    
-    return this._watcher.quit().then(() => this._builder.cleanup());
+    await this._watcher.quit();
+    await this._builder.cleanup();
   }
 }
 

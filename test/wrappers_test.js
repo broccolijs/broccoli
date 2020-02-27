@@ -1,9 +1,9 @@
 import Node from '../lib/wrappers/node';
 import TransformNode from '../lib/wrappers/transform-node';
-
-const chai = require('chai');
-const sinonChai = require('sinon-chai');
-const sinon = require('sinon').createSandbox();
+import chai from 'chai';
+import sinonChai from 'sinon-chai';
+import Sinon from 'sinon';
+const sinon = Sinon.createSandbox();
 const { expect } = chai;
 
 chai.use(sinonChai);
@@ -39,7 +39,7 @@ describe('transform-node', function() {
     expect(transform.shouldBuild()).to.be.false;
   });
 
-  it('shouldBuild method should return false if none of the inputNodes changed', function() {
+  it('shouldBuild method should return false if none of the inputNodes changed', async function() {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
     let inputWrapperA = new Node();
@@ -47,12 +47,12 @@ describe('transform-node', function() {
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
-    return transform.build().then(() => {
-      expect(transform.shouldBuild()).to.be.false;
-    });
+    await transform.build();
+
+    expect(transform.shouldBuild()).to.be.false;
   });
 
-  it('shouldBuild method should return true if some of the inputs changed', function() {
+  it('shouldBuild method should return true if some of the inputs changed', async function() {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
     let inputWrapperA = new Node();
@@ -60,10 +60,10 @@ describe('transform-node', function() {
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
-    return transform.build().then(() => {
-      inputWrapperA.revise();
-      expect(transform.shouldBuild()).to.be.true;
-    });
+    await transform.build();
+
+    inputWrapperA.revise();
+    expect(transform.shouldBuild()).to.be.true;
   });
 
   it('shouldBuild method should return true if none of the inputNodes changed and volatile is true', function() {

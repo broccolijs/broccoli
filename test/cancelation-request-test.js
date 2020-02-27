@@ -1,13 +1,13 @@
-const chai = require('chai');
-const expect = chai.expect;
-const chaiAsPromised = require('chai-as-promised');
-const CancelationRequest = require('../lib/cancelation-request');
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import CancelationRequest from '../lib/cancelation-request';
 import CancelationError from '../lib/errors/cancelation';
 
+const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 describe('cancelation-request', function() {
-  it('.isCancelled / .cancel', function() {
+  it('.isCancelled / .cancel', async function() {
     let request = new CancelationRequest(Promise.resolve());
 
     expect(request.isCanceled).to.eql(false);
@@ -19,23 +19,23 @@ describe('cancelation-request', function() {
     });
   });
 
-  it('.throwIfRequested (requested)', function() {
+  it('.throwIfRequested (requested)', async function() {
     let request = new CancelationRequest(Promise.resolve());
 
     request.throwIfRequested();
 
-    return request.cancel().then(() => {
-      expect(() => {
-        request.throwIfRequested();
-      }).to.throw('Build Canceled');
+    await request.cancel();
 
-      expect(() => {
-        request.throwIfRequested();
-      }).to.throw('Build Canceled');
-    });
+    expect(() => {
+      request.throwIfRequested();
+    }).to.throw('Build Canceled');
+
+    expect(() => {
+      request.throwIfRequested();
+    }).to.throw('Build Canceled');
   });
 
-  it('.cancel (with CancelationErrort rejection)', function() {
+  it('.cancel (with CancelationError rejection)', function() {
     let request = new CancelationRequest(Promise.reject(new CancelationError()));
 
     return request.cancel();

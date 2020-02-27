@@ -1,4 +1,4 @@
-import { Stream } from "stream";
+import { Stream } from 'stream';
 
 declare class UI {
   constructor(options: {

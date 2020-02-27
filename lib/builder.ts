@@ -8,9 +8,7 @@ import BuilderError from './errors/builder';
 import NodeSetupError from './errors/node-setup';
 import BuildError from './errors/build';
 import CancelationRequest from './cancelation-request';
-import Cancelation from './errors/cancelation';
 import filterMap from './utils/filter-map';
-import promiseFinally from 'promise.prototype.finally';
 import { EventEmitter } from 'events';
 import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
 
@@ -34,16 +32,14 @@ type NodeWrappers = TransformNodeWrapper | SourceNodeWrapper;
 
 // Build a graph of nodes, referenced by its final output node. Example:
 //
+// ```js
 // const builder = new Builder(outputNode)
-// builder.build()
-//   .then(() => {
-//     // Build output has been written to builder.outputPath
-//   })
-//   // To rebuild, call builder.build() repeatedly
-//   .finally(() => {
-//     // Delete temporary directories
-//     return builder.cleanup()
-//   })
+// try {
+//   const { outputPath } = await builder.build()
+// } finally {
+//   await builder.cleanup()
+// }
+// ```
 //
 // Note that the API of this Builder may change between minor Broccoli
 // versions. Backwards compatibility is only guaranteed for plugins, so any
@@ -104,12 +100,12 @@ class Builder extends EventEmitter {
   // build error, the promise is rejected with a Builder.BuildError instance.
   // This method will never throw, and it will never be rejected with anything
   // other than a BuildError.
-  build() {
+  async build() {
     if (this._cancelationRequest) {
-      return Promise.reject(new BuilderError('Cannot start a build if one is already running'));
+      throw new BuilderError('Cannot start a build if one is already running');
     }
 
-    let promise = Promise.resolve();
+    let pipeline = Promise.resolve();
 
     this.buildId++;
 
@@ -117,69 +113,64 @@ class Builder extends EventEmitter {
       // Wipe all buildState objects at the beginning of the build
       nw.buildState = {};
 
-      promise = promise.then(() => {
-        let needsEndNode = false;
-        // We use a nested .then/.catch so that the .catch can only catch errors
-        // from this node, but not from previous nodes.
-        return promiseFinally(
-          Promise.resolve()
-            .then(() => this._cancelationRequest.throwIfRequested())
-            .then(() => {
-              this.emit('beginNode', nw);
-              needsEndNode = true;
-            })
-            .then(() => nw.build()),
-          () => {
-            if (needsEndNode) {
-              this.emit('endNode', nw);
-            }
-          }
-        )
-          .then(() => this._cancelationRequest.throwIfRequested())
-          .catch(err => {
-            if (Cancelation.isCancelationError(err)) {
-              throw err;
-            } else {
-              throw new BuildError(err, nw);
-            }
-          });
+      // the build is two passes, first we create a promise chain representing
+      // the complete build, then we pass that terminal promises which
+      // represents the build to the CancelationRequest, after which the build
+      // itself begins.
+      //
+      // 1. build up a promise chain, which represents the complete build
+      pipeline = pipeline.then(async () => {
+        // 3. begin next build step
+        this._cancelationRequest.throwIfRequested();
+        this.emit('beginNode', nw);
+        try {
+          await nw.build();
+          this.emit('endNode', nw);
+        } catch (e) {
+          this.emit('endNode', nw);
+          // wrap the error which occurred from a node wrappers build with
+          // additional build information. This includes which build step
+          // caused the error, and where that build step was instantiated.
+          throw new BuildError(e, nw);
+        }
       });
     }
 
-    this._cancelationRequest = new CancelationRequest(promise);
+    // 2. Create CancelationRequest which waits on the complete build itself
+    // This allows us to initiate a cancellation, but wait until any
+    // un-cancelable work completes before canceling. This allows us to safely
+    // wait until cancelation is complete before performance actions such as
+    // cleanup, or restarting the build itself.
+    this._cancelationRequest = new CancelationRequest(pipeline);
 
-    return promiseFinally(
-      promise
-        .then(() => {
-          return this.outputNodeWrapper;
-        })
-        .then(outputNodeWrapper => {
-          this.buildHeimdallTree(outputNodeWrapper);
-        }),
-      () => {
-        let buildsSkipped = filterMap(
-          this._nodeWrappers.values(),
-          (nw: NodeWrappers) => nw.buildState.built === false
-        ).length;
-        logger.debug(`Total nodes skipped: ${buildsSkipped} out of ${this._nodeWrappers.size}`);
+    try {
+      await pipeline;
+      this._cancelationRequest.throwIfRequested();
+      this.buildHeimdallTree(this.outputNodeWrapper);
+    } finally {
+      let buildsSkipped = filterMap(
+        this._nodeWrappers.values(),
+        (nw: NodeWrappers) => nw.buildState.built === false
+      ).length;
+      logger.debug(`Total nodes skipped: ${buildsSkipped} out of ${this._nodeWrappers.size}`);
 
-        this._cancelationRequest = null;
-      }
-    );
+      this._cancelationRequest = null;
+    }
   }
 
-  cancel() {
-    if (!this._cancelationRequest) {
-      // No current build, so no cancelation
-      return Promise.resolve();
+  async cancel() {
+    if (this._cancelationRequest) {
+      return this._cancelationRequest.cancel();
     }
-
-    return this._cancelationRequest.cancel();
   }
 
   // Destructor-like method. Waits on current node to finish building, then cleans up temp directories
-  cleanup() {
-    return promiseFinally(this.cancel(), () => this.builderTmpDirCleanup());
+  async cleanup() {
+    try {
+      await this.cancel();
+    } finally {
+      await this.builderTmpDirCleanup();
+    }
   }
 
   // This method recursively traverses the node graph and returns a nodeWrapper.
@@ -191,7 +182,7 @@ class Builder extends EventEmitter {
     }
 
     // Turn string nodes into WatchedDir nodes
-    const originalNode = node; // keep original (possibly string) node around for deduping
+    const originalNode = node; // keep original (possibly string) node around so we can later deduplicate
     if (typeof node === 'string') {
       node = new WatchedDir(node, { annotation: 'string node' });
     }
@@ -241,8 +232,8 @@ class Builder extends EventEmitter {
       }
     }
 
-    // For 'transform' nodes, recurse into the input nodes; for 'source' nodes,
-    // record paths.
+    // For 'transform' nodes, recursively enter into the input nodes; for
+    // 'source' nodes, record paths.
     let inputNodeWrappers = [];
     if (nodeInfo.nodeType === 'transform') {
       const newStack = _stack.concat([nodeWrapper]);
@@ -299,15 +290,15 @@ class Builder extends EventEmitter {
   setupTmpDirs() {
     // Create temporary directories for each node:
     //
-    //   out-01-someplugin/
+    //   out-01-some-plugin/
     //   out-02-otherplugin/
-    //   cache-01-someplugin/
+    //   cache-01-some-plugin/
     //   cache-02-otherplugin/
     //
     // Here's an alternative directory structure we might consider (it's not
     // clear which structure makes debugging easier):
     //
-    //   01-someplugin/
+    //   01-some-plugin/
     //     out/
     //     cache/
     //     in-1 -> ... // symlink for convenience
@@ -315,14 +306,14 @@ class Builder extends EventEmitter {
     //   02-otherplugin/
     //     ...
     // @ts-ignore
-    const tmpobj = tmp.dirSync({
+    const tmpObj = tmp.dirSync({
       prefix: 'broccoli-',
       unsafeCleanup: true,
       dir: this.tmpdir,
     });
 
-    this.builderTmpDir = tmpobj.name;
-    this.builderTmpDirCleanup = tmpobj.removeCallback;
+    this.builderTmpDir = tmpObj.name;
+    this.builderTmpDirCleanup = tmpObj.removeCallback;
 
     for (let nodeWrapper of this._nodeWrappers.values()) {
       if (nodeWrapper.nodeInfo.nodeType === 'transform') {
@@ -392,7 +383,7 @@ class Builder extends EventEmitter {
         label: node.label,
         broccoliNode: true,
         broccoliId: node.id,
-        // we should do this instead of reparentNodes
+        // we should do this instead of reParentNodes
         // broccoliInputIds: node.inputNodeWrappers.map(input => input.id),
         broccoliCachedNode: false,
         broccoliPluginName: node.nodeInfo.name,
@@ -413,7 +404,7 @@ class Builder extends EventEmitter {
     }
 
     // Why?
-    reparentNodes(outputNodeWrapper);
+    reParentNodes(outputNodeWrapper);
 
     // What uses this??
     aggregateTime();
@@ -422,10 +413,10 @@ class Builder extends EventEmitter {
   get features() {
     return broccoliNodeInfo.features;
   }
-};
+}
 
-function reparentNodes(outputNodeWrapper: any) {
-  // reparent heimdall nodes according to input nodes
+function reParentNodes(outputNodeWrapper: any) {
+  // re-parent heimdall nodes according to input nodes
   const seen = new Set();
   const queue = [outputNodeWrapper];
   let node;

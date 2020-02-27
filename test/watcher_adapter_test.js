@@ -155,8 +155,8 @@ describe('WatcherAdapter', function() {
     const FIXTURE_PROJECT = __dirname + (isWin ? '\\fixtures\\project' : '/fixtures/project');
     let adapter;
 
-    afterEach(function() {
-      adapter.quit();
+    afterEach(async function() {
+      await adapter.quit();
     });
 
     it('supports symmetric start/shutdown', function() {
