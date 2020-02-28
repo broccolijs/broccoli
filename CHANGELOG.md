@@ -1,5 +1,12 @@
 # master
 
+# 3.3.0
+
+* Code-base utilizes async/await where appropriate
+* [BUGFIX] no longer cause spurious unhandled promise rejections warnings
+* convert lib to typescript
+* migrate to github actions
+
 # 3.2.0
 
 * Add input node change tracking (#419)
