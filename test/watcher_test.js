@@ -113,7 +113,7 @@ describe('Watcher', function() {
       watcher.on('debounce', debounceHandler);
       watcher.on('buildStart', buildStartHandler);
       watcher.on('buildSuccess', buildEndHandler);
-
+      // TODO: stop using mocks, spies and private API's
       watcher._ready = true;
       await watcher._change('change', 'file.js', 'root');
       expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
