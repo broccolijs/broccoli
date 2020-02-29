@@ -1,5 +1,9 @@
 # master
 
+# 3.3.2
+
+* Semver compatible dependency upgrades
+
 # 3.3.1
 
 * [BUGFIX] restore static APIs on Broccoli.Builder that got dropped during the typescript conversion
