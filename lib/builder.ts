@@ -11,6 +11,7 @@ import CancelationRequest from './cancelation-request';
 import filterMap from './utils/filter-map';
 import { EventEmitter } from 'events';
 import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
+import NodeWrapper from './wrappers/node';
 
 const heimdall = require('heimdalljs');
 const underscoreString = require('underscore.string');
@@ -57,6 +58,14 @@ class Builder extends EventEmitter {
   buildId: number;
   builderTmpDir!: string;
   builderTmpDirCleanup!: any;
+
+  static get BuilderError() { return BuilderError; }
+  static get InvalidNodeError() { return broccoliNodeInfo.InvalidNodeError; }
+  static get NodeSetupError() { return NodeSetupError; }
+  static get BuildError() { return BuildError; }
+  static get NodeWrapper() { return NodeWrapper; }
+  static get TransformNodeWrapper() { return TransformNodeWrapper; }
+  static get SourceNodeWrapper() { return SourceNodeWrapper; }
 
   constructor(outputNode: Node, options: BuilderOptions = {}) {
     super();
