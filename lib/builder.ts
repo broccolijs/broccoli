@@ -59,13 +59,27 @@ class Builder extends EventEmitter {
   builderTmpDir!: string;
   builderTmpDirCleanup!: any;
 
-  static get BuilderError() { return BuilderError; }
-  static get InvalidNodeError() { return broccoliNodeInfo.InvalidNodeError; }
-  static get NodeSetupError() { return NodeSetupError; }
-  static get BuildError() { return BuildError; }
-  static get NodeWrapper() { return NodeWrapper; }
-  static get TransformNodeWrapper() { return TransformNodeWrapper; }
-  static get SourceNodeWrapper() { return SourceNodeWrapper; }
+  static get BuilderError() {
+    return BuilderError;
+  }
+  static get InvalidNodeError() {
+    return broccoliNodeInfo.InvalidNodeError;
+  }
+  static get NodeSetupError() {
+    return NodeSetupError;
+  }
+  static get BuildError() {
+    return BuildError;
+  }
+  static get NodeWrapper() {
+    return NodeWrapper;
+  }
+  static get TransformNodeWrapper() {
+    return TransformNodeWrapper;
+  }
+  static get SourceNodeWrapper() {
+    return SourceNodeWrapper;
+  }
 
   constructor(outputNode: Node, options: BuilderOptions = {}) {
     super();
