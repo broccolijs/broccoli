@@ -19,7 +19,9 @@ module.exports = {
     'node/no-missing-require': ['error', {
       'tryExtensions': ['.js', '.json', '.node', '.ts'],
     }],
+    'node/no-missing-import': 'off',
     'node/no-unsupported-features': 'off',
+    'node/no-unsupported-features/es-syntax': 'off',
   },
   overrides: [
     {
