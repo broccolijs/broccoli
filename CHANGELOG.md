@@ -1,5 +1,9 @@
 # master
 
+# 3.3.3
+
+* [BUGFIX] Ensure buildAnnotation survives a round trip from watcher -> builder -> the fulfillment value of watcher.currentBuild
+
 # 3.3.2
 
 * Semver compatible dependency upgrades
