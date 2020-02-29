@@ -71,6 +71,16 @@ describe('Builder', function() {
     }
   });
 
+  it('has static members that are part of the public API', function() {
+    expect(Builder.BuilderError).to.be.ok;
+    expect(Builder.InvalidNodeError).to.be.ok;
+    expect(Builder.NodeSetupError).to.be.ok;
+    expect(Builder.BuildError).to.be.ok;
+    expect(Builder.NodeWrapper).to.be.ok;
+    expect(Builder.TransformNodeWrapper).to.be.ok;
+    expect(Builder.SourceNodeWrapper).to.be.ok;
+  });
+
   describe('build result', function() {
     it('returns a promise', function() {
       let stepA = new plugins.Noop();
