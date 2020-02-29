@@ -1,5 +1,9 @@
 # master
 
+# 3.3.1
+
+* [BUGFIX] restore static APIs on Broccoli.Builder that got dropped during the typescript conversion
+
 # 3.3.0
 
 * Code-base utilizes async/await where appropriate
@@ -19,7 +23,7 @@
 
 * Enable colored syntax highlighting in error messages from babel (#415)
 
-* [BUGFIX] Add `annotation` object for broccoli-sane-watcher compatiblity
+* [BUGFIX] Add `annotation` object for broccoli-sane-watcher compatibility
 
 # 3.1.0
 
