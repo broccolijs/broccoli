@@ -29,11 +29,9 @@ describe('Watcher', function() {
     watched: true,
   };
 
-  const buildResults = {};
-
   const builder = {
-    async build() {
-      return buildResults;
+    async build(_, buildAnnotation) {
+      return buildAnnotation;
     },
   };
 
@@ -59,7 +57,14 @@ describe('Watcher', function() {
       expect(adapterOn).to.have.been.calledWith('change');
       expect(adapterOn).to.have.been.calledWith('error');
 
-      await watcher.currentBuild;
+      const result = await watcher.currentBuild;
+      expect(result).to.eql({
+        type: 'initial',
+        reason: 'watcher',
+        primaryFile: undefined,
+        changedFiles: [],
+        filePath: undefined,
+      });
       expect(adapterWatch).to.have.been.called;
       expect(trigger).to.have.been.calledWith('buildStart');
       expect(trigger).to.have.been.calledWith('buildSuccess');
@@ -119,7 +124,14 @@ describe('Watcher', function() {
       expect(changeHandler).to.have.been.calledWith('change', 'file.js', 'root');
 
       const result = await watcher.currentBuild;
-      expect(result.filePath).to.equal(path.join('root', 'file.js'));
+
+      expect(result).to.eql({
+        type: 'rebuild',
+        reason: 'watcher',
+        primaryFile: path.join('root', 'file.js'),
+        changedFiles: [path.join('root', 'file.js')],
+        filePath: path.join('root', 'file.js'),
+      });
 
       expect(debounceHandler).to.have.been.called;
       expect(buildStartHandler).to.have.been.called;
@@ -171,27 +183,30 @@ describe('Watcher', function() {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       await watcher._build();
+
       expect(builderBuild.args[0][1]).to.deep.equal({
         type: 'initial',
         reason: 'watcher',
         primaryFile: undefined,
+        filePath: undefined,
         changedFiles: [],
       });
     });
 
-    it('annotation is properly sent on rebuild', function() {
+    it('annotation is properly sent on rebuild', async function() {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       watcher._changedFiles = [path.join('root', 'file.js')];
 
-      return watcher._build(path.join('root', 'file.js')).then(() => {
-        expect(builderBuild.args[0][1]).to.deep.equal({
-          type: 'rebuild',
-          reason: 'watcher',
-          primaryFile: path.join('root', 'file.js'),
-          changedFiles: [path.join('root', 'file.js')],
-        });
+      await watcher._build(path.join('root', 'file.js'));
+
+      expect(builderBuild.args[0][1]).to.deep.equal({
+        type: 'rebuild',
+        reason: 'watcher',
+        primaryFile: path.join('root', 'file.js'),
+        filePath: path.join('root', 'file.js'),
+        changedFiles: [path.join('root', 'file.js')],
       });
     });
   });
@@ -230,7 +245,7 @@ describe('Watcher', function() {
   });
 
   describe('quit', function() {
-    it('quits the watcher', function() {
+    it('quits the watcher', async function() {
       const adapterQuit = sinon.spy(adapter, 'quit');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -241,13 +256,20 @@ describe('Watcher', function() {
 
       watcher.start();
 
-      return watcher.currentBuild.then(() => {
-        return watcher.quit().then(() => {
-          expect(adapterQuit).to.have.been.called;
-          expect(quitStartHandler).to.have.been.called;
-          expect(quitEndHandler).to.have.been.called;
-        });
+      const result = await watcher.currentBuild;
+
+      expect(result).to.eql({
+        type: 'initial',
+        reason: 'watcher',
+        primaryFile: undefined,
+        changedFiles: [],
+        filePath: undefined,
       });
+
+      await watcher.quit();
+      expect(adapterQuit).to.have.been.called;
+      expect(quitStartHandler).to.have.been.called;
+      expect(quitEndHandler).to.have.been.called;
     });
 
     it('does nothing if already quitting', function() {

@@ -54,7 +54,7 @@ class Watcher extends EventEmitter {
     return this._currentBuild;
   }
 
-  // TODO: this is an interim solution, pending a largerly cleanup of this class.
+  // TODO: this is an interim solution, pending a largely cleanup of this class.
   // Currently I can rely on understanding the various pieces of this class, to
   // know this is safe. This is not a good long term solution, but given
   // relatively little time to address this currently, it is "ok". I do plan,
@@ -90,17 +90,19 @@ class Watcher extends EventEmitter {
 
     this.watcherAdapter.on('change', this._change.bind(this));
     this.watcherAdapter.on('error', this._error.bind(this));
-    this._updateCurrentBuild((async () => {
-      try {
-        await this.watcherAdapter.watch();
-        logger.debug('ready');
-        this._ready = true;
-      } catch(e) {
-        this._error(e);
-      }
+    this._updateCurrentBuild(
+      (async () => {
+        try {
+          await this.watcherAdapter.watch();
+          logger.debug('ready');
+          this._ready = true;
+        } catch (e) {
+          this._error(e);
+        }
 
-      await this._build();
-    })());
+        return this._build();
+      })()
+    );
 
     return this._lifetime.promise;
   }
