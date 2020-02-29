@@ -122,8 +122,8 @@ class Watcher extends EventEmitter {
 
     try {
       // Wait for current build, and ignore build failure
-      await this.currentBuild
-    } catch(e) {
+      await this.currentBuild;
+    } catch (e) {
       /* we don't care about failures in the last build, simply start the
        * next build once the last build has completed
        * */
@@ -133,20 +133,22 @@ class Watcher extends EventEmitter {
       return;
     }
 
-    this._updateCurrentBuild(new Promise((resolve, reject) => {
-      logger.debug('debounce');
-      this.emit('debounce');
-      setTimeout(() => {
-        // Only set _rebuildScheduled to false *after* the setTimeout so that
-        // change events during the setTimeout don't trigger a second rebuild
-        try {
-          this._rebuildScheduled = false;
-          resolve(this._build(path.join(root, filePath)));
-        } catch(e) {
-          reject(e);
-        }
-      }, this.options.debounce);
-    }));
+    this._updateCurrentBuild(
+      new Promise((resolve, reject) => {
+        logger.debug('debounce');
+        this.emit('debounce');
+        setTimeout(() => {
+          // Only set _rebuildScheduled to false *after* the setTimeout so that
+          // change events during the setTimeout don't trigger a second rebuild
+          try {
+            this._rebuildScheduled = false;
+            resolve(this._build(path.join(root, filePath)));
+          } catch (e) {
+            reject(e);
+          }
+        }, this.options.debounce);
+      })
+    );
   }
 
   _build(filePath?: string): Promise<void> {
