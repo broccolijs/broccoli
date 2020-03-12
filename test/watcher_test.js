@@ -177,10 +177,6 @@ describe('Watcher', function() {
       }
 
       class Plugin2 extends Plugin {
-        constructor(inputNodes, options) {
-          super(inputNodes || [], options);
-        }
-
         build() {
           pluginsCalled['plugin2'] = pluginsCalled['plugin2'] ? pluginsCalled['plugin2'] + 1 : 1;
 
