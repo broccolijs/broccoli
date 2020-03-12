@@ -210,8 +210,9 @@ describe('Watcher', function() {
           return changedBuild;
         })
         .then(() => {
-          expect(pluginsCalled['plugin1']).to.eq(1);
-          expect(pluginsCalled['plugin2']).to.eq(undefined);
+          expect(events).to.deep.equal([
+            'plugin 1',
+          ]);
 
           return watcher.currentBuild;
         })
