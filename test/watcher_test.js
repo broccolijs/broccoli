@@ -21,8 +21,16 @@ function defer() {
   return deferred;
 }
 
-function sleep(timeout = 10) {
-  return new Promise(resolve => setTimeout(resolve, timeout));
+function waitForWatcherToBeReady(watcher) {
+  return new Promise(resolve => {
+    if (watcher._ready === true) {
+      return resolve();
+    } else {
+      setTimeout(() => {
+        return resolve(waitForWatcherToBeReady(watcher));
+      }, 10);
+    }
+  });
 }
 
 const expect = chai.expect;
@@ -53,7 +61,7 @@ describe('Watcher', function() {
     async build(_, buildAnnotation) {
       return buildAnnotation;
     },
-    cancel() {
+    async cancel() {
       return Promise.resolve();
     },
   };
@@ -162,7 +170,7 @@ describe('Watcher', function() {
       expect(builderBuild).to.have.been.called;
     });
 
-    it('on change, rebuild is invoked and cancel is invoked from the build', function() {
+    it('on change, rebuild is invoked and cancel is invoked from the build', async function() {
       const events = [];
 
       const waitForPlugin1 = defer();
@@ -189,26 +197,23 @@ describe('Watcher', function() {
       const builder = new Builder(Merge([plugin1, plugin2]));
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      watcher._ready = true;
       watcher.start();
 
-      return sleep()
-        .then(() => {
-          const changedBuild = watcher._change('change', 'foo.js', 'root');
+      await waitForWatcherToBeReady(watcher);
+      {
+        const changedBuild = watcher._change('change', 'foo.js', 'root');
 
-          waitForPlugin1.resolve();
-          waitForPlugin2.resolve();
+        await waitForPlugin1.resolve();
+        await waitForPlugin2.resolve();
 
-          return changedBuild;
-        })
-        .then(() => {
-          expect(events).to.deep.equal(['plugin1']);
+        await changedBuild;
+      }
 
-          return watcher.currentBuild;
-        })
-        .then(() => {
-          expect(events).to.deep.equal(['plugin1', 'plugin1', 'plugin2']);
-        });
+      expect(events).to.deep.equal(['plugin1']);
+
+      await watcher.currentBuild;
+
+      expect(events).to.deep.equal(['plugin1', 'plugin1', 'plugin2']);
     }).timeout(600000);
 
     it('does nothing if not ready', function() {
