@@ -174,7 +174,7 @@ describe('Watcher', function() {
         }
 
         build() {
-          pluginsCalled['plugin1'] = pluginsCalled['plugin1'] ? pluginsCalled['plugin1'] + 1 : 1;
+    events.push('plugin1 build');
 
           return waitForPlugin1.promise;
         }
