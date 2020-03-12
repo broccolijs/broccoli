@@ -185,7 +185,7 @@ describe('Watcher', function() {
       }
 
       const plugin1 = new Plugin1([]);
-      const plugin2 = new Plugin2();
+      const plugin2 = new Plugin2([]);
       const builder = new Builder(Merge([plugin1, plugin2]));
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
