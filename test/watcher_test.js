@@ -9,7 +9,6 @@ const multidepRequire = require('multidep')('test/multidep.json');
 import SourceNodeWrapper from '../lib/wrappers/source-node';
 
 const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
-const Merge = multidepRequire('broccoli-merge-trees', '4.1.0');
 
 function defer() {
   let deferred = {};
@@ -171,30 +170,38 @@ describe('Watcher', function() {
     });
 
     it('on change, rebuild is invoked and cancel is invoked from the build', async function() {
-      const events = [];
+      class WaitingPlugin extends Plugin {
+        constructor(inputNodes) {
+          super(inputNodes);
+          this._waiter = defer();
+          this.buildCount = 0;
+        }
 
-      const waitForPlugin1 = defer();
-      const waitForPlugin2 = defer();
+        resolve(value) {
+          this._waiter.resolve(value);
+        }
 
-      class Plugin1 extends Plugin {
-        build() {
-          events.push('plugin1');
+        reject(reason) {
+          this._waiter.resolve(reason);
+        }
 
-          return waitForPlugin1.promise;
+        async build() {
+          try {
+            await this._waiter.promise;
+          } finally {
+            this.buildCount++;
+            this._waiter = defer();
+          }
         }
       }
 
-      class Plugin2 extends Plugin {
-        build() {
-          events.push('plugin2');
+      // now we construct a simple sequential build pipeline first -> second -> third
+      const first = new WaitingPlugin([]);
+      const second = new WaitingPlugin([first]);
 
-          return waitForPlugin2.promise;
-        }
-      }
+      const builder = new Builder(second);
 
-      const plugin1 = new Plugin1([]);
-      const plugin2 = new Plugin2([]);
-      const builder = new Builder(Merge([plugin1, plugin2]));
+      // now you can easily build many variants of the pipeline, and test what occurs if the watcher interrupts the build in those cases.
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       watcher.start();
@@ -203,17 +210,24 @@ describe('Watcher', function() {
       {
         const changedBuild = watcher._change('change', 'foo.js', 'root');
 
-        await waitForPlugin1.resolve();
-        await waitForPlugin2.resolve();
+        await first.resolve();
+        await second.resolve();
 
         await changedBuild;
       }
 
-      expect(events).to.deep.equal(['plugin1']);
+      expect(first.buildCount).to.eq(1);
+      expect(second.buildCount).to.eq(0);
+
+      await first.resolve();
+      await second.resolve();
 
       await watcher.currentBuild;
 
-      expect(events).to.deep.equal(['plugin1', 'plugin1', 'plugin2']);
+      expect(first.buildCount).to.eq(2);
+      expect(second.buildCount).to.eq(1);
+
+      // expect(events).to.deep.equal(['plugin1', 'plugin1', 'plugin2']);
     }).timeout(600000);
 
     it('does nothing if not ready', function() {
