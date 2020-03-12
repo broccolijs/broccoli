@@ -163,7 +163,7 @@ describe('Watcher', function() {
     });
 
     it('on change, rebuild is invoked and cancel is invoked from the build', function() {
-      const pluginsCalled = {};
+      const events = [];
 
       const waitForPlugin1 = defer();
       const waitForPlugin2 = defer();
