@@ -21,8 +21,8 @@ function defer() {
   return deferred;
 }
 
-function sleep() {
-  return new Promise(resolve => setTimeout(resolve, 10));
+function sleep(timeout = 10) {
+  return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
 const expect = chai.expect;
