@@ -169,10 +169,6 @@ describe('Watcher', function() {
       const waitForPlugin2 = defer();
 
       class Plugin1 extends Plugin {
-        constructor(inputNodes, options) {
-          super(inputNodes || [], options);
-        }
-
         build() {
     events.push('plugin1 build');
 
