@@ -170,7 +170,7 @@ describe('Watcher', function() {
 
       class Plugin1 extends Plugin {
         build() {
-    events.push('plugin1 build');
+          events.push('plugin1');
 
           return waitForPlugin1.promise;
         }
@@ -178,7 +178,7 @@ describe('Watcher', function() {
 
       class Plugin2 extends Plugin {
         build() {
-    events.push('plugin2 build');
+          events.push('plugin2');
 
           return waitForPlugin2.promise;
         }
@@ -202,18 +202,12 @@ describe('Watcher', function() {
           return changedBuild;
         })
         .then(() => {
-          expect(events).to.deep.equal([
-            'plugin 1',
-          ]);
+          expect(events).to.deep.equal(['plugin1']);
 
           return watcher.currentBuild;
         })
         .then(() => {
-          expect(events).to.deep.equal([
-            'plugin1',
-            'plugin1',
-            'plugin2',
-          ]);
+          expect(events).to.deep.equal(['plugin1', 'plugin1', 'plugin2']);
         });
     }).timeout(600000);
 
