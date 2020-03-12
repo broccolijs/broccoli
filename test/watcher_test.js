@@ -217,8 +217,11 @@ describe('Watcher', function() {
           return watcher.currentBuild;
         })
         .then(() => {
-          expect(pluginsCalled['plugin1']).to.eq(2);
-          expect(pluginsCalled['plugin2']).to.eq(1);
+          expect(events).to.deep.equal([
+            'plugin1',
+            'plugin1',
+            'plugin2',
+          ]);
         });
     }).timeout(600000);
 
