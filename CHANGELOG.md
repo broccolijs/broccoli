@@ -1,5 +1,9 @@
 # master
 
+# 3.4.0
+
+* [Feature] stop current build, when rebuild is triggered (#408)
+
 # 3.3.3
 
 * [BUGFIX] Ensure buildAnnotation survives a round trip from watcher -> builder -> the fulfillment value of watcher.currentBuild
