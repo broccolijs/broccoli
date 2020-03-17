@@ -227,9 +227,7 @@ describe('Watcher', function() {
 
       watcher.start();
 
-      watcher.ready().then(() => {
-        expect(true).to.be.true;
-      });
+      await watcher.ready();
     });
 
     it('does nothing if not ready', function() {
