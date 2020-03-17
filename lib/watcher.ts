@@ -109,7 +109,7 @@ class Watcher extends EventEmitter {
   }
 
   async ready() {
-    await new Promise(resolve => this.on('ready', resolve));
+    await new Promise(resolve => this.once('ready', resolve));
   }
 
   async _change(event: 'change', filePath: string, root: string) {
