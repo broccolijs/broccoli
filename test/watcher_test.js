@@ -20,18 +20,6 @@ function defer() {
   return deferred;
 }
 
-function waitForWatcherToBeReady(watcher) {
-  return new Promise(resolve => {
-    if (watcher._ready === true) {
-      return resolve();
-    } else {
-      setTimeout(() => {
-        return resolve(waitForWatcherToBeReady(watcher));
-      }, 10);
-    }
-  });
-}
-
 const expect = chai.expect;
 chai.use(sinonChai);
 const sinon = Sinon.createSandbox();
@@ -206,7 +194,7 @@ describe('Watcher', function() {
 
       watcher.start();
 
-      await waitForWatcherToBeReady(watcher);
+      await watcher.ready();
       {
         const changedBuild = watcher._change('change', 'foo.js', 'root');
 
@@ -226,9 +214,25 @@ describe('Watcher', function() {
 
       expect(first.buildCount).to.eq(2);
       expect(second.buildCount).to.eq(1);
+    });
 
-      // expect(events).to.deep.equal(['plugin1', 'plugin1', 'plugin2']);
-    }).timeout(600000);
+    it('should resolve when ready is sent', async function() {
+      class TestPlugin extends Plugin {
+        async build() {
+          return;
+        }
+      }
+
+      const plugin = new TestPlugin([]);
+      const builder = new Builder(plugin);
+      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
+
+      watcher.start();
+
+      watcher.ready().then(() => {
+        expect(true).to.be.true;
+      });
+    });
 
     it('does nothing if not ready', function() {
       const builderBuild = sinon.spy(builder, 'build');

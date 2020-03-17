@@ -95,6 +95,7 @@ class Watcher extends EventEmitter {
         try {
           await this.watcherAdapter.watch();
           logger.debug('ready');
+          this.emit('ready');
           this._ready = true;
         } catch (e) {
           this._error(e);
@@ -105,6 +106,14 @@ class Watcher extends EventEmitter {
     );
 
     return this._lifetime.promise;
+  }
+
+  async ready() {
+    return new Promise((resolve) => {
+      this.on('ready', () => {
+        resolve();
+      });
+    });
   }
 
   async _change(event: 'change', filePath: string, root: string) {
