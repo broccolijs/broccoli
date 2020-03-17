@@ -48,7 +48,7 @@ describe('Watcher', function() {
     async build(_, buildAnnotation) {
       return buildAnnotation;
     },
-    async cancel() { },
+    async cancel() {},
   };
 
   const adapter = {
