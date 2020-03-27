@@ -1,8 +1,9 @@
 import CancelationError from './errors/cancelation';
 
 export default class CancelationRequest {
-  _pendingWork: Promise<void>;
-  _canceling: Promise<void> | null;
+  private _pendingWork: Promise<void>;
+  private _canceling: Promise<void> | null;
+  private _cancelationError = new CancelationError('Build Canceled');
 
   constructor(pendingWork: Promise<void>) {
     this._pendingWork = pendingWork; // all
@@ -15,7 +16,7 @@ export default class CancelationRequest {
 
   throwIfRequested() {
     if (this.isCanceled) {
-      throw new CancelationError('Build Canceled');
+      throw this._cancelationError;
     }
   }
 
@@ -23,9 +24,13 @@ export default class CancelationRequest {
     return this._pendingWork.then(...arguments);
   }
 
-  cancel() {
+  cancel(cancelationError?: CancelationError) {
     if (this._canceling) {
       return this._canceling;
+    }
+
+    if (cancelationError) {
+      this._cancelationError = cancelationError;
     }
 
     this._canceling = this._pendingWork.catch(e => {

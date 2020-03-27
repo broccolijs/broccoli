@@ -15,20 +15,34 @@ interface WatcherOptions {
 // WatcherAdapter handles I/O via the sane package, and could be pluggable in
 // principle.
 
+type Deferred = {
+  promise: Promise<void>;
+  resolve: (value?: any) => void;
+  reject: (error?: any) => void;
+}
+
+function deferred() : Deferred {
+  const deferred = {} as Deferred;
+  deferred.promise = new Promise((resolve, reject) => {
+    deferred.resolve = resolve;
+    deferred.reject = reject ;
+  });
+
+  return deferred;
+}
+
 class Watcher extends EventEmitter {
-  _changedFiles: string[];
-  _quitting?: boolean; // is this ever set
-  _rebuildScheduled: boolean;
-  _ready: boolean;
-  _quittingPromise: Promise<void> | null;
-  _lifetime: {
-    promise?: Promise<void>;
-    resolve?: (value: any) => void;
-    reject?: (error: any) => void;
-  } | null;
+  private _changedFiles: string[] = [];
+  private _quitting?: boolean; // is this ever set
+  private _rebuildScheduled = false;
+  private _ready = false;
+  private _quittingPromise: Promise<void> | null = null;
+  private _lifetime: Deferred | null = null;
+  private _nextBuild? = deferred();
+  private _currentBuild?: Promise<void>;
+  private _activeBuild = false;
 
   options: WatcherOptions;
-  _currentBuild: Promise<void>;
   watcherAdapter: WatcherAdapter;
   builder: any;
 
@@ -38,42 +52,20 @@ class Watcher extends EventEmitter {
     if (this.options.debounce == null) {
       this.options.debounce = 100;
     }
-    this._currentBuild = Promise.resolve();
     this.builder = builder;
     this.watcherAdapter =
       this.options.watcherAdapter || new WatcherAdapter(watchedNodes, this.options.saneOptions);
-
-    this._rebuildScheduled = false;
-    this._ready = false;
-    this._quittingPromise = null;
-    this._lifetime = null;
-    this._changedFiles = [];
+    if (this._nextBuild) {
+      this._nextBuild.promise.catch(() => {});
+    }
   }
 
   get currentBuild() {
-    return this._currentBuild;
-  }
-
-  // TODO: this is an interim solution, pending a largely cleanup of this class.
-  // Currently I can rely on understanding the various pieces of this class, to
-  // know this is safe. This is not a good long term solution, but given
-  // relatively little time to address this currently, it is "ok". I do plan,
-  // as time permits to circle back, and do a more thorough refactoring of this
-  // class, to ensure it is safe for future travelers.
-  private _updateCurrentBuild(promise: Promise<void>) {
-    this._currentBuild = promise;
-
-    promise.catch(() => {
-      /**
-       * The watcher internally follows currentBuild, and outputs errors appropriately.
-       * Since watcher.currentBuild is public API, we must allow public follows
-       * to still be informed of rejections.  However we do not want `_currentBuild` itself
-       * to trigger unhandled rejections.
-       *
-       * By catching errors here, but returning `promise` instead of the chain from
-       * `promise.catch`, both goals are accomplished.
-       */
-    });
+    if (this._nextBuild) {
+      return this._nextBuild.promise;
+    } else {
+      return this._currentBuild;
+    }
   }
 
   start() {
@@ -81,29 +73,28 @@ class Watcher extends EventEmitter {
       throw new Error('Watcher.prototype.start() must not be called more than once');
     }
 
-    this._lifetime = {};
-    let lifetime = this._lifetime;
-    lifetime.promise = new Promise((resolve, reject) => {
-      lifetime.resolve = resolve;
-      lifetime.reject = reject;
-    });
+    this._lifetime = deferred();
+    this._lifetime.promise.catch(() => {});
 
     this.watcherAdapter.on('change', this._change.bind(this));
     this.watcherAdapter.on('error', this._error.bind(this));
-    this._updateCurrentBuild(
-      (async () => {
-        try {
-          await this.watcherAdapter.watch();
-          logger.debug('ready');
-          this.emit('ready');
-          this._ready = true;
-        } catch (e) {
-          this._error(e);
-        }
 
-        return this._build();
-      })()
-    );
+    (async () => {
+      try {
+        await this.watcherAdapter.watch();
+        logger.debug('ready');
+        this.emit('ready');
+        this._ready = true;
+      } catch (e) {
+        this._error(e);
+      }
+
+      try {
+        await this._build();
+      } catch (e) {
+        // _build handles error reporting internally
+      }
+    })()
 
     return this._lifetime.promise;
   }
@@ -118,63 +109,37 @@ class Watcher extends EventEmitter {
       logger.debug('change', 'ignored: before ready');
       return;
     }
-    if (this._rebuildScheduled) {
-      logger.debug('change', 'ignored: rebuild scheduled already');
-      return;
-    }
     logger.debug('change', event, filePath, root);
     this.emit('change', event, filePath, root);
 
-    this._rebuildScheduled = true;
-
-    try {
-      // cancel the current builder and wait for it to finish the current plugin
-      await this.builder.cancel();
-
-      // Wait for current build, and ignore build failure
-      await this.currentBuild;
-    } catch (e) {
-      /* we don't care about failures in the last build, simply start the
-       * next build once the last build has completed
-       * */
-    }
     if (this._quitting) {
-      this._updateCurrentBuild(Promise.resolve());
-      return;
+      await this.currentBuild;
+    } else if (this._activeBuild) {
+      await this.builder.retry(this.options.debounce);
+    } else {
+      try {
+        await this._build(path.join(root, filePath));
+      } catch (e) {
+        // _build handles error reporting internally
+      }
     }
-
-    this._updateCurrentBuild(
-      new Promise((resolve, reject) => {
-        logger.debug('debounce');
-        this.emit('debounce');
-        setTimeout(() => {
-          // Only set _rebuildScheduled to false *after* the setTimeout so that
-          // change events during the setTimeout don't trigger a second rebuild
-          try {
-            this._rebuildScheduled = false;
-            resolve(this._build(path.join(root, filePath)));
-          } catch (e) {
-            reject(e);
-          }
-        }, this.options.debounce);
-      })
-    );
   }
 
-  _build(filePath?: string): Promise<void> {
+  async _build(filePath?: string) : Promise<void> {
     logger.debug('buildStart');
     this.emit('buildStart');
 
     const start = process.hrtime();
 
     // This is to maintain backwards compatibility with broccoli-sane-watcher
-    let annotation = {
+    const annotation = {
       type: filePath ? 'rebuild' : 'initial',
       reason: 'watcher',
       primaryFile: filePath,
       changedFiles: this._changedFiles,
     };
 
+    this._activeBuild = true;
     const buildPromise = this.builder.build(null, annotation);
     // Trigger change/error events. Importantly, if somebody else chains to
     // currentBuild, their callback will come after our events have
@@ -199,8 +164,28 @@ class Watcher extends EventEmitter {
         logger.debug('buildFailure');
         this.emit('buildFailure', err);
       }
-    );
-    return buildPromise;
+    ).finally(() => this._activeBuild = false);
+
+
+    if (this._nextBuild) {
+      this._nextBuild.resolve(buildPromise);
+    }
+    this._currentBuild = buildPromise;
+    this._nextBuild = undefined;
+
+    buildPromise.catch(() => {
+      /**
+       * The watcher internally follows currentBuild, and outputs errors appropriately.
+       * Since watcher.currentBuild is public API, we must allow public follows
+       * to still be informed of rejections.  However we do not want `_currentBuild` itself
+       * to trigger unhandled rejections.
+       *
+       * By catching errors here, but returning `promise` instead of the chain from
+       * `promise.catch`, both goals are accomplished.
+       */
+    });
+
+    return this._currentBuild;
   }
 
   async _error(err: any) {
@@ -245,9 +230,16 @@ class Watcher extends EventEmitter {
 
     this._quittingPromise = (async () => {
       try {
-        await this.watcherAdapter.quit();
+        await Promise.all([
+          this.builder.cancel(),
+          this.watcherAdapter.quit(),
+        ])
+      } catch (e) {
       } finally {
         try {
+          if (this._nextBuild) {
+            this._nextBuild.resolve();
+          }
           await this.currentBuild;
         } catch (e) {
           // Wait for current build, and ignore build failure

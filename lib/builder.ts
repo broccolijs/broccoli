@@ -8,6 +8,7 @@ import BuilderError from './errors/builder';
 import NodeSetupError from './errors/node-setup';
 import BuildError from './errors/build';
 import CancelationRequest from './cancelation-request';
+import RetryCancellationRequest from './errors/retry-cancelation';
 import filterMap from './utils/filter-map';
 import { EventEmitter } from 'events';
 import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
@@ -53,7 +54,7 @@ class Builder extends EventEmitter {
   watchedPaths: string[];
   _nodeWrappers: Map<TransformNode | SourceNode, NodeWrappers>;
   outputNodeWrapper: NodeWrappers;
-  _cancelationRequest: any;
+  _cancelationRequest?: CancelationRequest;
   outputPath: string;
   buildId: number;
   builderTmpDir!: string;
@@ -143,8 +144,12 @@ class Builder extends EventEmitter {
       //
       // 1. build up a promise chain, which represents the complete build
       pipeline = pipeline.then(async () => {
+        if (this._cancelationRequest) {
+          this._cancelationRequest.throwIfRequested();
+        } else {
+          throw new BuilderError('Broccoli: The current build is missing a CancelationRequest, this is unexpected please report an issue: https://github.com/broccolijs/broccoli/issues/new ');
+        }
         // 3. begin next build step
-        this._cancelationRequest.throwIfRequested();
         this.emit('beginNode', nw);
         try {
           await nw.build();
@@ -166,23 +171,49 @@ class Builder extends EventEmitter {
     // cleanup, or restarting the build itself.
     this._cancelationRequest = new CancelationRequest(pipeline);
 
+    let skipFinally = false;
     try {
       await pipeline;
       this.buildHeimdallTree(this.outputNodeWrapper);
+    } catch (e) {
+      if (RetryCancellationRequest.isRetry(e)) {
+        this._cancelationRequest = undefined;
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            try {
+              resolve(this.build());
+            } catch(e) {
+              reject(e);
+            }
+          }, e.retryIn);
+        })
+        skipFinally = true;
+      } else {
+        throw e;
+      }
     } finally {
+      if (skipFinally) { return; }
       let buildsSkipped = filterMap(
         this._nodeWrappers.values(),
         (nw: NodeWrappers) => nw.buildState.built === false
       ).length;
       logger.debug(`Total nodes skipped: ${buildsSkipped} out of ${this._nodeWrappers.size}`);
 
-      this._cancelationRequest = null;
+      this._cancelationRequest = undefined;
     }
   }
 
   async cancel() {
     if (this._cancelationRequest) {
       return this._cancelationRequest.cancel();
+    }
+  }
+
+  async retry(retryIn: number) {
+    if (this._cancelationRequest) {
+      return this._cancelationRequest.cancel(new RetryCancellationRequest('Retry', retryIn));
+    } else {
+      return this.build();
     }
   }
 

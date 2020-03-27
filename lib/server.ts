@@ -86,8 +86,12 @@ class Server extends EventEmitter {
       this.instance.listen(this._port, this._host);
 
       this.instance.on('listening', () => {
-        this.ui.writeLine(`Serving on ${this._url}\n`);
-        resolve(this._watcher.start());
+        try {
+          this.ui.writeLine(`Serving on ${this._url}\n`);
+          this._watcher.start().then(resolve, reject);
+        } catch(e) {
+          reject(e);
+        }
       });
 
       this.instance.on('error', (error: any) => {
