@@ -192,6 +192,7 @@ describe('Watcher', function() {
 
       watcher.start();
 
+      const firstBuild = watcher.currentBuild;
       await watcher.ready();
       {
         const changedBuild = watcher._change('change', 'foo.js', 'root');
@@ -208,6 +209,7 @@ describe('Watcher', function() {
       await first.resolve();
       await second.resolve();
 
+      await firstBuild;
       await watcher.currentBuild;
 
       expect(first.buildCount).to.eq(2);

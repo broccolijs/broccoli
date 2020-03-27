@@ -141,8 +141,8 @@ export = function getMiddleware(watcher: Watcher, options: MiddlewareOptions = {
   const outputPath = path.resolve(watcher.builder.outputPath);
 
   return async function broccoliMiddleware(request: any, response: any, next: any) {
-    if (watcher.currentBuild == null) {
-      throw new Error('Waiting for initial build to start');
+    if (!watcher.currentBuild) {
+      throw new Error('Broccoli: watcher must have a currentBuild');
     }
 
     try {
