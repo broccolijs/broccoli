@@ -22,7 +22,7 @@ class Watcher extends EventEmitter {
   _ready: boolean;
   _quittingPromise: Promise<void> | null;
   _lifetime: {
-    promise?: Promise<void>;
+    promise?: Promise<void>,
     resolve?: (value: any) => void;
     reject?: (error: any) => void;
   } | null;
@@ -95,7 +95,6 @@ class Watcher extends EventEmitter {
         try {
           await this.watcherAdapter.watch();
           logger.debug('ready');
-          this.emit('ready');
           this._ready = true;
         } catch (e) {
           this._error(e);
@@ -106,10 +105,6 @@ class Watcher extends EventEmitter {
     );
 
     return this._lifetime.promise;
-  }
-
-  async ready() {
-    await new Promise(resolve => this.once('ready', resolve));
   }
 
   async _change(event: 'change', filePath: string, root: string) {
@@ -128,9 +123,6 @@ class Watcher extends EventEmitter {
     this._rebuildScheduled = true;
 
     try {
-      // cancel the current builder and wait for it to finish the current plugin
-      await this.builder.cancel();
-
       // Wait for current build, and ignore build failure
       await this.currentBuild;
     } catch (e) {

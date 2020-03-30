@@ -3,22 +3,7 @@ import chai from 'chai';
 import sinonChai from 'sinon-chai';
 import Sinon from 'sinon';
 import Watcher from '../lib/watcher';
-import broccoli from '..';
-const Builder = broccoli.Builder;
-const multidepRequire = require('multidep')('test/multidep.json');
 import SourceNodeWrapper from '../lib/wrappers/source-node';
-
-const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
-
-function defer() {
-  let deferred = {};
-  let promise = new Promise(function(resolve, reject) {
-    deferred.resolve = resolve;
-    deferred.reject = reject;
-  });
-  deferred.promise = promise;
-  return deferred;
-}
 
 const expect = chai.expect;
 chai.use(sinonChai);
@@ -48,7 +33,6 @@ describe('Watcher', function() {
     async build(_, buildAnnotation) {
       return buildAnnotation;
     },
-    async cancel() {},
   };
 
   const adapter = {
@@ -153,81 +137,6 @@ describe('Watcher', function() {
       expect(buildStartHandler).to.have.been.called;
       expect(buildEndHandler).to.have.been.called;
       expect(builderBuild).to.have.been.called;
-    });
-
-    it('on change, rebuild is invoked and cancel is invoked from the build', async function() {
-      class WaitingPlugin extends Plugin {
-        constructor(inputNodes) {
-          super(inputNodes);
-          this._waiter = defer();
-          this.buildCount = 0;
-        }
-
-        resolve(value) {
-          this._waiter.resolve(value);
-        }
-
-        reject(reason) {
-          this._waiter.resolve(reason);
-        }
-
-        async build() {
-          try {
-            await this._waiter.promise;
-          } finally {
-            this.buildCount++;
-            this._waiter = defer();
-          }
-        }
-      }
-
-      // now we construct a simple sequential build pipeline first -> second -> third
-      const first = new WaitingPlugin([]);
-      const second = new WaitingPlugin([first]);
-
-      const builder = new Builder(second);
-
-      // now you can easily build many variants of the pipeline, and test what occurs if the watcher interrupts the build in those cases.
-      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
-
-      watcher.start();
-
-      await watcher.ready();
-      {
-        const changedBuild = watcher._change('change', 'foo.js', 'root');
-
-        await first.resolve();
-        await second.resolve();
-
-        await changedBuild;
-      }
-
-      expect(first.buildCount).to.eq(1);
-      expect(second.buildCount).to.eq(0);
-
-      await first.resolve();
-      await second.resolve();
-
-      await watcher.currentBuild;
-
-      expect(first.buildCount).to.eq(2);
-      expect(second.buildCount).to.eq(1);
-    });
-
-    it('should resolve when ready is sent', async function() {
-      class TestPlugin extends Plugin {
-        async build() {
-          return;
-        }
-      }
-
-      const plugin = new TestPlugin([]);
-      const builder = new Builder(plugin);
-      const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
-
-      watcher.start();
-
-      await watcher.ready();
     });
 
     it('does nothing if not ready', function() {
