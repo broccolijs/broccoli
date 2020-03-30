@@ -1,5 +1,9 @@
 # master
 
+# 3.4.1
+
+* Revert retry feature (caused downstream failures for ember-cli users) (#459)
+
 # 3.4.0
 
 * [Feature] stop current build, when rebuild is triggered (#408)
