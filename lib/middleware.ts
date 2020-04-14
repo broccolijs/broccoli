@@ -146,7 +146,7 @@ export = function getMiddleware(watcher: Watcher, options: MiddlewareOptions = {
     }
 
     try {
-      await watcher.currentBuild
+      await watcher.currentBuild;
       handleRequest(outputPath, request, response, next, options);
     } catch (error) {
       // All errors thrown from builder.build() are guaranteed to be
