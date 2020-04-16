@@ -170,6 +170,8 @@ class Builder extends EventEmitter {
       await pipeline;
       this.buildHeimdallTree(this.outputNodeWrapper);
     } finally {
+      this.emit('buildFinished', pipeline);
+
       let buildsSkipped = filterMap(
         this._nodeWrappers.values(),
         (nw: NodeWrappers) => nw.buildState.built === false

@@ -344,6 +344,25 @@ describe('Builder', function() {
       });
     });
 
+    it('should emit buildFinished after builder has finished', async function() {
+      let isFinishedWasCalled = false;
+
+      builder = new FixtureBuilder('test/fixtures/basic');
+
+      builder.on('buildFinished', () => {
+        isFinishedWasCalled = true;
+      });
+
+      expect(builder.watchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
+      expect(builder.unwatchedPaths).to.deep.equal([]);
+
+      await expect(builder.build()).to.eventually.deep.equal({
+        'foo.txt': 'OK',
+      });
+
+      expect(isFinishedWasCalled).to.equal(true);
+    });
+
     it('records source directories only once', function() {
       const src = 'test/fixtures/basic';
 
