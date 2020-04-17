@@ -67,7 +67,7 @@ class WatcherAdapter extends EventEmitter {
 
   quit() {
     let closing = this.watchers.map(
-      (watcher: sane.Watcher) => 
+      (watcher: sane.Watcher) =>
         new Promise((resolve, reject) =>
           // @ts-ignore
           watcher.close((err: any) => {
@@ -79,6 +79,6 @@ class WatcherAdapter extends EventEmitter {
     this.watchers.length = 0;
     return Promise.all(closing).then(() => {});
   }
-};
+}
 
 export = WatcherAdapter;

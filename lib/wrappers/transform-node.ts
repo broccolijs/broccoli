@@ -7,7 +7,7 @@ import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
 const logger = require('heimdalljs-logger')('broccoli:transform-node');
 
 export default class TransformNodeWrapper extends NodeWrapper {
-  inputRevisions!: WeakMap<any, { revision: number, changed: boolean }>;
+  inputRevisions!: WeakMap<any, { revision: number; changed: boolean }>;
   callbackObject!: CallbackObject;
   inputPaths!: string[];
   nodeInfo!: TransformNodeInfo;
@@ -69,7 +69,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
 
     if (!this.shouldBuild()) {
       this.buildState.built = false;
-      return // Noop the build since inputs did not change
+      return; // Noop the build since inputs did not change
     }
 
     if (!this.nodeInfo.persistentOutput) {
@@ -100,11 +100,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
     }
 
     if (this.buildState.selfTime >= 100) {
-      logger.debug(
-        `Node build execution time: %ds %dms`,
-        endTime[0],
-        Math.round(endTime[1] / 1e6)
-      );
+      logger.debug(`Node build execution time: %ds %dms`, endTime[0], Math.round(endTime[1] / 1e6));
     }
   }
 
@@ -131,4 +127,4 @@ export default class TransformNodeWrapper extends NodeWrapper {
       // leave out instantiationStack (too long), inputNodes, and callbacks
     });
   }
-};
+}

@@ -41,4 +41,4 @@ export default class SourceNodeWrapper extends NodeWrapper {
       // leave out instantiationStack
     });
   }
-};
+}

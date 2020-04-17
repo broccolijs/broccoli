@@ -6,4 +6,4 @@ export default function wrapPrimitiveErrors(err: Error): Error {
     // that the stack trace is not useful, or even set the .stack to null.
     return new Error(err + '');
   }
-};
+}

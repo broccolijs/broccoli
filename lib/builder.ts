@@ -339,7 +339,9 @@ class Builder extends EventEmitter {
 
     for (let nodeWrapper of this._nodeWrappers.values()) {
       if (nodeWrapper.nodeInfo.nodeType === 'transform') {
-        (nodeWrapper as TransformNodeWrapper).inputPaths = nodeWrapper.inputNodeWrappers.map((nw: any) => nw.outputPath);
+        (nodeWrapper as TransformNodeWrapper).inputPaths = nodeWrapper.inputNodeWrappers.map(
+          (nw: any) => nw.outputPath
+        );
         nodeWrapper.outputPath = this.mkTmpDir(nodeWrapper, 'out');
 
         if (nodeWrapper.nodeInfo.needsCache) {

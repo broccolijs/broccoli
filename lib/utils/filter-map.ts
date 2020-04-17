@@ -6,4 +6,4 @@ export default function filterMap<T>(iterator: Iterable<T>, cb: (entry: T) => bo
     }
   }
   return result;
-};
+}

@@ -60,7 +60,7 @@ export default function printSlowNodes(tree: HeimdallNode, factor: number, ui: U
     ui.writeLine('Error when printing slow nodes', 'ERROR');
     ui.writeError(e);
   }
-};
+}
 
 function pad(str: string, len: number, char?: string, dir?: 'left' | 'both') {
   if (!char) {

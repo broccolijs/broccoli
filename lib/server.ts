@@ -24,7 +24,16 @@ class Server extends EventEmitter {
   _started: boolean;
   ui: any;
 
-  constructor(watcher: Watcher, host: string, port: string, connect = require('connect'), ui: UI, ssl: boolean, sslKey: string, sslCert: string) {
+  constructor(
+    watcher: Watcher,
+    host: string,
+    port: string,
+    connect = require('connect'),
+    ui: UI,
+    ssl: boolean,
+    sslKey: string,
+    sslCert: string
+  ) {
     super();
 
     this._watcher = watcher;
@@ -158,9 +167,9 @@ function serve(
       ui.writeError(err);
       _process.exit(1);
     });
-};
+}
 
 export = {
   Server,
-  serve
-}
+  serve,
+};

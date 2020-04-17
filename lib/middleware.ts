@@ -33,8 +33,14 @@ interface MiddlewareOptions {
 // Supported options:
 //   autoIndex (default: true) - set to false to disable directory listings
 //   liveReloadPath - LiveReload script URL for error pages
-function handleRequest(outputPath: string, request: any, response: any, next: any, options: MiddlewareOptions) {
-  const urlObj = url.parse(request.url);
+function handleRequest(
+  outputPath: string,
+  request: any,
+  response: any,
+  next: any,
+  options: MiddlewareOptions
+) {
+  const urlObj = url.URL(request.url);
   let pathname = urlObj.pathname || '';
   let filename: string, stat, lastModified, buffer;
 
@@ -87,21 +93,21 @@ function handleRequest(outputPath: string, request: any, response: any, next: an
       const context = {
         url: request.url,
         files: fs
-        .readdirSync(filename)
-        .sort()
-        .map(child => {
-          const stat = fs.statSync(path.join(filename, child)),
-            isDir = stat.isDirectory();
-          return {
-            href: child + (isDir ? '/' : ''),
-            type: isDir
-              ? 'dir'
-              : path
-              .extname(child)
-              .replace('.', '')
-              .toLowerCase(),
-          };
-        }),
+          .readdirSync(filename)
+          .sort()
+          .map(child => {
+            const stat = fs.statSync(path.join(filename, child)),
+              isDir = stat.isDirectory();
+            return {
+              href: child + (isDir ? '/' : ''),
+              type: isDir
+                ? 'dir'
+                : path
+                    .extname(child)
+                    .replace('.', '')
+                    .toLowerCase(),
+            };
+          }),
         liveReloadPath: options.liveReloadPath,
       };
       response.setHeader('Content-Type', 'text/html; charset=utf-8');

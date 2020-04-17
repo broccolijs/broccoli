@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     'no-var': 'error',
     'no-console': 'off',
+    'no-unused-vars': 'off', // this is turned off because of the lack of scope analysis on imported types (https://github.com/typescript-eslint/typescript-eslint/issues/1856)
     'no-process-exit': 'off',
     'object-shorthand': 'error',
     'prettier/prettier': ['error', require('./prettier.config')],

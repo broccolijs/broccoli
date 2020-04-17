@@ -4,7 +4,7 @@ import wrapPrimitiveErrors from '../utils/wrap-primitive-errors';
 
 interface BroccoliPayloadError {
   originalError: Error;
-  originalMessage: string,
+  originalMessage: string;
   nodeId: number;
   nodeLabel: string;
   nodeName: string;
@@ -15,7 +15,7 @@ interface BroccoliPayloadError {
     treeDir: string;
     line: number;
     column: number;
-  },
+  };
 }
 
 export default class BuildError extends BuilderError {
@@ -87,4 +87,4 @@ export default class BuildError extends BuilderError {
       },
     };
   }
-};
+}

@@ -22,7 +22,7 @@ class Watcher extends EventEmitter {
   _ready: boolean;
   _quittingPromise: Promise<void> | null;
   _lifetime: {
-    promise?: Promise<void>,
+    promise?: Promise<void>;
     resolve?: (value: any) => void;
     reject?: (error: any) => void;
   } | null;

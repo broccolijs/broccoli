@@ -11,4 +11,4 @@ export default class BuilderError extends Error {
 
     this.isBuilderError = true;
   }
-};
+}
