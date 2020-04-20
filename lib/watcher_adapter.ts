@@ -5,7 +5,7 @@ import SourceNodeWrapper from './wrappers/source-node';
 import bindFileEvent from './utils/bind-file-event';
 import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = HeimdallLogger('broccoli:watcherAdapter');
+const logger = new HeimdallLogger('broccoli:watcherAdapter');
 
 interface WatcherAdapterOptions extends sane.Options {
   filter?: (name: string) => boolean;

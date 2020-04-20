@@ -14,10 +14,11 @@ import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
 import NodeWrapper from './wrappers/node';
 import heimdall from 'heimdalljs';
 import underscoreString from 'underscore.string';
+// @ts-ignore
 import broccoliNodeInfo from 'broccoli-node-info';
 import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = HeimdallLogger('broccoli:builder');
+const logger = new HeimdallLogger('broccoli:builder');
 
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup();

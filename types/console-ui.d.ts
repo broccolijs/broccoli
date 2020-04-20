@@ -1,7 +1,7 @@
 import { Stream } from 'stream';
 
 declare class UI {
-  constructor(options: {
+  constructor(options?: {
     inputStream: Stream,
     outputStream: Stream,
     errorStream: Stream;

@@ -6,6 +6,7 @@ import handlebars from 'handlebars';
 import Watcher from './watcher';
 import BuildError from './errors/build';
 import resolvePath from 'resolve-path';
+// @ts-ignore
 import ansiHTML from 'ansi-html';
 
 // Resets foreground and background colors to black
@@ -41,7 +42,7 @@ function handleRequest(
   next: any,
   options: MiddlewareOptions
 ) {
-  const urlObj = url.URL(request.url);
+  const urlObj = new url.URL(request.url);
   const pathname = urlObj.pathname || '';
   let filename: string, stat;
 

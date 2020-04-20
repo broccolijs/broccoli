@@ -4,7 +4,7 @@ import TransformNodeWrapper from '../wrappers/transform-node';
 import WatcherAdapter from '../watcher_adapter';
 import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = HeimdallLogger('broccoli:watcherAdapter');
+const logger = new HeimdallLogger('broccoli:watcherAdapter');
 
 export default function bindFileEvent(
   adapter: WatcherAdapter,

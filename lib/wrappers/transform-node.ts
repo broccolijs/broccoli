@@ -5,7 +5,7 @@ import NodeWrapper from './node';
 import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
 import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = HeimdallLogger('broccoli:transform-node');
+const logger = new HeimdallLogger('broccoli:transform-node');
 
 export default class TransformNodeWrapper extends NodeWrapper {
   inputRevisions!: WeakMap<any, { revision: number; changed: boolean }>;
@@ -30,7 +30,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
   shouldBuild() {
     const nodesThatChanged: any[] = [];
     this.inputNodeWrappers.forEach((wrapper: any) => {
-      const { wrapper_revision_meta: wrapperRevisionMeta } = this.inputRevisions.get(wrapper);
+      const wrapperRevisionMeta = this.inputRevisions.get(wrapper);
 
       if (!wrapperRevisionMeta || wrapperRevisionMeta.revision !== wrapper.revision) {
         nodesThatChanged.push(wrapper.id);

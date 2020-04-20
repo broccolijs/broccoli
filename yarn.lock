@@ -125,6 +125,13 @@
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
   integrity sha512-OCutwjDZ4aFS6PB1UZ988C4YgwlBHJd6wCeQqaLdmadZ/7e+w79+hbMUFC1QXDNCmdyoRfAFdm0RypzwR+Qpag==
 
+"@types/esm@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@types/esm/-/esm-3.2.0.tgz#f53dbded33cc1cef95645ebbf287aa3b3742e103"
+  integrity sha512-aXemgVPnF1s0PQin04Ei8zTWaNwUdc4pmhZDg8LBW6QEl9kBWVItAUOLGUY5H5xduAmbL1pLGH1X/PN0+4R9tg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/events@*":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
@@ -262,6 +269,18 @@
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.0.33.tgz#1073c4bc824754ae3d10cfab88ab0237ba964e4d"
   integrity sha1-EHPEvIJHVK49EM+riKsCN7qWTk0=
+
+"@types/underscore.string@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/underscore.string/-/underscore.string-0.0.38.tgz#4081755f005f5691fb7fbd4eff3aabe6066a6c63"
+  integrity sha512-QPMttDInBYkulH/3nON0KnYpEd/RlyE5kUrhuts5d76B/stpjXpDticq+iTluoAsVnVXuGECFhPtuX+aDJdx+A==
+  dependencies:
+    "@types/underscore" "*"
+
+"@types/underscore@*":
+  version "1.9.4"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.9.4.tgz#22d1a3e6b494608e430221ec085fa0b7ccee7f33"
+  integrity sha512-CjHWEMECc2/UxOZh0kpiz3lEyX2Px3rQS9HzD20lxMvx571ivOBQKeLnqEjxUY0BMgp6WJWo/pQLRBwMW5v4WQ==
 
 "@typescript-eslint/eslint-plugin@^2.28.0":
   version "2.28.0"

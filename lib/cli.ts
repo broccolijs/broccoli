@@ -156,7 +156,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
           guardOutputDir(outputDir);
         } catch (e) {
           if (e instanceof CliError) {
-            ui.writeError(e.message);
+            ui.writeError(e);
             return process.exit(1);
           }
 

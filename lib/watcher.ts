@@ -5,7 +5,7 @@ import WatcherAdapter from './watcher_adapter';
 import SourceNodeWrapper from './wrappers/source-node';
 import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = HeimdallLogger('broccoli:watcher');
+const logger = new HeimdallLogger('broccoli:watcher');
 
 interface WatcherOptions {
   debounce?: number;
