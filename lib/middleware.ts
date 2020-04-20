@@ -42,6 +42,7 @@ function handleRequest(
   next: any,
   options: MiddlewareOptions
 ) {
+  // eslint-disable-next-line node/no-deprecated-api
   const urlObj = url.parse(request.url);
   const pathname = urlObj.pathname || '';
   let filename: string, stat;
