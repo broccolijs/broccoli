@@ -42,7 +42,7 @@ function handleRequest(
   next: any,
   options: MiddlewareOptions
 ) {
-  const urlObj = new url.URL(request.url);
+  const urlObj = url.parse(request.url);
   const pathname = urlObj.pathname || '';
   let filename: string, stat;
 
