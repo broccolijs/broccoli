@@ -17,6 +17,22 @@ import WatchDetector from 'watch-detector';
 const sinon = Sinon.createSandbox();
 chai.use(sinonChai);
 
+function createWatcherSpy() {
+  const spy = sinon.spy();
+  sinon.stub(broccoli, 'Watcher').value(
+    class Watcher extends DummyWatcher {
+      constructor(builder, watchedSourceNodes, options) {
+        super(builder, watchedSourceNodes, options);
+        spy.call(null, builder, watchedSourceNodes, options);
+      }
+
+      async start() {}
+      async quit() {}
+    }
+  );
+  return spy;
+}
+
 describe('cli', function() {
   let oldCwd = null;
   let exitStub;
@@ -559,19 +575,3 @@ describe('cli', function() {
     });
   });
 });
-
-function createWatcherSpy() {
-  const spy = sinon.spy();
-  sinon.stub(broccoli, 'Watcher').value(
-    class Watcher extends DummyWatcher {
-      constructor(builder, watchedSourceNodes, options) {
-        super(builder, watchedSourceNodes, options);
-        spy.call(null, builder, watchedSourceNodes, options);
-      }
-
-      async start() {}
-      async quit() {}
-    }
-  );
-  return spy;
-}

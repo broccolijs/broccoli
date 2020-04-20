@@ -5,8 +5,9 @@ import mime from 'mime-types';
 import handlebars from 'handlebars';
 import Watcher from './watcher';
 import BuildError from './errors/build';
-const resolvePath = require('resolve-path');
-const ansiHTML = require('ansi-html');
+import resolvePath from 'resolve-path';
+import ansiHTML from 'ansi-html';
+
 // Resets foreground and background colors to black
 // and white respectively
 ansiHTML.setColors({
@@ -41,8 +42,8 @@ function handleRequest(
   options: MiddlewareOptions
 ) {
   const urlObj = url.URL(request.url);
-  let pathname = urlObj.pathname || '';
-  let filename: string, stat, lastModified, buffer;
+  const pathname = urlObj.pathname || '';
+  let filename: string, stat;
 
   try {
     filename = decodeURIComponent(pathname);
@@ -122,7 +123,7 @@ function handleRequest(
     stat = fs.statSync(filename);
   }
 
-  lastModified = stat.mtime.toUTCString();
+  const lastModified = stat.mtime.toUTCString();
   response.setHeader('Last-Modified', lastModified);
   // nginx style treat last-modified as a tag since browsers echo it back
   if (request.headers['if-modified-since'] === lastModified) {
@@ -137,7 +138,7 @@ function handleRequest(
 
   // read file sync so we don't hold open the file creating a race with
   // the builder (Windows does not allow us to delete while the file is open).
-  buffer = fs.readFileSync(filename);
+  const buffer = fs.readFileSync(filename);
   response.writeHead(200);
   response.end(buffer);
 }

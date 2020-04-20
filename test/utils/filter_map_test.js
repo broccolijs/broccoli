@@ -1,6 +1,7 @@
-const chai = require('chai');
-const expect = chai.expect;
+import chai from 'chai';
 import filterMap from '../../lib/utils/filter-map';
+
+const expect = chai.expect;
 
 describe('filterMap', function() {
   it('works', function() {

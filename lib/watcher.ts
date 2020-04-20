@@ -3,8 +3,10 @@ import sane from 'sane';
 import { EventEmitter } from 'events';
 import WatcherAdapter from './watcher_adapter';
 import SourceNodeWrapper from './wrappers/source-node';
+import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = require('heimdalljs-logger')('broccoli:watcher');
+const logger = HeimdallLogger('broccoli:watcher');
+
 interface WatcherOptions {
   debounce?: number;
   watcherAdapter?: WatcherAdapter;
@@ -82,7 +84,7 @@ class Watcher extends EventEmitter {
     }
 
     this._lifetime = {};
-    let lifetime = this._lifetime;
+    const lifetime = this._lifetime;
     lifetime.promise = new Promise((resolve, reject) => {
       lifetime.resolve = resolve;
       lifetime.reject = reject;
@@ -160,7 +162,7 @@ class Watcher extends EventEmitter {
     const start = process.hrtime();
 
     // This is to maintain backwards compatibility with broccoli-sane-watcher
-    let annotation = {
+    const annotation = {
       type: filePath ? 'rebuild' : 'initial',
       reason: 'watcher',
       primaryFile: filePath,
@@ -221,7 +223,7 @@ class Watcher extends EventEmitter {
       return this._quittingPromise;
     }
 
-    let quitting = this._quit();
+    const quitting = this._quit();
 
     if (this._lifetime && typeof this._lifetime.resolve === 'function') {
       this._lifetime.resolve(quitting);

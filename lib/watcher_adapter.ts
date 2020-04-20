@@ -3,8 +3,9 @@ import { EventEmitter } from 'events';
 import SourceNode from './wrappers/source-node';
 import SourceNodeWrapper from './wrappers/source-node';
 import bindFileEvent from './utils/bind-file-event';
+import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = require('heimdalljs-logger')('broccoli:watcherAdapter');
+const logger = HeimdallLogger('broccoli:watcherAdapter');
 
 interface WatcherAdapterOptions extends sane.Options {
   filter?: (name: string) => boolean;
@@ -41,7 +42,7 @@ class WatcherAdapter extends EventEmitter {
   }
 
   watch() {
-    let watchers = this.watchedNodes.map((node: SourceNodeWrapper) => {
+    const watchers = this.watchedNodes.map((node: SourceNodeWrapper) => {
       const watchedPath = node.nodeInfo.sourceDirectory;
       const watcher = sane(watchedPath, this.options);
       this.watchers.push(watcher);
@@ -62,11 +63,11 @@ class WatcherAdapter extends EventEmitter {
         logger.debug('ready', watchedPath);
       });
     });
-    return Promise.all(watchers).then(() => {});
+    return Promise.all(watchers).then(() => ({}));
   }
 
   quit() {
-    let closing = this.watchers.map(
+    const closing = this.watchers.map(
       (watcher: sane.Watcher) =>
         new Promise((resolve, reject) =>
           // @ts-ignore
@@ -77,7 +78,7 @@ class WatcherAdapter extends EventEmitter {
         )
     );
     this.watchers.length = 0;
-    return Promise.all(closing).then(() => {});
+    return Promise.all(closing).then(() => ({}));
   }
 }
 

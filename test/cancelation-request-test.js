@@ -8,10 +8,10 @@ chai.use(chaiAsPromised);
 
 describe('cancelation-request', function() {
   it('.isCancelled / .cancel', async function() {
-    let request = new CancelationRequest(Promise.resolve());
+    const request = new CancelationRequest(Promise.resolve());
 
     expect(request.isCanceled).to.eql(false);
-    let wait = request.cancel();
+    const wait = request.cancel();
     expect(request.isCanceled).to.eql(true);
 
     return wait.then(() => {
@@ -20,7 +20,7 @@ describe('cancelation-request', function() {
   });
 
   it('.throwIfRequested (requested)', async function() {
-    let request = new CancelationRequest(Promise.resolve());
+    const request = new CancelationRequest(Promise.resolve());
 
     request.throwIfRequested();
 
@@ -36,13 +36,13 @@ describe('cancelation-request', function() {
   });
 
   it('.cancel (with CancelationError rejection)', function() {
-    let request = new CancelationRequest(Promise.reject(new CancelationError()));
+    const request = new CancelationRequest(Promise.reject(new CancelationError()));
 
     return request.cancel();
   });
 
   it('.cancel (with non-builder rejection)', function() {
-    let request = new CancelationRequest(Promise.reject(new Error('OOPS')));
+    const request = new CancelationRequest(Promise.reject(new Error('OOPS')));
 
     return expect(request.cancel()).to.eventually.be.rejectedWith('OOPS');
   });

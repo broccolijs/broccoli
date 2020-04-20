@@ -2,8 +2,9 @@ import sane from 'sane';
 import SourceNodeWrapper from '../wrappers/source-node';
 import TransformNodeWrapper from '../wrappers/transform-node';
 import WatcherAdapter from '../watcher_adapter';
+import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = require('heimdalljs-logger')('broccoli:watcherAdapter');
+const logger = HeimdallLogger('broccoli:watcherAdapter');
 
 export default function bindFileEvent(
   adapter: WatcherAdapter,

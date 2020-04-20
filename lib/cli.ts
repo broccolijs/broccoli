@@ -6,9 +6,8 @@ import CliError from './errors/cli';
 import broccoli from './index';
 import messages from './messages';
 import ConsoleUI from '../types/console-ui';
-
-const WatchDetector = require('watch-detector');
-const UI = require('console-ui');
+import WatchDetector from 'watch-detector';
+import UI from 'console-ui';
 
 interface ServeOptions {
   host: string;
@@ -39,12 +38,84 @@ interface BuildOptions {
   dev?: boolean;
 }
 
+function buildBrocfileOptions(options: { environment: string }) {
+  return {
+    env: options.environment,
+  };
+}
+
+function getBuilder(options: { environment: string }) {
+  const brocfile = broccoli.loadBrocfile(options);
+  return new broccoli.Builder(brocfile(buildBrocfileOptions(options)));
+}
+
+function getWatcher(options: { watch?: boolean }) {
+  return options.watch ? broccoli.Watcher : require('./dummy-watcher');
+}
+
+function buildWatcherOptions(options: { watcher?: string }, ui: ConsoleUI) {
+  if (!options) {
+    options = {};
+  }
+
+  const detector = new WatchDetector({
+    ui,
+    childProcess,
+    fs,
+    watchmanSupportsPlatform: /^win/.test(process.platform),
+    root: process.cwd(),
+  });
+
+  const watchPreference = detector.findBestWatcherOption({
+    watcher: options.watcher,
+  });
+  const watcher = watchPreference.watcher;
+
+  return {
+    saneOptions: {
+      poll: watcher === 'polling',
+      watchman: watcher === 'watchman',
+      node: watcher === 'node' || !watcher,
+    },
+  };
+}
+
+function isParentDirectory(outputPath: string) {
+  if (!fs.existsSync(outputPath)) {
+    return false;
+  }
+
+  outputPath = fs.realpathSync(outputPath);
+
+  const rootPath = process.cwd();
+  const rootPathParents = [rootPath];
+  let dir = path.dirname(rootPath);
+  rootPathParents.push(dir);
+
+  while (dir !== path.dirname(dir)) {
+    dir = path.dirname(dir);
+    rootPathParents.push(dir);
+  }
+
+  return rootPathParents.indexOf(outputPath) !== -1;
+}
+
+function guardOutputDir(outputDir: string) {
+  if (isParentDirectory(outputDir)) {
+    throw new CliError(
+      `build directory can not be the current or direct parent directory: ${outputDir}`
+    );
+  }
+}
+
 export = function broccoliCLI(args: string[], ui = new UI()) {
   // always require a fresh commander, as it keeps state at module scope
   delete require.cache[require.resolve('commander')];
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const program = require('commander');
   let actionPromise;
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   program.version(require('../package.json').version).usage('<command> [options] [<args ...>]');
 
   program
@@ -209,73 +280,3 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     process.exit(1);
   }
 };
-
-function getBuilder(options: { environment: string }) {
-  const brocfile = broccoli.loadBrocfile(options);
-  return new broccoli.Builder(brocfile(buildBrocfileOptions(options)));
-}
-
-function getWatcher(options: { watch?: boolean }) {
-  return options.watch ? broccoli.Watcher : require('./dummy-watcher');
-}
-
-function buildWatcherOptions(options: { watcher?: string }, ui: ConsoleUI) {
-  if (!options) {
-    options = {};
-  }
-
-  const detector = new WatchDetector({
-    ui,
-    childProcess,
-    fs,
-    watchmanSupportsPlatform: /^win/.test(process.platform),
-    root: process.cwd(),
-  });
-
-  const watchPreference = detector.findBestWatcherOption({
-    watcher: options.watcher,
-  });
-  const watcher = watchPreference.watcher;
-
-  return {
-    saneOptions: {
-      poll: watcher === 'polling',
-      watchman: watcher === 'watchman',
-      node: watcher === 'node' || !watcher,
-    },
-  };
-}
-
-function buildBrocfileOptions(options: { environment: string }) {
-  return {
-    env: options.environment,
-  };
-}
-
-function guardOutputDir(outputDir: string) {
-  if (isParentDirectory(outputDir)) {
-    throw new CliError(
-      `build directory can not be the current or direct parent directory: ${outputDir}`
-    );
-  }
-}
-
-function isParentDirectory(outputPath: string) {
-  if (!fs.existsSync(outputPath)) {
-    return false;
-  }
-
-  outputPath = fs.realpathSync(outputPath);
-
-  const rootPath = process.cwd();
-  const rootPathParents = [rootPath];
-  let dir = path.dirname(rootPath);
-  rootPathParents.push(dir);
-
-  while (dir !== path.dirname(dir)) {
-    dir = path.dirname(dir);
-    rootPathParents.push(dir);
-  }
-
-  return rootPathParents.indexOf(outputPath) !== -1;
-}

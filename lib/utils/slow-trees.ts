@@ -10,6 +10,34 @@ function ellipsize(string: string, desiredLength: number) {
   }
 }
 
+function pad(str: string, len: number, char?: string, dir?: 'left' | 'both') {
+  if (!char) {
+    char = ' ';
+  }
+
+  if (len + 1 >= str.length)
+    switch (dir) {
+      case 'left': {
+        str = Array(len + 1 - str.length).join(char) + str;
+        break;
+      }
+
+      case 'both': {
+        const padlen = len - str.length;
+        const right = Math.ceil(padlen / 2);
+        const left = padlen - right;
+        str = Array(left + 1).join(char) + str + Array(right + 1).join(char);
+        break;
+      }
+
+      default: {
+        str = str + Array(len + 1 - str.length).join(char);
+      }
+    }
+
+  return str;
+}
+
 export default function printSlowNodes(tree: HeimdallNode, factor: number, ui: UI) {
   try {
     const summary = calculateSummary(tree);
@@ -60,32 +88,4 @@ export default function printSlowNodes(tree: HeimdallNode, factor: number, ui: U
     ui.writeLine('Error when printing slow nodes', 'ERROR');
     ui.writeError(e);
   }
-}
-
-function pad(str: string, len: number, char?: string, dir?: 'left' | 'both') {
-  if (!char) {
-    char = ' ';
-  }
-
-  if (len + 1 >= str.length)
-    switch (dir) {
-      case 'left': {
-        str = Array(len + 1 - str.length).join(char) + str;
-        break;
-      }
-
-      case 'both': {
-        const padlen = len - str.length;
-        const right = Math.ceil(padlen / 2);
-        const left = padlen - right;
-        str = Array(left + 1).join(char) + str + Array(right + 1).join(char);
-        break;
-      }
-
-      default: {
-        str = str + Array(len + 1 - str.length).join(char);
-      }
-    }
-
-  return str;
 }

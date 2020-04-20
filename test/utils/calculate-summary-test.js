@@ -1,10 +1,9 @@
-const chai = require('chai');
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import Heimdall from 'heimdalljs/heimdall';
+import calculateSummary from '../../lib/utils/calculate-summary';
+
 const expect = chai.expect;
-const chaiAsPromised = require('chai-as-promised');
-
-const Heimdall = require('heimdalljs/heimdall');
-const calculateSummary = require('../../lib/utils/calculate-summary');
-
 chai.use(chaiAsPromised);
 
 function stubTime(ms) {

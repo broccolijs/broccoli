@@ -90,7 +90,7 @@ describe('Watcher', function() {
         [],
         { watcherAdapter: adapter }
       );
-      let failHandler = sinon.spy();
+      const failHandler = sinon.spy();
       watcher.on('buildFailure', failHandler);
 
       watcher.start();
@@ -110,10 +110,10 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      let changeHandler = sinon.spy();
-      let debounceHandler = sinon.spy();
-      let buildStartHandler = sinon.spy();
-      let buildEndHandler = sinon.spy();
+      const changeHandler = sinon.spy();
+      const debounceHandler = sinon.spy();
+      const buildStartHandler = sinon.spy();
+      const buildEndHandler = sinon.spy();
       watcher.on('change', changeHandler);
       watcher.on('debounce', debounceHandler);
       watcher.on('buildStart', buildStartHandler);
@@ -143,7 +143,7 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      let changeHandler = sinon.spy();
+      const changeHandler = sinon.spy();
       watcher.on('change', changeHandler);
 
       watcher._change('change', 'file.js', 'root');
@@ -155,7 +155,7 @@ describe('Watcher', function() {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      let changeHandler = sinon.spy();
+      const changeHandler = sinon.spy();
       watcher.on('change', changeHandler);
 
       watcher._rebuildScheduled = true;
@@ -216,9 +216,9 @@ describe('Watcher', function() {
       const error = new Error('fail');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      let errorHandler = sinon.spy();
-      let quitStartHandler = sinon.spy();
-      let quitEndHandler = sinon.spy();
+      const errorHandler = sinon.spy();
+      const quitStartHandler = sinon.spy();
+      const quitEndHandler = sinon.spy();
       watcher.on('error', errorHandler);
       watcher.on('quitStart', quitStartHandler);
       watcher.on('quitEnd', quitEndHandler);
@@ -234,7 +234,7 @@ describe('Watcher', function() {
       const error = new Error('fail');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      let errorHandler = sinon.spy();
+      const errorHandler = sinon.spy();
       watcher.on('error', errorHandler);
 
       watcher._quittingPromise = true;
@@ -249,8 +249,8 @@ describe('Watcher', function() {
       const adapterQuit = sinon.spy(adapter, 'quit');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
-      let quitStartHandler = sinon.spy();
-      let quitEndHandler = sinon.spy();
+      const quitStartHandler = sinon.spy();
+      const quitEndHandler = sinon.spy();
       watcher.on('quitStart', quitStartHandler);
       watcher.on('quitEnd', quitEndHandler);
 
@@ -277,8 +277,8 @@ describe('Watcher', function() {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
       watcher._quittingPromise = true;
 
-      let quitStartHandler = sinon.spy();
-      let quitEndHandler = sinon.spy();
+      const quitStartHandler = sinon.spy();
+      const quitEndHandler = sinon.spy();
       watcher.on('quitStart', quitStartHandler);
       watcher.on('quitEnd', quitEndHandler);
 

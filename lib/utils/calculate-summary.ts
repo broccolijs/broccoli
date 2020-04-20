@@ -33,7 +33,7 @@ export default function calculateSummary(tree: HeimdallNode) {
   let totalTime = 0;
   let nodes: BaseNode[] = [];
   let groupedNodes: GroupedNode[] = [];
-  let nodesGroupedByName: { [key: string]: GroupedNode } = {};
+  const nodesGroupedByName: { [key: string]: GroupedNode } = {};
 
   // calculate times
   tree.visitPostOrder(node => {

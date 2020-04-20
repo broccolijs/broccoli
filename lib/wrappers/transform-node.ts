@@ -3,8 +3,9 @@ import rimraf from 'rimraf';
 import undefinedToNull from '../utils/undefined-to-null';
 import NodeWrapper from './node';
 import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
+import HeimdallLogger from 'heimdalljs-logger';
 
-const logger = require('heimdalljs-logger')('broccoli:transform-node');
+const logger = HeimdallLogger('broccoli:transform-node');
 
 export default class TransformNodeWrapper extends NodeWrapper {
   inputRevisions!: WeakMap<any, { revision: number; changed: boolean }>;
@@ -27,11 +28,11 @@ export default class TransformNodeWrapper extends NodeWrapper {
   }
 
   shouldBuild() {
-    let nodesThatChanged: any[] = [];
+    const nodesThatChanged: any[] = [];
     this.inputNodeWrappers.forEach((wrapper: any) => {
-      let wrapper_revision_meta = this.inputRevisions.get(wrapper);
+      const { wrapper_revision_meta: wrapperRevisionMeta } = this.inputRevisions.get(wrapper);
 
-      if (!wrapper_revision_meta || wrapper_revision_meta.revision !== wrapper.revision) {
+      if (!wrapperRevisionMeta || wrapperRevisionMeta.revision !== wrapper.revision) {
         nodesThatChanged.push(wrapper.id);
         this.inputRevisions.set(wrapper, { revision: wrapper.revision, changed: true });
       } else {
@@ -65,7 +66,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
   }
 
   async build() {
-    let startTime = process.hrtime();
+    const startTime = process.hrtime();
 
     if (!this.shouldBuild()) {
       this.buildState.built = false;
@@ -78,7 +79,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
     }
 
     if (this.nodeInfo.trackInputChanges === true) {
-      let changed = this.inputNodeWrappers.map(
+      const changed = this.inputNodeWrappers.map(
         wrapper => this.inputRevisions.get(wrapper)!.changed
       );
 

@@ -133,7 +133,7 @@ describe('server', function() {
   });
 
   it('converts ANSI codes to HTML from the error stack', async function() {
-    let error = new Error('whoops');
+    const error = new Error('whoops');
     error.stack = `\u001b[35m102\u001b[39m\u001b[33m\u001b[0m`;
 
     const mockUI = new MockUI();

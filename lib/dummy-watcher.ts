@@ -14,7 +14,7 @@ class Watcher extends EventEmitter {
     this.builder = builder;
     this.currentBuild = null;
     this._lifetimeDeferred = {};
-    let lifetime = this._lifetimeDeferred;
+    const lifetime = this._lifetimeDeferred;
     lifetime.promise = new Promise((resolve, reject) => {
       lifetime.resolve = resolve;
       lifetime.reject = reject;

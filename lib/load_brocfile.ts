@@ -1,6 +1,8 @@
 import path from 'path';
 import findup from 'findup-sync';
-const esmRequire = require('esm')(module);
+import esm from 'esm';
+
+const esmRequire = esm(module);
 
 interface LoadBrocfileOptions {
   brocfilePath?: string;

@@ -80,7 +80,6 @@
     "got": "^9.0.0",
     "longjohn": "^0.2.12",
     "mocha": "^7.1.0",
-    "mocha-eslint": "^4.1.0",
     "multidep": "^2.0.2",
     "portfinder": "^1.0.25",
     "prettier": "^1.19.1",
