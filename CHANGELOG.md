@@ -1,5 +1,10 @@
 # master
 
+# 3.4.2
+
+* fix TypeScript types
+* add missing semi colon
+
 # 3.4.1
 
 * Revert retry feature (caused downstream failures for ember-cli users) (#459)
