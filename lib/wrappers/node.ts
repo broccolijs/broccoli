@@ -48,5 +48,5 @@ export default class NodeWrapper {
 
   nodeInfoToJSON() {
     return {};
-  };
-};
+  }
+}

@@ -6,7 +6,7 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['node', 'prettier'],
-  extends: ['eslint:recommended', 'plugin:node/recommended'],
+  extends: ['eslint:recommended', 'plugin:node/recommended', 'plugin:@typescript-eslint/recommended'],
   env: {
     node: true,
   },
@@ -19,6 +19,7 @@ module.exports = {
     'node/no-missing-require': ['error', {
       'tryExtensions': ['.js', '.json', '.node', '.ts'],
     }],
+    '@typescript-eslint/ban-ts-ignore': 'off',
     'node/no-missing-import': 'off',
     'node/no-unsupported-features': 'off',
     'node/no-unsupported-features/es-syntax': 'off',
@@ -31,6 +32,7 @@ module.exports = {
         mocha: true,
       },
       rules: {
+        '@typescript-eslint/no-empty-function': 'off',
         'mocha/no-exclusive-tests': 'error',
         'mocha/handle-done-callback': 'error',
       },

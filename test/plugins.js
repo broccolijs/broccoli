@@ -60,12 +60,12 @@ module.exports = function(Plugin) {
   plugins.Async = class AsyncPlugin extends CountingPlugin {
     constructor(inputNodes, options) {
       super(inputNodes || [], options);
-      let buildFinishedDeferred = (this.buildFinishedDeferred = {});
+      const buildFinishedDeferred = (this.buildFinishedDeferred = {});
       buildFinishedDeferred.promise = new Promise((resolve, reject) => {
         buildFinishedDeferred.resolve = resolve;
         buildFinishedDeferred.reject = reject;
       });
-      let buildStartedDeferred = (this.buildStartedDeferred = {});
+      const buildStartedDeferred = (this.buildStartedDeferred = {});
       buildStartedDeferred.promise = new Promise((resolve, reject) => {
         buildStartedDeferred.resolve = resolve;
         buildStartedDeferred.reject = reject;

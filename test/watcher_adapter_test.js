@@ -11,6 +11,33 @@ const expect = chai.expect;
 chai.use(sinonChai);
 const sinon = Sinon.createSandbox();
 
+function spin(cb, limit) {
+  return new Promise((resolve, reject) => {
+    let spinner;
+    const cancel = setTimeout(() => {
+      clearTimeout(spinner);
+      try {
+        cb();
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    }, limit);
+
+    (function spin() {
+      try {
+        cb();
+        clearTimeout(cancel);
+        resolve();
+      } catch (e) {
+        if (e.name === 'AssertionError') {
+          spinner = setTimeout(spin, 0);
+        }
+      }
+    })();
+  });
+}
+
 describe('WatcherAdapter', function() {
   afterEach(function() {
     sinon.restore();
@@ -172,7 +199,7 @@ describe('WatcherAdapter', function() {
 
       expect(adapter.watchers.length).to.eql(0);
 
-      let watching = adapter.watch();
+      const watching = adapter.watch();
 
       expect(adapter.watchers.length).to.eql(1);
 
@@ -190,7 +217,7 @@ describe('WatcherAdapter', function() {
           changeHandler.resetHistory();
 
           // this time also watch the FIXTURE_PROJECT
-          let watching = adapter.watch([watchedNodeProject]);
+          const watching = adapter.watch([watchedNodeProject]);
           expect(adapter.watchers.length).to.eql(2);
 
           return watching.then(val => {
@@ -210,7 +237,7 @@ describe('WatcherAdapter', function() {
                 fs.utimesSync(FIXTURE_PROJECT + '/Brocfile.js', new Date(), new Date());
 
                 expect(adapter.watchers.length).to.eql(2);
-                let quitting = adapter.quit();
+                const quitting = adapter.quit();
                 expect(adapter.watchers.length).to.eql(0);
                 return quitting.then(val => {
                   expect(val).to.eql(undefined);
@@ -232,30 +259,3 @@ describe('WatcherAdapter', function() {
     });
   });
 });
-
-function spin(cb, limit) {
-  return new Promise((resolve, reject) => {
-    let spinner;
-    let cancel = setTimeout(() => {
-      clearTimeout(spinner);
-      try {
-        cb();
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    }, limit);
-
-    (function spin() {
-      try {
-        cb();
-        clearTimeout(cancel);
-        resolve();
-      } catch (e) {
-        if (e.name === 'AssertionError') {
-          spinner = setTimeout(spin, 0);
-        }
-      }
-    })();
-  });
-}

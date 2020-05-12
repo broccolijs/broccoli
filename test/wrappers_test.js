@@ -42,8 +42,8 @@ describe('transform-node', function() {
   it('shouldBuild method should return false if none of the inputNodes changed', async function() {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
-    let inputWrapperA = new Node();
-    let inputWrapperB = new Node();
+    const inputWrapperA = new Node();
+    const inputWrapperB = new Node();
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
@@ -55,8 +55,8 @@ describe('transform-node', function() {
   it('shouldBuild method should return true if some of the inputs changed', async function() {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
-    let inputWrapperA = new Node();
-    let inputWrapperB = new Node();
+    const inputWrapperA = new Node();
+    const inputWrapperB = new Node();
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
@@ -69,8 +69,8 @@ describe('transform-node', function() {
   it('shouldBuild method should return true if none of the inputNodes changed and volatile is true', function() {
     transform.nodeInfo.volatile = true;
 
-    let inputWrapperA = new Node();
-    let inputWrapperB = new Node();
+    const inputWrapperA = new Node();
+    const inputWrapperB = new Node();
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
@@ -85,8 +85,8 @@ describe('transform-node', function() {
     transform.nodeInfo.build = spy;
     transform.nodeInfo.trackInputChanges = true;
 
-    let inputWrapperA = new Node();
-    let inputWrapperB = new Node();
+    const inputWrapperA = new Node();
+    const inputWrapperB = new Node();
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 
@@ -123,8 +123,8 @@ describe('transform-node', function() {
     transform.nodeInfo.build = spy;
     // transform.nodeInfo.trackInputChanges is undefined
 
-    let inputWrapperA = new Node();
-    let inputWrapperB = new Node();
+    const inputWrapperA = new Node();
+    const inputWrapperB = new Node();
 
     transform.inputNodeWrappers = [inputWrapperA, inputWrapperB];
 

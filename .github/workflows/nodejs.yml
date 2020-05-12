@@ -4,14 +4,14 @@ on:
   pull_request:
   push:
     # filtering branches here, prevents duplicate builds from pull_request and push
-    branches: 
+    branches:
       - master
       - 'v*'
     # always run CI for tags
     tags:
       - '*'
-      
-  # early issue detection, run CI weekly on Sundays  
+
+  # early issue detection, run CI weekly on Sundays
   schedule:
   - cron:  '0 6 * * 0'
 
@@ -26,17 +26,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
+
     - name: Use Node.js ${{ matrix.node_version }}
       uses: actions/setup-node@v1
       with:
         version: ${{ matrix.node_version }}
-  
+
     - name:  install yarn
       run: npm install -g yarn cross-env
 
     - name: install dependencies
       run: yarn install --frozen-lockfile
+
+    - name: lint
+      run: yarn lint
 
     - name: test
       run: cross-env CI=true yarn test

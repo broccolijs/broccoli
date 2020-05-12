@@ -1,6 +1,8 @@
 import path from 'path';
 import findup from 'findup-sync';
-const esmRequire = require('esm')(module);
+import esm from 'esm';
+
+const esmRequire = esm(module);
 
 interface LoadBrocfileOptions {
   brocfilePath?: string;
@@ -40,6 +42,7 @@ function requireBrocfile(brocfilePath: string) {
   }
 
   // ESM `export default X` is represented as module.exports = { default: X }
+  // eslint-disable-next-line no-prototype-builtins
   if (brocfile !== null && typeof brocfile === 'object' && brocfile.hasOwnProperty('default')) {
     brocfile = brocfile.default;
   }

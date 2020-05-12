@@ -4,22 +4,25 @@ import path from 'path';
 import tmp from 'tmp';
 import broccoli from '..';
 import BuilderError from '../lib/errors/build';
-const makePlugins = require('./plugins');
-const Builder = broccoli.Builder;
-const fixturify = require('fixturify');
-const sinon = require('sinon').createSandbox();
-const chai = require('chai'),
-  expect = chai.expect;
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-const sinonChai = require('sinon-chai');
-chai.use(sinonChai);
-const multidepRequire = require('multidep')('test/multidep.json');
-const semver = require('semver');
-const heimdall = require('heimdalljs');
+import makePlugins from './plugins';
+import fixturify from 'fixturify';
+import Sinon from 'sinon';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import sinonChai from 'sinon-chai';
+import MultidepRequire from 'multidep';
+import semver from 'semver';
+import heimdall from 'heimdalljs';
 
+const multidepRequire = MultidepRequire('test/multidep.json');
 const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
+
+const Builder = broccoli.Builder;
+const expect = chai.expect;
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
+const sinon = Sinon.createSandbox();
 
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup();
@@ -83,16 +86,16 @@ describe('Builder', function() {
 
   describe('build result', function() {
     it('returns a promise', function() {
-      let stepA = new plugins.Noop();
-      let builder = new Builder(stepA);
-      let promise = builder.build();
+      const stepA = new plugins.Noop();
+      const builder = new Builder(stepA);
+      const promise = builder.build();
       expect(promise).to.be.an.instanceOf(Promise);
     });
 
     it('promise resolves to a node', function() {
-      let stepA = new plugins.Noop();
-      let builder = new Builder(stepA);
-      let promise = builder.build();
+      const stepA = new plugins.Noop();
+      const builder = new Builder(stepA);
+      const promise = builder.build();
 
       return promise;
     });
@@ -397,12 +400,12 @@ describe('Builder', function() {
 
   describe('error handling in constructor', function() {
     it('detects cycles', function() {
-      // Cycles are quite hard to construct, so we make a special plugin
-      CyclicalPlugin.prototype = Object.create(Plugin.prototype);
-      CyclicalPlugin.prototype.constructor = CyclicalPlugin;
       function CyclicalPlugin() {
         Plugin.call(this, [this]); // use `this` as input node
       }
+      // Cycles are quite hard to construct, so we make a special plugin
+      CyclicalPlugin.prototype = Object.create(Plugin.prototype);
+      CyclicalPlugin.prototype.constructor = CyclicalPlugin;
       CyclicalPlugin.prototype.build = function() {};
 
       expect(() => {
@@ -474,6 +477,7 @@ describe('Builder', function() {
 
     class Sleep extends Plugin {
       constructor() {
+        // eslint-disable-next-line prefer-rest-params
         super(...arguments);
         this.buildWasCalled = false;
         this.wait = new Promise(resolve => {
@@ -868,8 +872,8 @@ describe('Builder', function() {
 
   describe('cancel()', function() {
     it('handles a cancel without an active build (has no affect)', async function() {
-      let stepA = new plugins.Noop();
-      let pipeline = new Builder(stepA);
+      const stepA = new plugins.Noop();
+      const pipeline = new Builder(stepA);
 
       pipeline.cancel();
       pipeline.cancel(); // ensure double cancel is always safe here
@@ -881,12 +885,13 @@ describe('Builder', function() {
     });
 
     it('returns a promise which waits until cancellation is complete', async function() {
-      let pipeline;
+      let resolveCancel;
       let stepAIsComplete = false;
       let cancellingIsComplete = false;
 
       class StepA extends plugins.Deferred {
         async build() {
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           resolveCancel(pipeline.cancel());
 
           setTimeout(() => this.resolve(), 50);
@@ -903,11 +908,10 @@ describe('Builder', function() {
       const stepA = new StepA();
       const stepB = new plugins.Deferred([stepA]);
 
-      pipeline = new Builder(stepB);
+      const pipeline = new Builder(stepB);
 
       const building = expect(pipeline.build()).to.eventually.be.rejectedWith('Build Canceled');
 
-      let resolveCancel;
       const cancelling = new Promise(resolve => (resolveCancel = resolve));
 
       await Promise.all([
@@ -963,9 +967,9 @@ describe('Builder', function() {
 
     it('it cancels immediately if cancelled immediately after build', async function() {
       const step = new plugins.Deferred();
-      let pipeline = new Builder(step);
+      const pipeline = new Builder(step);
       step.resolve();
-      let build = pipeline.build();
+      const build = pipeline.build();
       pipeline.cancel();
 
       try {
@@ -976,6 +980,7 @@ describe('Builder', function() {
     });
 
     it('completes the current task before cancelling, and can be resumed', async function() {
+      // eslint-disable-next-line prefer-const
       let pipeline;
 
       class SometimesBuildCanceller extends plugins.Noop {
@@ -1042,7 +1047,7 @@ describe('Builder', function() {
       const timeTotalAssert = function(parentNode, childNodes) {
         expect(parentNode.stats.time.self).to.be.a('number');
 
-        let childTime = childNodes.reduce(
+        const childTime = childNodes.reduce(
           (accumulator, node) => accumulator + node.stats.time.total,
           0
         );
@@ -1084,7 +1089,7 @@ describe('Builder', function() {
       timeEqualAssert(sleepingNode2.stats.time.self, 20e6);
 
       // We can't use the actual times when doing a deep equal
-      for (let node of json.nodes) {
+      for (const node of json.nodes) {
         node.stats.time.self = 0;
         node.stats.time.total = 0;
       }

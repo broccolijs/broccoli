@@ -5,8 +5,10 @@ import mime from 'mime-types';
 import handlebars from 'handlebars';
 import Watcher from './watcher';
 import BuildError from './errors/build';
-const resolvePath = require('resolve-path');
-const ansiHTML = require('ansi-html');
+import resolvePath from 'resolve-path';
+// @ts-ignore
+import ansiHTML from 'ansi-html';
+
 // Resets foreground and background colors to black
 // and white respectively
 ansiHTML.setColors({
@@ -33,10 +35,17 @@ interface MiddlewareOptions {
 // Supported options:
 //   autoIndex (default: true) - set to false to disable directory listings
 //   liveReloadPath - LiveReload script URL for error pages
-function handleRequest(outputPath: string, request: any, response: any, next: any, options: MiddlewareOptions) {
+function handleRequest(
+  outputPath: string,
+  request: any,
+  response: any,
+  next: any,
+  options: MiddlewareOptions
+) {
+  // eslint-disable-next-line node/no-deprecated-api
   const urlObj = url.parse(request.url);
-  let pathname = urlObj.pathname || '';
-  let filename: string, stat, lastModified, buffer;
+  const pathname = urlObj.pathname || '';
+  let filename: string, stat;
 
   try {
     filename = decodeURIComponent(pathname);
@@ -87,21 +96,21 @@ function handleRequest(outputPath: string, request: any, response: any, next: an
       const context = {
         url: request.url,
         files: fs
-        .readdirSync(filename)
-        .sort()
-        .map(child => {
-          const stat = fs.statSync(path.join(filename, child)),
-            isDir = stat.isDirectory();
-          return {
-            href: child + (isDir ? '/' : ''),
-            type: isDir
-              ? 'dir'
-              : path
-              .extname(child)
-              .replace('.', '')
-              .toLowerCase(),
-          };
-        }),
+          .readdirSync(filename)
+          .sort()
+          .map(child => {
+            const stat = fs.statSync(path.join(filename, child)),
+              isDir = stat.isDirectory();
+            return {
+              href: child + (isDir ? '/' : ''),
+              type: isDir
+                ? 'dir'
+                : path
+                    .extname(child)
+                    .replace('.', '')
+                    .toLowerCase(),
+            };
+          }),
         liveReloadPath: options.liveReloadPath,
       };
       response.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -116,7 +125,7 @@ function handleRequest(outputPath: string, request: any, response: any, next: an
     stat = fs.statSync(filename);
   }
 
-  lastModified = stat.mtime.toUTCString();
+  const lastModified = stat.mtime.toUTCString();
   response.setHeader('Last-Modified', lastModified);
   // nginx style treat last-modified as a tag since browsers echo it back
   if (request.headers['if-modified-since'] === lastModified) {
@@ -131,7 +140,7 @@ function handleRequest(outputPath: string, request: any, response: any, next: an
 
   // read file sync so we don't hold open the file creating a race with
   // the builder (Windows does not allow us to delete while the file is open).
-  buffer = fs.readFileSync(filename);
+  const buffer = fs.readFileSync(filename);
   response.writeHead(200);
   response.end(buffer);
 }

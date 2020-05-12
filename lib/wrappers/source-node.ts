@@ -6,6 +6,7 @@ import undefinedToNull from '../utils/undefined-to-null';
 export default class SourceNodeWrapper extends NodeWrapper {
   nodeInfo!: SourceNodeInfo;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setup(/* features */) {}
   build() {
     // We only check here that the sourceDirectory exists and is a directory
@@ -27,7 +28,7 @@ export default class SourceNodeWrapper extends NodeWrapper {
   }
 
   toString() {
-    let hint = this.nodeInfo.sourceDirectory + (this.nodeInfo.watched ? '' : ' (unwatched)');
+    const hint = this.nodeInfo.sourceDirectory + (this.nodeInfo.watched ? '' : ' (unwatched)');
     return '[NodeWrapper:' + this.id + ' ' + hint + ']';
   }
 
@@ -41,4 +42,4 @@ export default class SourceNodeWrapper extends NodeWrapper {
       // leave out instantiationStack
     });
   }
-};
+}

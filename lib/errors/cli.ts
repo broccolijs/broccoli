@@ -1,2 +1,2 @@
 // Base class for cli errors
-export default class CliError extends Error {};
+export default class CliError extends Error {}

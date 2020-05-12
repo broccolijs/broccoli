@@ -1,13 +1,17 @@
 import loadBrocfile from '../lib/load_brocfile';
-import chai from 'chai';
-const esmRequire = require('esm')(module);
 import BroccoliSource from 'broccoli-source';
+import chai from 'chai';
+import esm from 'esm';
+
+const esmRequire = esm(module);
 
 const projectPath = 'test/fixtures/project';
 const projectPathEsm = 'test/fixtures/project-esm';
 const projectPathTs = 'test/fixtures/project-ts';
 const projectPathTsConfig = 'test/fixtures/project-ts-tsconfig';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const brocfileFunctionFixture = require('../' + projectPath + '/Brocfile-Function.js');
 const brocfileEsmFixture = esmRequire('../' + projectPathEsm + '/Brocfile.js');
 

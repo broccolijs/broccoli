@@ -13,4 +13,4 @@ export default class Cancelation extends Error {
     this.isCancelation = true;
     this.isSilent = true;
   }
-};
+}

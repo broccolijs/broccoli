@@ -4,7 +4,7 @@ class Watcher extends EventEmitter {
   builder: any;
   currentBuild: any;
   _lifetimeDeferred: {
-    promise?: Promise<void>,
+    promise?: Promise<void>;
     resolve?: (value?: any) => void;
     reject?: (error?: any) => void;
   };
@@ -14,7 +14,7 @@ class Watcher extends EventEmitter {
     this.builder = builder;
     this.currentBuild = null;
     this._lifetimeDeferred = {};
-    let lifetime = this._lifetimeDeferred;
+    const lifetime = this._lifetimeDeferred;
     lifetime.promise = new Promise((resolve, reject) => {
       lifetime.resolve = resolve;
       lifetime.reject = reject;
@@ -34,6 +34,6 @@ class Watcher extends EventEmitter {
       this._lifetimeDeferred.resolve();
     }
   }
-};
+}
 
 export = Watcher;

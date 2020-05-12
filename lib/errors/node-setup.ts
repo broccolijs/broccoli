@@ -19,4 +19,4 @@ export default class NodeSetupError extends BuilderError {
     // The stack will have the original exception name, but that's OK
     this.stack = originalError.stack;
   }
-};
+}

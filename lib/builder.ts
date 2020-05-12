@@ -12,14 +12,82 @@ import filterMap from './utils/filter-map';
 import { EventEmitter } from 'events';
 import { TransformNode, SourceNode, Node } from 'broccoli-node-api';
 import NodeWrapper from './wrappers/node';
+import heimdall from 'heimdalljs';
+import underscoreString from 'underscore.string';
+// @ts-ignore
+import broccoliNodeInfo from 'broccoli-node-info';
+import HeimdallLogger from 'heimdalljs-logger';
 
-const heimdall = require('heimdalljs');
-const underscoreString = require('underscore.string');
-const broccoliNodeInfo = require('broccoli-node-info');
-const logger = require('heimdalljs-logger')('broccoli:builder');
+const logger = new HeimdallLogger('broccoli:builder');
 
 // Clean up left-over temporary directories on uncaught exception.
 tmp.setGracefulCleanup();
+
+function reParentNodes(outputNodeWrapper: any) {
+  // re-parent heimdall nodes according to input nodes
+  const seen = new Set();
+  const queue = [outputNodeWrapper];
+  let node;
+  let parent;
+  const stack: any = [];
+  while ((node = queue.pop()) !== undefined) {
+    if (parent === node) {
+      parent = stack.pop();
+    } else {
+      queue.push(node);
+
+      let heimdallNode = node.__heimdall__;
+      if (heimdallNode === undefined || seen.has(heimdallNode)) {
+        // make 0 time node
+        const cookie = heimdall.start(Object.assign({}, heimdallNode.id));
+        heimdallNode = heimdall.current;
+        heimdallNode.id.broccoliCachedNode = true;
+        cookie.stop();
+        heimdallNode.stats.time.self = 0;
+      } else {
+        seen.add(heimdallNode);
+        // Only push children for non "cached inputs"
+        const inputNodeWrappers = node.inputNodeWrappers;
+        for (let i = inputNodeWrappers.length - 1; i >= 0; i--) {
+          queue.push(inputNodeWrappers[i]);
+        }
+      }
+
+      if (parent) {
+        heimdallNode.remove();
+        parent.__heimdall__.addChild(heimdallNode);
+        stack.push(parent);
+      }
+      parent = node;
+    }
+  }
+}
+
+function aggregateTime() {
+  const queue = [heimdall.current];
+  const stack: any = [];
+  let parent;
+  let node;
+  while ((node = queue.pop()) !== undefined) {
+    if (parent === node) {
+      parent = stack.pop();
+      if (parent !== undefined) {
+        parent.stats.time.total += node.stats.time.total;
+      }
+    } else {
+      const children = node._children;
+      queue.push(node);
+      for (let i = children.length - 1; i >= 0; i--) {
+        queue.push(children[i]);
+      }
+      if (parent) {
+        stack.push(parent);
+      }
+      node.stats.time.total = node.stats.time.self;
+      parent = node;
+    }
+  }
+}
 
 interface BuilderOptions {
   tmpdir?: string | null;
@@ -170,7 +238,7 @@ class Builder extends EventEmitter {
       await pipeline;
       this.buildHeimdallTree(this.outputNodeWrapper);
     } finally {
-      let buildsSkipped = filterMap(
+      const buildsSkipped = filterMap(
         this._nodeWrappers.values(),
         (nw: NodeWrappers) => nw.buildState.built === false
       ).length;
@@ -198,7 +266,7 @@ class Builder extends EventEmitter {
   // This method recursively traverses the node graph and returns a nodeWrapper.
   // The nodeWrapper graph parallels the node graph 1:1.
   makeNodeWrapper(node: Node, _stack: any = []) {
-    let wrapper = this._nodeWrappers.get(node);
+    const wrapper = this._nodeWrappers.get(node);
     if (wrapper !== undefined) {
       return wrapper;
     }
@@ -337,9 +405,11 @@ class Builder extends EventEmitter {
     this.builderTmpDir = tmpObj.name;
     this.builderTmpDirCleanup = tmpObj.removeCallback;
 
-    for (let nodeWrapper of this._nodeWrappers.values()) {
+    for (const nodeWrapper of this._nodeWrappers.values()) {
       if (nodeWrapper.nodeInfo.nodeType === 'transform') {
-        (nodeWrapper as TransformNodeWrapper).inputPaths = nodeWrapper.inputNodeWrappers.map((nw: any) => nw.outputPath);
+        (nodeWrapper as TransformNodeWrapper).inputPaths = nodeWrapper.inputNodeWrappers.map(
+          (nw: any) => nw.outputPath
+        );
         nodeWrapper.outputPath = this.mkTmpDir(nodeWrapper, 'out');
 
         if (nodeWrapper.nodeInfo.needsCache) {
@@ -357,7 +427,7 @@ class Builder extends EventEmitter {
   // /tmp/broccoli-9rLfJh/out-067-merge_trees_vendor_packages
   // type is 'out' or 'cache'
   mkTmpDir(nodeWrapper: NodeWrappers, type: 'out' | 'cache') {
-    let nameAndAnnotation =
+    const nameAndAnnotation =
       nodeWrapper.nodeInfo.name + ' ' + (nodeWrapper.nodeInfo.annotation || '');
     // slugify turns fooBar into foobar, so we call underscored first to
     // preserve word boundaries
@@ -381,7 +451,7 @@ class Builder extends EventEmitter {
   }
 
   setupNodes() {
-    for (let nw of this._nodeWrappers.values()) {
+    for (const nw of this._nodeWrappers.values()) {
       try {
         nw.setup(this.features);
       } catch (err) {
@@ -400,7 +470,7 @@ class Builder extends EventEmitter {
         name = node.nodeInfo.annotation || node.nodeInfo.name;
       }
 
-      node.__heimdall_cookie__ = heimdall.start({
+      node['__heimdall_cookie__'] = heimdall.start({
         name,
         label: node.label,
         broccoliNode: true,
@@ -434,72 +504,6 @@ class Builder extends EventEmitter {
 
   get features() {
     return broccoliNodeInfo.features;
-  }
-}
-
-function reParentNodes(outputNodeWrapper: any) {
-  // re-parent heimdall nodes according to input nodes
-  const seen = new Set();
-  const queue = [outputNodeWrapper];
-  let node;
-  let parent;
-  let stack: any = [];
-  while ((node = queue.pop()) !== undefined) {
-    if (parent === node) {
-      parent = stack.pop();
-    } else {
-      queue.push(node);
-
-      let heimdallNode = node.__heimdall__;
-      if (heimdallNode === undefined || seen.has(heimdallNode)) {
-        // make 0 time node
-        const cookie = heimdall.start(Object.assign({}, heimdallNode.id));
-        heimdallNode = heimdall.current;
-        heimdallNode.id.broccoliCachedNode = true;
-        cookie.stop();
-        heimdallNode.stats.time.self = 0;
-      } else {
-        seen.add(heimdallNode);
-        // Only push children for non "cached inputs"
-        const inputNodeWrappers = node.inputNodeWrappers;
-        for (let i = inputNodeWrappers.length - 1; i >= 0; i--) {
-          queue.push(inputNodeWrappers[i]);
-        }
-      }
-
-      if (parent) {
-        heimdallNode.remove();
-        parent.__heimdall__.addChild(heimdallNode);
-        stack.push(parent);
-      }
-      parent = node;
-    }
-  }
-}
-
-function aggregateTime() {
-  let queue = [heimdall.current];
-  let stack: any = [];
-  let parent;
-  let node;
-  while ((node = queue.pop()) !== undefined) {
-    if (parent === node) {
-      parent = stack.pop();
-      if (parent !== undefined) {
-        parent.stats.time.total += node.stats.time.total;
-      }
-    } else {
-      const children = node._children;
-      queue.push(node);
-      for (let i = children.length - 1; i >= 0; i--) {
-        queue.push(children[i]);
-      }
-      if (parent) {
-        stack.push(parent);
-      }
-      node.stats.time.total = node.stats.time.self;
-      parent = node;
-    }
   }
 }
 
