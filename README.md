@@ -171,7 +171,7 @@ By way of example, let's assume we have a graph of Broccoli nodes constructed vi
 ```js
 // non Brocfile.js, regular commonjs
 const Funnel = require('broccoli-funnel');
-const Merge = require('broccoli-merge');
+const MergeTrees = require('broccoli-merge-trees');
 
 const html = new Funnel(appRoot, {
   files: ['index.html'],
@@ -195,7 +195,7 @@ const public = new Funnel(appRoot, {
   annotation: 'Public Files'
 });
 
-const tree = new Merge([html, js, css, public]);
+const tree = new MergeTrees([html, js, css, public]);
 ```
 
 At this point, `tree` is a graph of nodes, each of which can represent either an input or a transformation that we want to perform. In other words, `tree` is an abstract set of operations, *not* a concrete set of output files.
@@ -209,9 +209,9 @@ Since we typically want do more than write to a temporary folder, we'll also use
 ```js
 const { Builder } = require('broccoli');
 const TreeSync = require('tree-sync');
-const Merge = require('broccoli-merge');
+const MergeTrees = require('broccoli-merge-trees');
 // ...snip...
-const tree = new Merge([html, js, css, public]);
+const tree = new MergeTrees([html, js, css, public]);
 
 const builder = new Builder(tree);
 
