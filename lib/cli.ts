@@ -254,14 +254,20 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
       process.on('SIGTERM', cleanupAndExit);
 
       actionPromise = (async () => {
+        let buildFailed = false;
         try {
           await watcher.start();
         } catch (e) {
+          buildFailed = true;
           ui.writeError(e);
         } finally {
           try {
             builder.cleanup();
-            process.exit(0);
+            if (buildFailed) {
+              process.exit(1);
+            } else {
+              process.exit(0);
+            }
           } catch (e) {
             ui.writeLine('Cleanup error:', 'ERROR');
             ui.writeError(e);

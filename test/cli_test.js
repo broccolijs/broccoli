@@ -94,6 +94,17 @@ describe('cli', function() {
       });
     });
 
+    context('on failed build', function() {
+      it('closes process with exit code 1', async function() {
+        sinon.stub(DummyWatcher.prototype, 'start').value(() => {
+          throw new Error('Build failed');
+        });
+
+        await cli(['node', 'broccoli', 'build', 'dist']);
+        chai.expect(exitStub).to.be.calledWith(1);
+      });
+    });
+
     context('overwrites existing [target]', function() {
       afterEach(() => {
         rimraf.sync('dist');
