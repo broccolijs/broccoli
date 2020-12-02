@@ -7,18 +7,10 @@ import HeimdallLogger from 'heimdalljs-logger';
 
 const logger = new HeimdallLogger('broccoli:watcherAdapter');
 
-interface WatcherAdapterOptions extends sane.Options {
-  filter?: (name: string) => boolean;
-}
-
-function defaultFilterFunction(name: string) {
-  return /^[^.]/.test(name);
-}
-
 class WatcherAdapter extends EventEmitter {
   watchers: sane.Watcher[];
   watchedNodes: SourceNodeWrapper[];
-  options: WatcherAdapterOptions;
+  options: sane.Options;
 
   constructor(watchedNodes: SourceNodeWrapper[], options: sane.Options = {}) {
     super();
@@ -37,7 +29,6 @@ class WatcherAdapter extends EventEmitter {
     }
     this.watchedNodes = watchedNodes;
     this.options = options;
-    this.options.filter = this.options.filter || defaultFilterFunction;
     this.watchers = [];
   }
 

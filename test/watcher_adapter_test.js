@@ -122,30 +122,6 @@ describe('WatcherAdapter', function() {
       expect(() => WatcherAdapter()).to.throw(/\bwithout 'new'/);
     });
 
-    it('has defaults', function() {
-      const adapter = new WatcherAdapter([]);
-
-      expect(adapter.options).to.have.keys('filter');
-      expect(adapter.options.filter).to.have.be.a('Function');
-    });
-
-    it('supports custom options, but without filter', function() {
-      const customOptions = {};
-      const adapter = new WatcherAdapter([], customOptions);
-
-      expect(adapter.options).to.eql(customOptions);
-      expect(adapter.options.filter).to.have.be.a('Function');
-    });
-
-    it('supports custom options, and allows for a  custom filter', function() {
-      function filter() {}
-      const customOptions = { filter };
-      const adapter = new WatcherAdapter([], customOptions);
-
-      expect(adapter.options).to.eql(customOptions);
-      expect(adapter.options.filter).to.eql(filter);
-    });
-
     it('throws if you try to watch a non array', function() {
       [NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(arg => {
         expect(() => new WatcherAdapter(arg)).to.throw(
