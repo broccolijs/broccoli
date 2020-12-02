@@ -6,6 +6,7 @@ import TransformNodeWrapper from '../lib/wrappers/transform-node';
 import SourceNodeWrapper from '../lib/wrappers/source-node';
 import WatcherAdapter from '../lib/watcher_adapter';
 import bindFileEvent from '../lib/utils/bind-file-event';
+import { join } from 'path';
 
 const expect = chai.expect;
 chai.use(sinonChai);
@@ -232,6 +233,27 @@ describe('WatcherAdapter', function() {
           });
         });
       });
+    });
+  });
+  describe('optionsFor', function() {
+    let adapter;
+    beforeEach(function() {
+      adapter = new WatcherAdapter([], {}, [join(__dirname, 'my-ignored-subdir')]);
+    });
+    afterEach(async function() {
+      await adapter.quit();
+    });
+    it('generates a relative ignored path inside watchedDir', function() {
+      const options = adapter.optionsFor(__dirname);
+      expect(options.ignored).to.deep.eq(['my-ignored-subdir/**']);
+    });
+    it('generates no relative ignored paths when they are outside watchedDir', function() {
+      const options = adapter.optionsFor('/somewhere/else');
+      expect(options.ignored).to.eq(undefined);
+    });
+    it('is not fooled by name prefix matches', function() {
+      const options = adapter.optionsFor(join(__dirname, 'my-ignored-subdir-just-kidding'));
+      expect(options.ignored).to.eq(undefined);
     });
   });
 });

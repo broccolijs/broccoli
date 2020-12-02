@@ -11,6 +11,10 @@ interface WatcherOptions {
   debounce?: number;
   watcherAdapter?: WatcherAdapter;
   saneOptions?: sane.Options;
+
+  // list of absolute paths that we should not watch, even if they end up nested
+  // beneath dirs that we are watching.
+  ignored?: string[];
 }
 
 // This Watcher handles all the Broccoli logic, such as debouncing. The
@@ -43,7 +47,8 @@ class Watcher extends EventEmitter {
     this._currentBuild = Promise.resolve();
     this.builder = builder;
     this.watcherAdapter =
-      this.options.watcherAdapter || new WatcherAdapter(watchedNodes, this.options.saneOptions);
+      this.options.watcherAdapter ||
+      new WatcherAdapter(watchedNodes, this.options.saneOptions, this.options.ignored);
 
     this._rebuildScheduled = false;
     this._ready = false;
