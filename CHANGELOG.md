@@ -1,5 +1,20 @@
 # master
 
+## v3.5.0 (2020-12-07)
+
+#### :rocket: Enhancement
+* [#474](https://github.com/broccolijs/broccoli/pull/474) add the ability to ignore absolute paths from watcher ([@ef4](https://github.com/ef4))
+
+#### :bug: Bug Fix
+* [#473](https://github.com/broccolijs/broccoli/pull/473) remove vestigial filter option ([@ef4](https://github.com/ef4))
+
+#### :memo: Documentation
+* [#470](https://github.com/broccolijs/broccoli/pull/470) Fix wrong package name in README ([@ursm](https://github.com/ursm))
+
+#### Committers: 2
+- Edward Faulkner ([@ef4](https://github.com/ef4))
+- Keita Urashima ([@ursm](https://github.com/ursm))
+
 # 3.4.2
 
 * fix TypeScript types
