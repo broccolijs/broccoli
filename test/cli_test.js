@@ -35,7 +35,7 @@ function createWatcherSpy() {
 
 describe('cli', function() {
   let oldCwd = null;
-  let EXIT_CODE = process.exitCode;
+  const EXIT_CODE = process.exitCode;
 
   beforeEach(function() {
     oldCwd = process.cwd();
@@ -91,6 +91,28 @@ describe('cli', function() {
       it('creates output folder', async function() {
         await cli(['node', 'broccoli', 'build', 'dist']);
         chai.expect(fs.existsSync('dist')).to.be.true;
+      });
+    });
+
+    context('on failed build', function() {
+      it('closes process with exit code 1 on build failure', async function() {
+        const mockUI = new MockUI();
+        sinon.stub(DummyWatcher.prototype, 'start').value(function() {
+          this.emit('buildFailure', new Error('Build failed'));
+        });
+
+        await cli(['node', 'broccoli', 'build', 'dist'], mockUI);
+        chai.expect(process.exitCode).to.eql(1);
+      });
+
+      it('closes process with exit code 1 when the watcher fails to start', async function() {
+        const mockUI = new MockUI();
+        sinon.stub(DummyWatcher.prototype, 'start').value(function() {
+          throw new Error('Build failed');
+        });
+
+        await cli(['node', 'broccoli', 'build', 'dist'], mockUI);
+        chai.expect(process.exitCode).to.eql(1);
       });
     });
 

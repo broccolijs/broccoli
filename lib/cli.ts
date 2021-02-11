@@ -264,14 +264,17 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
           await watcher.start();
         } catch (e) {
           ui.writeError(e);
+          process.exitCode = 1;
         } finally {
           try {
             builder.cleanup();
-            process.exitCode = 0;
+            if (!process.exitCode) {
+              process.exitCode = 0;
+            }
           } catch (e) {
             ui.writeLine('Cleanup error:', 'ERROR');
             ui.writeError(e);
-            process.exitCode = 0;
+            process.exitCode = 1;
           }
         }
       })();
