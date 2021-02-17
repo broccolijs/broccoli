@@ -1,5 +1,10 @@
 # master
 
+## v3.5.1 (2021-02-17)
+
+#### :bug: Bug Fix
+* [#476](https://github.com/broccolijs/broccoli/pull/476) Exit broccoli-cli with correct status code ([@chiragpat](https://github.com/chiragpat))
+
 ## v3.5.0 (2020-12-07)
 
 #### :rocket: Enhancement
