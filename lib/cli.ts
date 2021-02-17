@@ -157,7 +157,8 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
         } catch (e) {
           if (e instanceof CliError) {
             ui.writeError(e);
-            return process.exit(1);
+            process.exitCode = 1;
+            return;
           }
 
           throw e;
@@ -196,7 +197,8 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     .action((outputDir: string, options: BuildOptions) => {
       if (outputDir && options.outputPath) {
         ui.writeLine('option --output-path and [target] cannot be passed at same time', 'ERROR');
-        return process.exit(1);
+        process.exitCode = 1;
+        return;
       }
 
       if (options.outputPath) {
@@ -218,7 +220,8 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
       } catch (e) {
         if (e instanceof CliError) {
           ui.writeError(e);
-          return process.exit(1);
+          process.exitCode = 1;
+          return;
         }
 
         throw e;
@@ -244,6 +247,9 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
       watcher.on('buildFailure', (err: any) => {
         ui.writeLine('build failure', 'ERROR');
         ui.writeError(err);
+        if (!options.watch) {
+          process.exitCode = 1;
+        }
       });
 
       function cleanupAndExit() {
@@ -258,14 +264,17 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
           await watcher.start();
         } catch (e) {
           ui.writeError(e);
+          process.exitCode = 1;
         } finally {
           try {
             builder.cleanup();
-            process.exit(0);
+            if (!process.exitCode) {
+              process.exitCode = 0;
+            }
           } catch (e) {
             ui.writeLine('Cleanup error:', 'ERROR');
             ui.writeError(e);
-            process.exit(1);
+            process.exitCode = 1;
           }
         }
       })();
@@ -277,6 +286,6 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     return actionPromise;
   } else {
     program.outputHelp();
-    process.exit(1);
+    process.exitCode = 1;
   }
 };

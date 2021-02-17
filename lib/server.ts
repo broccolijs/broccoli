@@ -161,11 +161,15 @@ function serve(
 
   return server
     .start()
-    .then(() => _process.exit(0))
+    .then(() => {
+      if (!_process.exitCode) {
+        _process.exitCode = 0;
+      }
+    })
     .catch(err => {
       ui.writeLine('Broccoli Cleanup error:', 'ERROR');
       ui.writeError(err);
-      _process.exit(1);
+      _process.exitCode = 1;
     });
 }
 
