@@ -165,11 +165,12 @@ function serve(
       if (!_process.exitCode) {
         _process.exitCode = 0;
       }
+      _process.exit(_process.exitCode);
     })
     .catch(err => {
       ui.writeLine('Broccoli Cleanup error:', 'ERROR');
       ui.writeError(err);
-      _process.exitCode = 1;
+      _process.exit(1);
     });
 }
 

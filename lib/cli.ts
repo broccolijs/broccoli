@@ -157,8 +157,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
         } catch (e) {
           if (e instanceof CliError) {
             ui.writeError(e);
-            process.exitCode = 1;
-            return;
+            return process.exit(1);
           }
 
           throw e;
@@ -197,8 +196,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     .action((outputDir: string, options: BuildOptions) => {
       if (outputDir && options.outputPath) {
         ui.writeLine('option --output-path and [target] cannot be passed at same time', 'ERROR');
-        process.exitCode = 1;
-        return;
+        return process.exit(1);
       }
 
       if (options.outputPath) {
@@ -220,8 +218,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
       } catch (e) {
         if (e instanceof CliError) {
           ui.writeError(e);
-          process.exitCode = 1;
-          return;
+          return process.exit(1);
         }
 
         throw e;
@@ -271,10 +268,11 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
             if (!process.exitCode) {
               process.exitCode = 0;
             }
+            process.exit(process.exitCode);
           } catch (e) {
             ui.writeLine('Cleanup error:', 'ERROR');
             ui.writeError(e);
-            process.exitCode = 1;
+            process.exit(1);
           }
         }
       })();
@@ -286,6 +284,6 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     return actionPromise;
   } else {
     program.outputHelp();
-    process.exitCode = 1;
+    process.exit(1);
   }
 };
