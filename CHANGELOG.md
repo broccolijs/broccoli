@@ -1,5 +1,13 @@
 # master
 
+## v3.5.2 (2021-05-03)
+
+#### :bug: Bug Fix
+* [#478](https://github.com/broccolijs/broccoli/pull/478) Manually exit process ([@asakusuma](https://github.com/asakusuma))
+
+#### Committers: 1
+- Asa Kusuma ([@asakusuma](https://github.com/asakusuma))
+
 ## v3.5.1 (2021-02-17)
 
 #### :bug: Bug Fix
