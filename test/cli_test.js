@@ -35,9 +35,11 @@ function createWatcherSpy() {
 
 describe('cli', function() {
   let oldCwd = null;
+  let exitStub;
   const EXIT_CODE = process.exitCode;
 
   beforeEach(function() {
+    exitStub = sinon.stub(process, 'exit');
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
   });
@@ -86,6 +88,7 @@ describe('cli', function() {
       it('closes process on completion', async function() {
         await cli(['node', 'broccoli', 'build', 'dist']);
         chai.expect(process.exitCode).to.eql(0);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
       it('creates output folder', async function() {
@@ -146,7 +149,7 @@ describe('cli', function() {
         chai
           .expect(mockUI.errors)
           .to.contain('build directory can not be the current or direct parent directory: /');
-        chai.expect(process.exitCode).to.eql(1);
+        chai.expect(exitStub).to.be.calledWith(1);
       });
     });
 
@@ -162,6 +165,7 @@ describe('cli', function() {
       it('closes process on completion', async function() {
         await cli(['node', 'broccoli', 'build', 'dist', '--watcher', 'polling']);
         chai.expect(process.exitCode).to.eql(0);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
       it('creates watcher with sane options for polling', async function() {
@@ -221,6 +225,7 @@ describe('cli', function() {
       it('closes process on completion', async function() {
         await cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
         chai.expect(process.exitCode).to.eql(0);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
       it('loads brocfile from a path', async function() {
@@ -243,6 +248,7 @@ describe('cli', function() {
             '../../empty/Brocfile.js',
           ]);
           chai.expect(process.exitCode).eql(0);
+          chai.expect(exitStub).to.be.calledWith(0);
         });
       });
     });
@@ -300,12 +306,14 @@ describe('cli', function() {
     it('supports `b` alias', async function() {
       await cli(['node', 'broccoli', 'b']);
       chai.expect(process.exitCode).to.eql(0);
+      chai.expect(exitStub).to.be.calledWith(0);
     });
 
     context('with param --output-path', function() {
       it('closes process on completion', async function() {
         await cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
         chai.expect(process.exitCode).to.eql(0);
+        chai.expect(exitStub).to.be.calledWith(0);
       });
 
       it('creates output folder', async function() {
@@ -316,7 +324,7 @@ describe('cli', function() {
       context('and with [target]', function() {
         it('exits with error', function() {
           cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
-          chai.expect(process.exitCode).to.eql(1);
+          chai.expect(exitStub).to.be.calledWith(1);
         });
 
         it('outputs error reason to console', function() {
