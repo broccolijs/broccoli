@@ -221,6 +221,22 @@ describe('cli', function() {
       });
     });
 
+    context('with promise in a Brocfile default export', function() {
+      it('closes process on completion', async function() {
+        await cli([
+          'node',
+          'broccoli',
+          'build',
+          'dist',
+          '--brocfile-path',
+          '../../async-brocfile/Brocfile.js',
+        ]);
+        chai.expect(process.exitCode).to.eql(0);
+        chai.expect(exitStub).to.be.calledWith(0);
+        chai.expect(fs.existsSync('dist')).to.be.true;
+      });
+    });
+
     context('with param --brocfile-path', function() {
       it('closes process on completion', async function() {
         await cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
