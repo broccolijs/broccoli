@@ -27,6 +27,16 @@ interface MiddlewareOptions {
   liveReloadPath?: string;
 }
 
+function findClosestIndexFileForPath(outputPath: string, prefix: string): string | undefined {
+  const candidates = [];
+  const parts = prefix.split('/');
+  while (parts.length) {
+    parts.pop();
+    candidates.push(resolvePath(outputPath, [...parts, 'index.html'].join(path.sep)));
+  }
+  return candidates.find(file => fs.existsSync(file));
+}
+
 // You must call watcher.start() before you call `getMiddleware`
 //
 // This middleware is for development use only. It hasn't been reviewed
@@ -45,7 +55,7 @@ function handleRequest(
   // eslint-disable-next-line node/no-deprecated-api
   const urlObj = url.parse(request.url);
   const pathname = urlObj.pathname || '';
-  let filename: string, stat;
+  let filename: string, stat!: fs.Stats;
 
   try {
     filename = decodeURIComponent(pathname);
@@ -66,9 +76,24 @@ function handleRequest(
   try {
     stat = fs.statSync(filename);
   } catch (e) {
-    // not found
-    next();
-    return;
+    const nameStats = path.parse(filename);
+    const maybeIndex = findClosestIndexFileForPath(outputPath, filename.substr(1));
+
+    // if it's looks like an SPA path
+    if (nameStats.ext === '' && maybeIndex) {
+      filename = maybeIndex.replace(path.sep + 'index.html', '');
+      try {
+        stat = fs.statSync(filename);
+      } catch (e) {
+        // not found
+        next();
+        return;
+      }
+    } else {
+      // not found
+      next();
+      return;
+    }
   }
 
   if (stat.isDirectory()) {

@@ -17,6 +17,7 @@ import heimdall from 'heimdalljs';
 const multidepRequire = MultidepRequire('test/multidep.json');
 const Plugin = multidepRequire('broccoli-plugin', '1.3.0');
 const broccoliSource = multidepRequire('broccoli-source', '1.1.0');
+const isWin = os.platform() === 'win32';
 
 const Builder = broccoli.Builder;
 const expect = chai.expect;
@@ -1040,7 +1041,8 @@ describe('Builder', function() {
         // the actual results of process.hrtime() are not
         // reliable
         if (process.env.CI !== 'true') {
-          expect(a).to.be.within(b, b + 10e6);
+          const delta = isWin ? 15e6 : 10e6;
+          expect(a).to.be.within(b, b + delta);
         }
       };
 

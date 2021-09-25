@@ -113,6 +113,37 @@ describe('server', function() {
     expect(statusCode).to.eql(200);
   }).timeout(5000);
 
+  it('support SPA routing to index.html from child paths', async function() {
+    const mockUI = new MockUI();
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/spa'));
+    const watcher = new Watcher(builder, []);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
+    server.start();
+    await new Promise(resolve => {
+      server.instance.on('listening', resolve);
+    });
+    const { statusCode, body } = await got(`http://127.0.0.1:${PORT}/foo/bar/baz`); // basic serving
+    expect(statusCode).to.eql(200);
+    expect(body).to.contain('Hello from SPA');
+  }).timeout(5000);
+
+  it("skip SPA routing to index.html from child path if it's ends with extension", async function() {
+    const mockUI = new MockUI();
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/spa'));
+    const watcher = new Watcher(builder, []);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
+    server.start();
+    await new Promise(resolve => {
+      server.instance.on('listening', resolve);
+    });
+    try {
+      await got(`http://127.0.0.1:${PORT}/foo/bar/baz.png`);
+      expect.fail('expected rejection');
+    } catch (e) {
+      expect(e.body).to.include(`Cannot GET /foo/bar/baz.png`);
+    }
+  }).timeout(5000);
+
   it('buildSuccess is handled', async function() {
     const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
