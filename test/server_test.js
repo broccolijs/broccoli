@@ -122,7 +122,11 @@ describe('server', function() {
     await new Promise(resolve => {
       server.instance.on('listening', resolve);
     });
-    const { statusCode, body } = await got(`http://127.0.0.1:${PORT}/foo/bar/baz`); // basic serving
+    const { statusCode, body } = await got(`http://127.0.0.1:${PORT}/foo/bar/baz`, {
+      headers: {
+        Accept: 'text/html',
+      },
+    }); // basic serving
     expect(statusCode).to.eql(200);
     expect(body).to.contain('Hello from SPA');
   }).timeout(5000);
@@ -140,7 +144,26 @@ describe('server', function() {
       await got(`http://127.0.0.1:${PORT}/foo/bar/baz.png`);
       expect.fail('expected rejection');
     } catch (e) {
+      expect(e.statusCode).to.equal(404);
       expect(e.body).to.include(`Cannot GET /foo/bar/baz.png`);
+    }
+  }).timeout(5000);
+
+  it('skip SPA routing to index.html from child path contains dot', async function() {
+    const mockUI = new MockUI();
+    const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/spa'));
+    const watcher = new Watcher(builder, []);
+    server = new Server.Server(watcher, '127.0.0.1', PORT, undefined, mockUI);
+    server.start();
+    await new Promise(resolve => {
+      server.instance.on('listening', resolve);
+    });
+    try {
+      await got(`http://127.0.0.1:${PORT}/foo/b.ar/baz`);
+      expect.fail('expected rejection');
+    } catch (e) {
+      expect(e.statusCode).to.equal(404);
+      expect(e.body).to.include(`Cannot GET /foo/b.ar/baz`);
     }
   }).timeout(5000);
 

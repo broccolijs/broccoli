@@ -77,17 +77,38 @@ function handleRequest(
     stat = fs.statSync(filename);
   } catch (e) {
     const nameStats = path.parse(filename);
-    const maybeIndex = findClosestIndexFileForPath(outputPath, filename.substr(1));
+    const acceptHeaders = request.headers.accept || [];
+    const hasHTMLHeader = acceptHeaders.indexOf('text/html') !== -1;
+    const hasCorrectRequestType = ['GET'].includes(request.method);
+    const hasCorrectPathName = nameStats.ext === '';
 
+    let maybeIndex;
+
+    if (!filename.substr(1).includes('.')) {
+      maybeIndex = findClosestIndexFileForPath(outputPath, filename.substr(1));
+    }
+
+    const matchSPAconditions = [
+      hasCorrectPathName,
+      hasHTMLHeader,
+      hasCorrectRequestType,
+      maybeIndex,
+    ];
     // if it's looks like an SPA path
-    if (nameStats.ext === '' && maybeIndex) {
-      filename = maybeIndex.replace(path.sep + 'index.html', '');
+    if (matchSPAconditions.every(el => el)) {
+      filename = (maybeIndex as string).replace(path.sep + 'index.html', '');
       try {
         stat = fs.statSync(filename);
       } catch (e) {
-        // not found
-        next();
-        return;
+        if ((e as Error & { code: string }).code == 'ENOENT') {
+          // no such file or directory. File really does not exist
+          // not found
+          next();
+          return;
+        } else {
+          // have no idea how to handle it
+          return;
+        }
       }
     } else {
       // not found

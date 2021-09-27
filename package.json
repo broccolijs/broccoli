@@ -58,6 +58,7 @@
     "watch-detector": "^1.0.0"
   },
   "devDependencies": {
+    "@types/connect": "^3.4.35",
     "@types/console-ui": "^2.2.3",
     "@types/esm": "^3.2.0",
     "@types/findup-sync": "^2.0.2",
