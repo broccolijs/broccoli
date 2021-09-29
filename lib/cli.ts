@@ -9,6 +9,17 @@ import ConsoleUI from '../types/console-ui';
 import WatchDetector from 'watch-detector';
 import UI from 'console-ui';
 
+enum EnvironmentType {
+  PRODUCTION = 'production',
+  DEVELOPMENT = 'development',
+}
+
+enum WatcherType {
+  POLLING = 'polling',
+  WATCHMAN = 'watchman',
+  NODE = 'node',
+}
+
 interface ServeOptions {
   host: string;
   port: string;
@@ -19,8 +30,8 @@ interface ServeOptions {
   outputPath?: string;
   cwd?: string;
   noWatch?: boolean;
-  watcher?: string;
-  environment: string;
+  watcher?:  WatcherType,
+  environment: EnvironmentType;
   prod?: boolean;
   dev?: boolean;
 
@@ -32,8 +43,8 @@ interface BuildOptions {
   outputPath?: string;
   cwd?: string;
   watch?: boolean;
-  watcher?: string;
-  environment: string;
+  watcher?: WatcherType;
+  environment: EnvironmentType;
   prod?: boolean;
   dev?: boolean;
 }
@@ -44,9 +55,10 @@ function buildBrocfileOptions(options: { environment: string }) {
   };
 }
 
-function getBuilder(options: { environment: string }) {
+async function getBuilder(options: { environment: string }) {
   const brocfile = broccoli.loadBrocfile(options);
-  return new broccoli.Builder(brocfile(buildBrocfileOptions(options)));
+  const instance = await Promise.resolve(brocfile(buildBrocfileOptions(options)));
+  return new broccoli.Builder(instance);
 }
 
 function getWatcher(options: { watch?: boolean }) {
@@ -73,9 +85,9 @@ function buildWatcherOptions(options: { watcher?: string }, ui: ConsoleUI) {
 
   return {
     saneOptions: {
-      poll: watcher === 'polling',
-      watchman: watcher === 'watchman',
-      node: watcher === 'node' || !watcher,
+      poll: watcher === WatcherType.POLLING,
+      watchman: watcher === WatcherType.WATCHMAN,
+      node: watcher === WatcherType.NODE || !watcher,
     },
   };
 }
@@ -135,14 +147,14 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     .option('-e, --environment <environment>', 'build environment [development]', 'development')
     .option('--prod', 'alias for --environment=production')
     .option('--dev', 'alias for --environment=development')
-    .action((options: ServeOptions) => {
+    .action(async (options: ServeOptions) => {
       if (options.prod) {
-        options.environment = 'production';
+        options.environment = EnvironmentType.PRODUCTION;
       } else if (options.dev) {
-        options.environment = 'development';
+        options.environment = EnvironmentType.DEVELOPMENT;
       }
 
-      const builder = getBuilder(options);
+      const builder = await getBuilder(options);
       const Watcher = getWatcher(options);
       const outputDir = options.outputPath;
       const watcher = new Watcher(
@@ -193,7 +205,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
     .option('-e, --environment <environment>', 'build environment [development]', 'development')
     .option('--prod', 'alias for --environment=production')
     .option('--dev', 'alias for --environment=development')
-    .action((outputDir: string, options: BuildOptions) => {
+    .action(async (outputDir: string, options: BuildOptions) => {
       if (outputDir && options.outputPath) {
         ui.writeLine('option --output-path and [target] cannot be passed at same time', 'ERROR');
         return process.exit(1);
@@ -208,9 +220,9 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
       }
 
       if (options.prod) {
-        options.environment = 'production';
+        options.environment = EnvironmentType.PRODUCTION;
       } else if (options.dev) {
-        options.environment = 'development';
+        options.environment = EnvironmentType.DEVELOPMENT;
       }
 
       try {
@@ -224,7 +236,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
         throw e;
       }
 
-      const builder = getBuilder(options);
+      const builder = await getBuilder(options);
       const Watcher = getWatcher(options);
       const outputTree = new TreeSync(builder.outputPath, outputDir);
       const watcher = new Watcher(
