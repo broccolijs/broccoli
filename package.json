@@ -51,7 +51,7 @@
     "mime-types": "^2.1.26",
     "resolve-path": "^1.4.0",
     "rimraf": "^3.0.2",
-    "sane": "^4.0.0",
+    "sane": "^5.0.1",
     "tmp": "^0.0.33",
     "tree-sync": "^2.0.0",
     "underscore.string": "^3.2.2",
