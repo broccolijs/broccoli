@@ -1,8 +1,5 @@
 import path from 'path';
 import findup from 'findup-sync';
-import esm from 'esm';
-
-const esmRequire = esm(module);
 
 interface LoadBrocfileOptions {
   brocfilePath?: string;
@@ -37,8 +34,29 @@ function requireBrocfile(brocfilePath: string) {
     // Load brocfile via ts-node
     brocfile = require(brocfilePath);
   } else {
-    // Load brocfile via esm shim
-    brocfile = esmRequire(brocfilePath);
+    /**
+     * because 'esm' patches global modules,
+     * let's only load 'esm' if we absolutely have to.
+     * See context: https://github.com/broccolijs/broccoli/issues/498
+     *  (and related linkes)
+     *
+     *  If this function (requireBrocfile) were to be async, we could use
+     *  await import here instead and get rid of the esm package altogether.
+     *
+     *  However, it may mean that all of broccoli then needs to be converted to ESM (idk)
+     *
+     *  Definitely, all of broccoli would need to be converted to async.
+     *  the CLI and brocifile loading is currently all sync.
+     */
+    try {
+      brocfile = require(brocfilePath);
+    } catch {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires, node/no-missing-require
+      const esm = require('esm');
+      const esmRequire = esm(module);
+
+      brocfile = esmRequire(brocfilePath);
+    }
   }
 
   // ESM `export default X` is represented as module.exports = { default: X }
