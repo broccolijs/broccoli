@@ -30,7 +30,7 @@ interface ServeOptions {
   outputPath?: string;
   cwd?: string;
   noWatch?: boolean;
-  watcher?:  WatcherType,
+  watcher?: WatcherType;
   environment: EnvironmentType;
   prod?: boolean;
   dev?: boolean;
