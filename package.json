@@ -79,7 +79,7 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^3.1.2",
     "fixturify": "^1.1.0",
-    "got": "^9.0.0",
+    "got": "^11.8.5",
     "longjohn": "^0.2.12",
     "mocha": "^7.1.0",
     "multidep": "^2.0.2",
