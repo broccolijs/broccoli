@@ -22,15 +22,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        node_version: ['8', '10', '12']
+        node_version: ['8', '10', '12', '14', '16', '18', '20', '22']
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
     - name: Use Node.js ${{ matrix.node_version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
-        version: ${{ matrix.node_version }}
+        node-version: ${{ matrix.node_version }}
 
     - name:  install yarn
       run: npm install -g yarn cross-env
