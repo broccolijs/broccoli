@@ -16,6 +16,26 @@ on:
   - cron:  '0 6 * * 0'
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 16
+
+    - name: Install yarn
+      run: npm install -g yarn
+
+    - name: install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: lint
+      run: yarn lint
+
   test:
     name: Test
     runs-on: ${{ matrix.os }}
@@ -38,9 +58,6 @@ jobs:
 
     - name: install dependencies
       run: yarn install --frozen-lockfile
-
-    - name: lint
-      run: yarn lint
 
     - name: test
       run: cross-env CI=true yarn test
