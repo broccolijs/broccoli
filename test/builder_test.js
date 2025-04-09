@@ -10,7 +10,7 @@ import Sinon from 'sinon';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
-import MultidepRequire from 'multidep';
+import MultidepRequire from './utils/multidep/index';
 import semver from 'semver';
 import heimdall from 'heimdalljs';
 
