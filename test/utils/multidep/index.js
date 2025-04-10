@@ -1,10 +1,36 @@
 'use strict';
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
 const execa = require('execa');
 const RSVP = require('rsvp');
 const rimraf = require('rimraf');
+
+function getSpec(specPath) {
+  // specPath is relative to cwd, so we need to call realpathSync
+  const spec = require(fs.realpathSync(specPath));
+  // eslint-disable-next-line no-prototype-builtins
+  if (!spec || !spec.hasOwnProperty('path') || Array.isArray(spec.versions)) {
+    throw new Error(
+      'Invalid version spec; expected { path: "test/multidep_modules", versions: { ... } }, got ' +
+        require('util').inspect(spec)
+    );
+  }
+  return spec;
+}
+
+function PackageCollection() {
+  // We cannot use Object.keys(this) to get the versions because we want to
+  // preserve the order in which they are listed in the spec
+  this.versions = [];
+}
+
+PackageCollection.prototype.forEachVersion = function(cb) {
+  for (let i = 0; i < this.versions.length; i++) {
+    const module = this[this.versions[i]](); // require
+    cb(this.versions[i], module);
+  }
+};
 
 // Check that all referenced versions referenced by the spec exist, and
 // additionally pick up master versions. Return a hash of packages.
@@ -111,29 +137,4 @@ module.exports.install = function(specPath) {
       });
     });
   return promise;
-};
-
-function getSpec(specPath) {
-  // specPath is relative to cwd, so we need to call realpathSync
-  const spec = require(fs.realpathSync(specPath));
-  if (!spec || !spec.hasOwnProperty('path') || Array.isArray(spec.versions)) {
-    throw new Error(
-      'Invalid version spec; expected { path: "test/multidep_modules", versions: { ... } }, got ' +
-        require('util').inspect(spec)
-    );
-  }
-  return spec;
-}
-
-function PackageCollection() {
-  // We cannot use Object.keys(this) to get the versions because we want to
-  // preserve the order in which they are listed in the spec
-  this.versions = [];
-}
-
-PackageCollection.prototype.forEachVersion = function(cb) {
-  for (let i = 0; i < this.versions.length; i++) {
-    const module = this[this.versions[i]](); // require
-    cb(this.versions[i], module);
-  }
 };
