@@ -95,7 +95,7 @@
     "typescript": "~3.8.3"
   },
   "engines": {
-    "node": "8.* || >= 10.*"
+    "node": ">= 10.*"
   },
   "files": [
     "dist"
