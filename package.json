@@ -35,7 +35,7 @@
     "@types/chai": "^4.2.9",
     "@types/chai-as-promised": "^7.1.2",
     "@types/express": "^4.17.2",
-    "ansi-html": "^0.0.7",
+    "ansi-html": "^0.0.9",
     "broccoli-node-info": "^2.1.0",
     "broccoli-slow-trees": "^3.0.1",
     "broccoli-source": "^3.0.0",
