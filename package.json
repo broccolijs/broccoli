@@ -44,7 +44,7 @@
     "console-ui": "^3.0.4",
     "esm": "^3.2.4",
     "findup-sync": "^5.0.0",
-    "handlebars": "^4.7.3",
+    "handlebars": "^4.7.8",
     "heimdalljs": "^0.2.6",
     "heimdalljs-logger": "^0.1.9",
     "https": "^1.0.0",
