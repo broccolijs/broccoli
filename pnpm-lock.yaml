@@ -21,14 +21,14 @@ importers:
         specifier: ^0.0.9
         version: 0.0.9
       broccoli-node-info:
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.2.0
+        version: 2.2.0
       broccoli-slow-trees:
         specifier: ^3.0.1
         version: 3.0.1
       broccoli-source:
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: ^3.0.1
+        version: 3.0.1
       commander:
         specifier: ^4.1.1
         version: 4.1.1
@@ -435,15 +435,15 @@ packages:
   broccoli-node-api@1.7.0:
     resolution: {integrity: sha512-QIqLSVJWJUVOhclmkmypJJH9u9s/aWH4+FH6Q6Ju5l+Io4dtwqdPUNmDfw40o6sxhbZHhqGujDJuHTML1wG8Yw==}
 
-  broccoli-node-info@2.1.0:
-    resolution: {integrity: sha512-l6qDuboJThHfRVVWQVaTs++bFdrFTP0gJXgsWenczc1PavRVUmL1Eyb2swTAXXMpDOnr2zhNOBLx4w9AxkqbPQ==}
+  broccoli-node-info@2.2.0:
+    resolution: {integrity: sha512-VabSGRpKIzpmC+r+tJueCE5h8k6vON7EIMMWu6d/FyPdtijwLQ7QvzShEw+m3mHoDzUaj/kiZsDYrS8X2adsBg==}
     engines: {node: 8.* || >= 10.*}
 
   broccoli-slow-trees@3.0.1:
     resolution: {integrity: sha512-YSziKLG9j0aKZBIO0u10DbCOlsVV6EEFWcY0W8rZdTwBS1eG3RSEyLYHhJhVMJTUZYYjphpDhedDMrdxUPm39A==}
 
-  broccoli-source@3.0.0:
-    resolution: {integrity: sha512-G4Zc8HngZIdASyQOiz/9H/0Gjc2F02EFwhWF4wiueaI+/FBrM9Ixj6Prno/1aiLIYcN0JvRC3oytN9uOVonTww==}
+  broccoli-source@3.0.1:
+    resolution: {integrity: sha512-ZbGVQjivWi0k220fEeIUioN6Y68xjMy0xiLAc0LdieHI99gw+tafU8w0CggBDYVNsJMKUr006AZaM7gNEwCxEg==}
     engines: {node: 8.* || 10.* || >= 12.*}
 
   browser-stdout@1.3.1:
@@ -2074,13 +2074,13 @@ snapshots:
 
   broccoli-node-api@1.7.0: {}
 
-  broccoli-node-info@2.1.0: {}
+  broccoli-node-info@2.2.0: {}
 
   broccoli-slow-trees@3.0.1:
     dependencies:
       heimdalljs: 0.2.6
 
-  broccoli-source@3.0.0:
+  broccoli-source@3.0.1:
     dependencies:
       broccoli-node-api: 1.7.0
 
