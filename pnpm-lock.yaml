@@ -166,8 +166,8 @@ importers:
         specifier: ^3.1.0
         version: 3.6.2
       semver:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^7.7.3
+        version: 7.7.3
       sinon:
         specifier: ^9.0.0
         version: 9.0.0
@@ -1494,6 +1494,11 @@ packages:
 
   semver@6.3.0:
     resolution: {integrity: sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==}
+    hasBin: true
+
+  semver@7.7.3:
+    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
+    engines: {node: '>=10'}
     hasBin: true
 
   set-blocking@2.0.0:
@@ -3194,6 +3199,8 @@ snapshots:
   semver@5.7.1: {}
 
   semver@6.3.0: {}
+
+  semver@7.7.3: {}
 
   set-blocking@2.0.0: {}
 
