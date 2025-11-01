@@ -42,7 +42,7 @@
     "commander": "^4.1.1",
     "connect": "^3.6.6",
     "console-ui": "^3.0.4",
-    "esm": "^3.2.4",
+    "esm": "^3.2.25",
     "findup-sync": "^5.0.0",
     "handlebars": "^4.7.8",
     "heimdalljs": "^0.2.6",
