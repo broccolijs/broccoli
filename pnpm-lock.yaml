@@ -23,9 +23,6 @@ importers:
       broccoli-node-info:
         specifier: ^2.2.0
         version: 2.2.0
-      broccoli-slow-trees:
-        specifier: ^3.0.1
-        version: 3.0.1
       broccoli-source:
         specifier: ^3.0.1
         version: 3.0.1
@@ -438,9 +435,6 @@ packages:
   broccoli-node-info@2.2.0:
     resolution: {integrity: sha512-VabSGRpKIzpmC+r+tJueCE5h8k6vON7EIMMWu6d/FyPdtijwLQ7QvzShEw+m3mHoDzUaj/kiZsDYrS8X2adsBg==}
     engines: {node: 8.* || >= 10.*}
-
-  broccoli-slow-trees@3.0.1:
-    resolution: {integrity: sha512-YSziKLG9j0aKZBIO0u10DbCOlsVV6EEFWcY0W8rZdTwBS1eG3RSEyLYHhJhVMJTUZYYjphpDhedDMrdxUPm39A==}
 
   broccoli-source@3.0.1:
     resolution: {integrity: sha512-ZbGVQjivWi0k220fEeIUioN6Y68xjMy0xiLAc0LdieHI99gw+tafU8w0CggBDYVNsJMKUr006AZaM7gNEwCxEg==}
@@ -2075,10 +2069,6 @@ snapshots:
   broccoli-node-api@1.7.0: {}
 
   broccoli-node-info@2.2.0: {}
-
-  broccoli-slow-trees@3.0.1:
-    dependencies:
-      heimdalljs: 0.2.6
 
   broccoli-source@3.0.1:
     dependencies:
