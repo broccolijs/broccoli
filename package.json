@@ -40,7 +40,7 @@
     "broccoli-source": "^3.0.1",
     "commander": "^4.1.1",
     "connect": "^3.6.6",
-    "console-ui": "^3.0.4",
+    "console-ui": "^3.1.2",
     "esm": "^3.2.25",
     "findup-sync": "^5.0.0",
     "handlebars": "^4.7.8",
@@ -52,9 +52,9 @@
     "rimraf": "^3.0.2",
     "sane": "^5.0.1",
     "tmp": "^0.2.5",
-    "tree-sync": "^2.0.0",
-    "underscore.string": "^3.2.2",
-    "watch-detector": "^1.0.0"
+    "tree-sync": "^2.1.0",
+    "underscore.string": "^3.3.6",
+    "watch-detector": "^1.0.2"
   },
   "devDependencies": {
     "@types/console-ui": "^2.2.3",

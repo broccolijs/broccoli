@@ -33,8 +33,8 @@ importers:
         specifier: ^3.6.6
         version: 3.7.0
       console-ui:
-        specifier: ^3.0.4
-        version: 3.1.1
+        specifier: ^3.1.2
+        version: 3.1.2
       esm:
         specifier: ^3.2.25
         version: 3.2.25
@@ -69,14 +69,14 @@ importers:
         specifier: ^0.2.5
         version: 0.2.5
       tree-sync:
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.1.0
+        version: 2.1.0
       underscore.string:
-        specifier: ^3.2.2
-        version: 3.3.5
+        specifier: ^3.3.6
+        version: 3.3.6
       watch-detector:
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.0.2
+        version: 1.0.2
     devDependencies:
       '@types/console-ui':
         specifier: ^2.2.3
@@ -300,6 +300,9 @@ packages:
 
   '@types/serve-static@1.13.3':
     resolution: {integrity: sha512-oprSwp094zOglVrXdlo/4bAHtKTAxX6VT8FOZlBKrmyLbNvE1zxZyJ6yikMVtHIvwP45+ZQGJn+FdXGKTozq0g==}
+
+  '@types/symlink-or-copy@1.2.2':
+    resolution: {integrity: sha512-MQ1AnmTLOncwEf9IVU+B2e4Hchrku5N67NkgcAHW0p3sdzPe0FNMANxEm6OJUzPniEQGkeT3OROLlCwZJLWFZA==}
 
   '@types/through@0.0.30':
     resolution: {integrity: sha512-FvnCJljyxhPM3gkRgWmxmDZyAQSiBQQWLI0A0VFL0K7W1oRUrPJSqNO0NvTnLkBcotdlp3lKvaT0JrnyRDkzOg==}
@@ -533,8 +536,8 @@ packages:
     resolution: {integrity: sha512-ZqRXc+tZukToSNmh5C2iWMSoV3X1YUcPbqEM4DkEG5tNQXrQUZCNVGGv3IuicnkMtPfGf3Xtp8WCXs295iQ1pQ==}
     engines: {node: '>= 0.10.0'}
 
-  console-ui@3.1.1:
-    resolution: {integrity: sha512-22y+uk4AGq9quz6kofKQjkeCIAm86+MTxT/RZMFm8fMArP2lAkzxjUjNyrw7S6wXnnB+qRnC+/2ANMTke68RTQ==}
+  console-ui@3.1.2:
+    resolution: {integrity: sha512-+5j3R4wZJcEYZeXk30whc4ZU/+fWW9JMTNntVuMYpjZJ9n26Cxr0tUBXco1NRjVZRpRVvZ4DDKKKIHNYeUG9Dw==}
     engines: {node: 6.* || 8.* || >= 10.*}
 
   copyfiles@2.2.0:
@@ -824,8 +827,9 @@ packages:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
 
-  fs-tree-diff@0.5.9:
-    resolution: {integrity: sha512-872G8ax0kHh01m9n/2KDzgYwouKza0Ad9iFltBpNykvROvf2AGtoOzPJgGx125aolGPER3JuC7uZFrQ7bG1AZw==}
+  fs-tree-diff@2.0.1:
+    resolution: {integrity: sha512-x+CfAZ/lJHQqwlD64pYM5QxWjzWhSjroaVsr8PW831zOApL55qPibed0c+xebaLWVr2BnHFoHdrwOv8pzt8R5A==}
+    engines: {node: 6.* || 8.* || >= 10.*}
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -1176,6 +1180,10 @@ packages:
   mkdirp@0.5.1:
     resolution: {integrity: sha512-SknJC52obPfGQPnjIkXbmA6+5H15E+fR+E4iR2oQ3zzCLbd7/ONua69R/Gw7AgkTLsRG+r5fzksYwWe1AgTyWA==}
     deprecated: Legacy versions of mkdirp are no longer supported. Please update to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)
+    hasBin: true
+
+  mkdirp@0.5.6:
+    resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
 
   mktemp@0.4.0:
@@ -1661,8 +1669,8 @@ packages:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
 
-  tree-sync@2.0.0:
-    resolution: {integrity: sha512-AzeJnbmJjGVfWMTJ0T152fv8NDTbQc9ERY4nEs7Lmxd94Xah2bUS56+CcoTh6FB8qn2KjBMjC0mLNc731aVBqw==}
+  tree-sync@2.1.0:
+    resolution: {integrity: sha512-OLWW+Nd99NOM53aZ8ilT/YpEiOo6mXD3F4/wLbARqybSZ3Jb8IxHK5UGVbZaae0wtXAyQshVV+SeqVBik+Fbmw==}
     engines: {node: '>=8'}
 
   ts-node@8.6.2:
@@ -1703,8 +1711,8 @@ packages:
     engines: {node: '>=0.8.0'}
     hasBin: true
 
-  underscore.string@3.3.5:
-    resolution: {integrity: sha512-g+dpmgn+XBneLmXXo+sGlW5xQEt4ErkS3mgeN2GFbremYeMBSJKr9Wf2KJplQVaiPY/f7FN6atosWYNm9ovrYg==}
+  underscore.string@3.3.6:
+    resolution: {integrity: sha512-VoC83HWXmCrF6rgkyxS9GHv8W9Q5nhMKho+OadDJGzL2oDYbYEppBaCMH6pFlwLeqj2QS+hhkw2kpXkSdD1JxQ==}
 
   universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
@@ -1737,8 +1745,8 @@ packages:
   walker@1.0.7:
     resolution: {integrity: sha512-cF4je9Fgt6sj1PKfuFt9jpQPeHosM+Ryma/hfY9U7uXGKM7pJCsF0v2r55o+Il54+i77SyYWetB4tD1dEygRkw==}
 
-  watch-detector@1.0.0:
-    resolution: {integrity: sha512-siywMl3fXK30Tlpu/dUBHhlpxhQmHdguZ8OIb813eU9lrVmmsJa9k0+n1HtJ+7p3SzFCPq2XbmR3GUYpPC3TBA==}
+  watch-detector@1.0.2:
+    resolution: {integrity: sha512-MrJK9z7kD5Gl3jHBnnBVHvr1saVGAfmkyyrvuNzV/oe0Gr1nwZTy5VSA0Gw2j2Or0Mu8HcjUa44qlBvC2Ofnpg==}
     engines: {node: '>= 8'}
 
   wcwidth@1.0.1:
@@ -1938,6 +1946,8 @@ snapshots:
     dependencies:
       '@types/express-serve-static-core': 4.17.2
       '@types/mime': 2.0.1
+
+  '@types/symlink-or-copy@1.2.2': {}
 
   '@types/through@0.0.30':
     dependencies:
@@ -2182,7 +2192,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  console-ui@3.1.1:
+  console-ui@3.1.2:
     dependencies:
       chalk: 2.4.2
       inquirer: 6.5.0
@@ -2528,8 +2538,9 @@ snapshots:
       jsonfile: 4.0.0
       universalify: 0.1.2
 
-  fs-tree-diff@0.5.9:
+  fs-tree-diff@2.0.1:
     dependencies:
+      '@types/symlink-or-copy': 1.2.2
       heimdalljs-logger: 0.1.10
       object-assign: 4.1.1
       path-posix: 1.0.0
@@ -2878,6 +2889,10 @@ snapshots:
     dependencies:
       minimist: 0.0.8
 
+  mkdirp@0.5.6:
+    dependencies:
+      minimist: 1.2.8
+
   mktemp@0.4.0: {}
 
   mocha@7.1.0:
@@ -3079,7 +3094,7 @@ snapshots:
     dependencies:
       mktemp: 0.4.0
       rimraf: 2.7.1
-      underscore.string: 3.3.5
+      underscore.string: 3.3.6
 
   ramda@0.27.0: {}
 
@@ -3361,11 +3376,11 @@ snapshots:
     dependencies:
       is-number: 7.0.0
 
-  tree-sync@2.0.0:
+  tree-sync@2.1.0:
     dependencies:
-      debug: 2.6.9
-      fs-tree-diff: 0.5.9
-      mkdirp: 0.5.1
+      debug: 4.1.1
+      fs-tree-diff: 2.0.1
+      mkdirp: 0.5.6
       quick-temp: 0.1.8
       walk-sync: 0.3.4
     transitivePeerDependencies:
@@ -3403,7 +3418,7 @@ snapshots:
       source-map: 0.6.1
     optional: true
 
-  underscore.string@3.3.5:
+  underscore.string@3.3.6:
     dependencies:
       sprintf-js: 1.1.2
       util-deprecate: 1.0.2
@@ -3435,10 +3450,9 @@ snapshots:
     dependencies:
       makeerror: 1.0.11
 
-  watch-detector@1.0.0:
+  watch-detector@1.0.2:
     dependencies:
       heimdalljs-logger: 0.1.10
-      semver: 6.3.0
       silent-error: 1.1.1
       tmp: 0.1.0
     transitivePeerDependencies:
