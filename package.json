@@ -52,7 +52,7 @@
     "resolve-path": "^1.4.0",
     "rimraf": "^3.0.2",
     "sane": "^5.0.1",
-    "tmp": "^0.0.33",
+    "tmp": "^0.2.5",
     "tree-sync": "^2.0.0",
     "underscore.string": "^3.2.2",
     "watch-detector": "^1.0.0"
@@ -65,7 +65,7 @@
     "@types/node": "^12.7.1",
     "@types/rimraf": "^2.0.3",
     "@types/sane": "^2.0.0",
-    "@types/tmp": "^0.0.33",
+    "@types/tmp": "^0.2.6",
     "@types/underscore.string": "^0.0.38",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
