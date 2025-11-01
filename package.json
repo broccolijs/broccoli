@@ -20,15 +20,15 @@
     "url": "https://github.com/broccolijs/broccoli"
   },
   "scripts": {
-    "build": "tsc && yarn html",
+    "build": "tsc && pnpm html",
     "clean": "rm -rf dist",
     "html": "copyfiles -u 1 lib/templates/*.html ./dist",
     "lint": "eslint --ext .ts,.js lib/ test/",
     "lint:fix": "eslint --ext .ts,.js lib/ test/ --fix",
-    "prepare": "yarn build",
+    "prepare": "pnpm build",
     "pretest": "node test/utils/multidep.js test/multidep.json",
-    "test": "yarn build && mocha -r test/utils/requires",
-    "test:debug": "yarn build && mocha --inspect-brk -r test/utils/requires",
+    "test": "pnpm build && mocha -r test/utils/requires",
+    "test:debug": "pnpm build && mocha --inspect-brk -r test/utils/requires",
     "watch": "tsc --watch"
   },
   "dependencies": {
@@ -60,7 +60,7 @@
   "devDependencies": {
     "@types/console-ui": "^2.2.3",
     "@types/esm": "^3.2.0",
-    "@types/findup-sync": "^2.0.2",
+    "@types/findup-sync": "^4.0.5",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^12.7.1",
     "@types/rimraf": "^2.0.3",

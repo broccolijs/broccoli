@@ -27,14 +27,14 @@ jobs:
       with:
         node-version: 20
 
-    - name: Install yarn
-      run: npm install -g yarn
-
-    - name: install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+    
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
     - name: lint
-      run: yarn lint
+      run: pnpm lint
 
   test:
     name: Test
@@ -53,11 +53,14 @@ jobs:
       with:
         node-version: ${{ matrix.node_version }}
 
-    - name:  install yarn
-      run: npm install -g yarn cross-env
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
 
-    - name: install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      
+    - name: Install cross-env
+      run: npm install -g cross-env
 
     - name: test
-      run: cross-env CI=true yarn test
+      run: cross-env CI=true pnpm test
