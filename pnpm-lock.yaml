@@ -8,15 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@types/chai':
-        specifier: ^4.2.9
-        version: 4.2.9
-      '@types/chai-as-promised':
-        specifier: ^7.1.2
-        version: 7.1.2
-      '@types/express':
-        specifier: ^4.17.2
-        version: 4.17.2
       ansi-html:
         specifier: ^0.0.9
         version: 0.0.9
@@ -78,12 +69,21 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
     devDependencies:
+      '@types/chai':
+        specifier: ^4.2.9
+        version: 4.2.9
+      '@types/chai-as-promised':
+        specifier: ^7.1.2
+        version: 7.1.2
       '@types/console-ui':
         specifier: ^2.2.3
         version: 2.2.3
       '@types/esm':
         specifier: ^3.2.0
         version: 3.2.0
+      '@types/express':
+        specifier: ^4.17.2
+        version: 4.17.2
       '@types/findup-sync':
         specifier: ^4.0.5
         version: 4.0.5

@@ -32,9 +32,6 @@
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "@types/chai": "^4.2.9",
-    "@types/chai-as-promised": "^7.1.2",
-    "@types/express": "^4.17.2",
     "ansi-html": "^0.0.9",
     "broccoli-node-info": "^2.2.0",
     "broccoli-source": "^3.0.1",
@@ -57,6 +54,9 @@
     "watch-detector": "^1.0.2"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.9",
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/express": "^4.17.2",
     "@types/console-ui": "^2.2.3",
     "@types/esm": "^3.2.0",
     "@types/findup-sync": "^4.0.5",
