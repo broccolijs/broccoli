@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const execa = require('execa');
 const RSVP = require('rsvp');
-const rimraf = require('rimraf');
+const { rimrafSync } = require('rimraf');
 
 function getSpec(specPath) {
   // specPath is relative to cwd, so we need to call realpathSync
@@ -130,7 +130,7 @@ module.exports.install = function(specPath) {
               // We created a nested promise with `RSVP.resolve()` above so this
               // .catch clause only applies to the previous .then and doesn't
               // catch earlier failures in the chain
-              rimraf.sync(packagePath);
+              rimrafSync(packagePath);
               throw err;
             });
         });
