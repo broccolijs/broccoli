@@ -20,7 +20,6 @@ export default class CancelationRequest {
   }
 
   then() {
-    // eslint-disable-next-line prefer-rest-params
     return this._pendingWork.then(...arguments);
   }
 

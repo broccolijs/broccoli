@@ -111,11 +111,10 @@ function guardOutputDir(outputDir: string) {
 export = function broccoliCLI(args: string[], ui = new UI()) {
   // always require a fresh commander, as it keeps state at module scope
   delete require.cache[require.resolve('commander')];
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+
   const program = require('commander');
   let actionPromise;
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   program.version(require('../package.json').version).usage('<command> [options] [<args ...>]');
 
   program

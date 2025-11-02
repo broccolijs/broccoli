@@ -34,6 +34,7 @@ module.exports = [
         clearInterval: 'readonly',
         setImmediate: 'readonly',
         clearImmediate: 'readonly',
+        global: 'readonly',
       },
     },
     plugins: {
@@ -51,6 +52,8 @@ module.exports = [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
   {
@@ -59,6 +62,7 @@ module.exports = [
       globals: {
         describe: 'readonly',
         it: 'readonly',
+        context: 'readonly',
         before: 'readonly',
         after: 'readonly',
         beforeEach: 'readonly',
@@ -70,6 +74,7 @@ module.exports = [
     },
     rules: {
       '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
       'mocha/no-exclusive-tests': 'error',
       'mocha/handle-done-callback': 'error',
     },

@@ -1,3 +1,3 @@
-const foo: String = 123;
+const _foo: string = 123;
 
-export default (options) => 'subdir';
+export default (_options: any) => 'subdir';

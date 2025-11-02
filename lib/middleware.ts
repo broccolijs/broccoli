@@ -4,7 +4,6 @@ import path from 'path';
 import mime from 'mime-types';
 import handlebars from 'handlebars';
 import Watcher from './watcher';
-import BuildError from './errors/build';
 import resolvePath from 'resolve-path';
 // @ts-ignore
 import ansiHTML from 'ansi-html';
@@ -42,7 +41,6 @@ function handleRequest(
   next: any,
   options: MiddlewareOptions
 ) {
-  // eslint-disable-next-line node/no-deprecated-api
   const urlObj = url.parse(request.url);
   const pathname = urlObj.pathname || '';
   let filename: string, stat;
@@ -65,7 +63,7 @@ function handleRequest(
 
   try {
     stat = fs.statSync(filename);
-  } catch (e) {
+  } catch {
     // not found
     next();
     return;

@@ -78,7 +78,7 @@ class Server extends EventEmitter {
             key: fs.readFileSync(this._sslKey),
             cert: fs.readFileSync(this._sslCert),
           };
-        } catch (err) {
+        } catch {
           throw new Error(
             `SSL key and certificate files should be present at ${path.join(
               process.cwd(),

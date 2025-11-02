@@ -61,7 +61,7 @@ class WatcherAdapter extends EventEmitter {
         logger.debug('ready', watchedPath);
       });
     });
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+
     return Promise.all(watchers).then(() => {});
   }
 
@@ -77,7 +77,7 @@ class WatcherAdapter extends EventEmitter {
         )
     );
     this.watchers.length = 0;
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+
     return Promise.all(closing).then(() => {});
   }
 

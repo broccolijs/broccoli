@@ -19,18 +19,18 @@ function requireBrocfile(brocfilePath: string) {
   if (brocfilePath.match(/\.ts$/)) {
     try {
       require.resolve('ts-node');
-    } catch (e) {
+    } catch {
       throw new Error(`Cannot find module 'ts-node', please install`);
     }
 
     try {
       require.resolve('typescript');
-    } catch (e) {
+    } catch {
       throw new Error(`Cannot find module 'typescript', please install`);
     }
 
     // Register ts-node typescript compiler
-    require('ts-node').register(); // eslint-disable-line node/no-unpublished-require
+    require('ts-node').register();
 
     // Load brocfile via ts-node
     brocfile = require(brocfilePath);
