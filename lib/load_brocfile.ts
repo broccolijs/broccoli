@@ -39,7 +39,7 @@ function requireBrocfile(brocfilePath: string) {
       brocfile = require(brocfilePath);
     } catch (err) {
       // Node error when requiring an ESM file from CJS on Node <= 20
-      if (err && err.code === 'ERR_REQUIRE_ESM') {
+      if (err && (err as any).code === 'ERR_REQUIRE_ESM') {
         // esm is side-effectful so only load when needed
         const esmRequire = esm(module);
 

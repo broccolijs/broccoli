@@ -6,8 +6,8 @@ declare class WatchDetector {
   constructor(options: any);
 
   findBestWatcherOption: (options: {
-    watcher: string
+    watcher?: string
   }) => WatchPreference;
 }
 
-export default HeimdallLogger;
+export default WatchDetector;

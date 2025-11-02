@@ -69,7 +69,7 @@ describe('loadBrocfile', function() {
     it('throws an error for invalid syntax', function() {
       chai
         .expect(() => loadBrocfile({ brocfilePath: projectPathTs + '/Brocfile-invalid.ts' }))
-        .to.throw(Error, /TS2322:.*Type '123' is not assignable to type 'String'/);
+        .to.throw(Error, /TS2322:.*Type '(number|123)' is not assignable to type 'String'/);
     });
   });
 

@@ -86,6 +86,6 @@ export default function printSlowNodes(tree: HeimdallNode, factor: number, ui: U
     ui.writeLine('\n' + cumulativeLogLines.join('\n') + '\n');
   } catch (e) {
     ui.writeLine('Error when printing slow nodes', 'ERROR');
-    ui.writeError(e);
+    ui.writeError(e as Error);
   }
 }

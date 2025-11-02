@@ -48,9 +48,9 @@ class WatcherAdapter extends EventEmitter {
       bindFileEvent(this, watcher, node, 'add');
       bindFileEvent(this, watcher, node, 'delete');
 
-      return new Promise((resolve, reject) => {
-        watcher.on('ready', resolve);
-        watcher.on('error', reject);
+      return new Promise<void>((resolve, reject) => {
+        watcher.on('ready', () => resolve());
+        watcher.on('error', (err: Error) => reject(err));
       }).then(() => {
         watcher.removeAllListeners('ready');
         watcher.removeAllListeners('error');
@@ -68,7 +68,7 @@ class WatcherAdapter extends EventEmitter {
   quit() {
     const closing = this.watchers.map(
       (watcher: sane.Watcher) =>
-        new Promise((resolve, reject) =>
+        new Promise<void>((resolve, reject) =>
           // @ts-ignore
           watcher.close((err: any) => {
             if (err) reject(err);

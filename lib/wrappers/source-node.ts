@@ -16,10 +16,11 @@ export default class SourceNodeWrapper extends NodeWrapper {
       }
     } catch (err) {
       // stat might throw, or we might throw
-      err.file = this.nodeInfo.sourceDirectory;
+      const error = err as any;
+      error.file = this.nodeInfo.sourceDirectory;
       // fs.stat augments error message with file name, but that's redundant
       // with our err.file, so we strip it
-      err.message = err.message.replace(/, stat '[^'\n]*'$/m, '');
+      error.message = error.message.replace(/, stat '[^'\n]*'$/m, '');
       throw err;
     }
 
