@@ -240,7 +240,7 @@ describe('Builder', function() {
         });
       });
 
-      if (version === 'master' || semver.gt(version, '1.3.0')) {
+      if (version === 'master' || version === 'main' || semver.gt(version, '1.3.0')) {
         it('does not create a cachePath when opt-ed out', async function() {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case

@@ -5,7 +5,7 @@ on:
   push:
     # filtering branches here, prevents duplicate builds from pull_request and push
     branches:
-      - master
+      - main
       - 'v*'
     # always run CI for tags
     tags:
