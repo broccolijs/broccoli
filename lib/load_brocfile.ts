@@ -2,8 +2,6 @@ import path from 'path';
 import findup from 'findup-sync';
 import esm from 'esm';
 
-const esmRequire = esm(module);
-
 interface LoadBrocfileOptions {
   brocfilePath?: string;
   cwd?: string;
@@ -37,8 +35,19 @@ function requireBrocfile(brocfilePath: string) {
     // Load brocfile via ts-node
     brocfile = require(brocfilePath);
   } else {
-    // Load brocfile via esm shim
-    brocfile = esmRequire(brocfilePath);
+    try {
+      brocfile = require(brocfilePath);
+    } catch (err) {
+      // Node error when requiring an ESM file from CJS on Node <= 20
+      if (err && err.code === 'ERR_REQUIRE_ESM') {
+        // esm is side-effectful so only load when needed
+        const esmRequire = esm(module);
+
+        // Load brocfile via esm shim
+        brocfile = esmRequire(brocfilePath);
+      }
+      throw err;
+    }
   }
 
   // ESM `export default X` is represented as module.exports = { default: X }

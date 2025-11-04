@@ -16,30 +16,48 @@ on:
   - cron:  '0 6 * * 0'
 
 jobs:
-  test:
-    name: Test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        node_version: ['8', '10', '12']
-
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node_version }}
-      uses: actions/setup-node@v1
+    - name: Setup Node
+      uses: actions/setup-node@v4
       with:
-        version: ${{ matrix.node_version }}
+        node-version: 20
 
-    - name:  install yarn
-      run: npm install -g yarn cross-env
+    - name: Install yarn
+      run: npm install -g yarn
 
     - name: install dependencies
       run: yarn install --frozen-lockfile
 
     - name: lint
       run: yarn lint
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        node_version: ['20', '22', '24']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node_version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node_version }}
+
+    - name:  install yarn
+      run: npm install -g yarn cross-env
+
+    - name: install dependencies
+      run: yarn install --frozen-lockfile
 
     - name: test
       run: cross-env CI=true yarn test

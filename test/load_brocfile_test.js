@@ -3,8 +3,6 @@ import BroccoliSource from 'broccoli-source';
 import chai from 'chai';
 import esm from 'esm';
 
-const esmRequire = esm(module);
-
 const projectPath = 'test/fixtures/project';
 const projectPathEsm = 'test/fixtures/project-esm';
 const projectPathTs = 'test/fixtures/project-ts';
@@ -13,7 +11,20 @@ const projectPathTsConfig = 'test/fixtures/project-ts-tsconfig';
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const brocfileFunctionFixture = require('../' + projectPath + '/Brocfile-Function.js');
-const brocfileEsmFixture = esmRequire('../' + projectPathEsm + '/Brocfile.js');
+const brocfileEsmFixturePath = '../' + projectPathEsm + '/Brocfile.js';
+let brocfileEsmFixture;
+try {
+  brocfileEsmFixture = require(brocfileEsmFixturePath);
+} catch (err) {
+  // Node error when requiring an ESM file from CJS on Node <= 20
+  if (err && err.code === 'ERR_REQUIRE_ESM') {
+    // esm is side-effectful so only load when needed
+    const esmRequire = esm(module);
+    // Load brocfile via esm shim
+    brocfileEsmFixture = esmRequire(brocfileEsmFixturePath);
+  }
+  throw err;
+}
 
 describe('loadBrocfile', function() {
   let oldCwd = null;

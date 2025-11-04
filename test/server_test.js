@@ -3,7 +3,7 @@ import Sinon from 'sinon';
 import got from 'got';
 import fs from 'fs';
 import Watcher from '../lib/watcher';
-import multidep from 'multidep';
+import multidep from './utils/multidep/index';
 
 const expect = chai.expect;
 const multidepRequire = multidep('test/multidep.json');
