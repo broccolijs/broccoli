@@ -477,7 +477,6 @@ describe('Builder', function() {
 
     class Sleep extends Plugin {
       constructor() {
-        // eslint-disable-next-line prefer-rest-params
         super(...arguments);
         this.buildWasCalled = false;
         this.wait = new Promise(resolve => {
@@ -891,7 +890,6 @@ describe('Builder', function() {
 
       class StepA extends plugins.Deferred {
         async build() {
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           resolveCancel(pipeline.cancel());
 
           setTimeout(() => this.resolve(), 50);
@@ -980,7 +978,6 @@ describe('Builder', function() {
     });
 
     it('completes the current task before cancelling, and can be resumed', async function() {
-      // eslint-disable-next-line prefer-const
       let pipeline;
 
       class SometimesBuildCanceller extends plugins.Noop {

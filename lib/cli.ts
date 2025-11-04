@@ -109,13 +109,11 @@ function guardOutputDir(outputDir: string) {
 }
 
 export = function broccoliCLI(args: string[], ui = new UI()) {
-  // always require a fresh commander, as it keeps state at module scope
-  delete require.cache[require.resolve('commander')];
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const program = require('commander');
+  // Create a new Commander instance for each invocation
+  const { Command } = require('commander');
+  const program = new Command();
   let actionPromise;
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   program.version(require('../package.json').version).usage('<command> [options] [<args ...>]');
 
   program
@@ -260,7 +258,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
         try {
           await watcher.start();
         } catch (e) {
-          ui.writeError(e);
+          ui.writeError(e as Error);
           process.exitCode = 1;
         } finally {
           try {
@@ -271,7 +269,7 @@ export = function broccoliCLI(args: string[], ui = new UI()) {
             process.exit(process.exitCode);
           } catch (e) {
             ui.writeLine('Cleanup error:', 'ERROR');
-            ui.writeError(e);
+            ui.writeError(e as Error);
             process.exit(1);
           }
         }

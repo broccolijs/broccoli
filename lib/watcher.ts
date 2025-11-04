@@ -132,7 +132,7 @@ class Watcher extends EventEmitter {
     try {
       // Wait for current build, and ignore build failure
       await this.currentBuild;
-    } catch (e) {
+    } catch {
       /* we don't care about failures in the last build, simply start the
        * next build once the last build has completed
        * */
@@ -213,7 +213,7 @@ class Watcher extends EventEmitter {
 
     try {
       await this._quit();
-    } catch (e) {
+    } catch {
       // ignore errors that occur during quitting
     }
 
@@ -248,7 +248,7 @@ class Watcher extends EventEmitter {
       } finally {
         try {
           await this.currentBuild;
-        } catch (e) {
+        } catch {
           // Wait for current build, and ignore build failure
         }
         logger.debug('quitEnd');

@@ -291,7 +291,9 @@ class Builder extends EventEmitter {
             _stack[_stack.length - 1].label +
             _stack[_stack.length - 1].formatInstantiationStackForTerminal()
           : '\nused as output node';
-      throw new broccoliNodeInfo.InvalidNodeError(e.message + messageSuffix);
+      throw new broccoliNodeInfo.InvalidNodeError(
+        (e as broccoliNodeInfo.InvalidNodeError).message + messageSuffix
+      );
     }
 
     // Compute label, like "Funnel (test suite)"
@@ -368,7 +370,7 @@ class Builder extends EventEmitter {
       let isDirectory;
       try {
         isDirectory = fs.statSync(this.watchedPaths[i]).isDirectory();
-      } catch (err) {
+      } catch {
         throw new BuilderError('Directory not found: ' + this.watchedPaths[i]);
       }
       if (!isDirectory) {
@@ -455,7 +457,7 @@ class Builder extends EventEmitter {
       try {
         nw.setup(this.features);
       } catch (err) {
-        throw new NodeSetupError(err, nw);
+        throw new NodeSetupError(err as Error, nw);
       }
     }
   }

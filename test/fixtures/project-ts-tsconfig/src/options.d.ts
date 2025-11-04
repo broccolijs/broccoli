@@ -1,3 +1,3 @@
 export interface BrocfileOptions {
-    env: string;
+  env: string;
 }

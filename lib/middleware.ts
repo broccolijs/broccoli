@@ -4,7 +4,6 @@ import path from 'path';
 import mime from 'mime-types';
 import handlebars from 'handlebars';
 import Watcher from './watcher';
-import BuildError from './errors/build';
 import resolvePath from 'resolve-path';
 // @ts-ignore
 import ansiHTML from 'ansi-html';
@@ -42,7 +41,6 @@ function handleRequest(
   next: any,
   options: MiddlewareOptions
 ) {
-  // eslint-disable-next-line node/no-deprecated-api
   const urlObj = url.parse(request.url);
   const pathname = urlObj.pathname || '';
   let filename: string, stat;
@@ -58,14 +56,14 @@ function handleRequest(
 
     filename = resolvePath(outputPath, filename.substr(1));
   } catch (err) {
-    response.writeHead(err.status || 500);
+    response.writeHead((err as any).status || 500);
     response.end();
     return;
   }
 
   try {
     stat = fs.statSync(filename);
-  } catch (e) {
+  } catch {
     // not found
     next();
     return;
@@ -160,15 +158,16 @@ export = function getMiddleware(watcher: Watcher, options: MiddlewareOptions = {
     } catch (error) {
       // All errors thrown from builder.build() are guaranteed to be
       // Builder.BuildError instances.
+      const err = error as any;
       const context = {
-        stack: ansiHTML(error.stack || ''),
+        stack: ansiHTML(err.stack || ''),
         liveReloadPath: options.liveReloadPath,
-        payload: error.broccoliPayload,
+        payload: err.broccoliPayload,
       };
       response.setHeader('Content-Type', 'text/html; charset=utf-8');
       response.writeHead(500);
       response.end(errorTemplate(context));
-      return error.stack;
+      return err.stack;
     }
   };
 };
