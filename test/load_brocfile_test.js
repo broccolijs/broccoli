@@ -7,9 +7,9 @@ const projectPath = 'test/fixtures/project';
 const projectPathEsm = 'test/fixtures/project-esm';
 const projectPathTs = 'test/fixtures/project-ts';
 const projectPathTsConfig = 'test/fixtures/project-ts-tsconfig';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 const brocfileFixture = require('../' + projectPath + '/Brocfile.js');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 const brocfileFunctionFixture = require('../' + projectPath + '/Brocfile-Function.js');
 const brocfileEsmFixturePath = '../' + projectPathEsm + '/Brocfile.js';
 let brocfileEsmFixture;
@@ -33,8 +33,8 @@ describe('loadBrocfile', function() {
     oldCwd = process.cwd();
 
     // Ensure any previous .tsx? extensions are removed
-    delete require.extensions['.ts']; // eslint-disable-line node/no-deprecated-api
-    delete require.extensions['.tsx']; // eslint-disable-line node/no-deprecated-api
+    delete require.extensions['.ts'];
+    delete require.extensions['.tsx'];
   });
 
   afterEach(function() {
@@ -69,7 +69,10 @@ describe('loadBrocfile', function() {
     it('throws an error for invalid syntax', function() {
       chai
         .expect(() => loadBrocfile({ brocfilePath: projectPathTs + '/Brocfile-invalid.ts' }))
-        .to.throw(Error, /TS2322:.*Type '123' is not assignable to type 'String'/);
+        .to.throw(
+          Error,
+          /TS2322:.*Type '(number|123)' is not assignable to type '(String|string)'/
+        );
     });
   });
 

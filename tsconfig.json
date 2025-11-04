@@ -13,7 +13,8 @@
     "paths": {
       "*": ["types/*"]
     },
-    "allowJs": true
+    "allowJs": true,
+    "skipLibCheck": true
   },
   "include": [
     "lib/**/*"

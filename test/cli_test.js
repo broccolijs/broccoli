@@ -1,6 +1,6 @@
 import chai from 'chai';
 import fs from 'fs';
-import rimraf from 'rimraf';
+import { rimrafSync } from 'rimraf';
 import childProcess from 'child_process';
 import Sinon from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -54,7 +54,7 @@ describe('cli', function() {
 
   describe('build', function() {
     afterEach(function() {
-      rimraf.sync('dist');
+      rimrafSync('dist');
     });
 
     it('creates watcher with sane options', async function() {
@@ -121,7 +121,7 @@ describe('cli', function() {
 
     context('overwrites existing [target]', function() {
       afterEach(() => {
-        rimraf.sync('dist');
+        rimrafSync('dist');
       });
 
       it('removes existing files', async function() {
@@ -437,7 +437,7 @@ describe('cli', function() {
 
     context('with param --output-path', function() {
       afterEach(function() {
-        rimraf.sync('dist');
+        rimrafSync('dist');
       });
 
       it('creates output folder', function(done) {
@@ -459,7 +459,7 @@ describe('cli', function() {
       context('and with folder already existing', function() {
         context('accepts --overwrite option', function() {
           afterEach(() => {
-            rimraf.sync('dist');
+            rimrafSync('dist');
           });
 
           it('overwrites existing files', function(done) {

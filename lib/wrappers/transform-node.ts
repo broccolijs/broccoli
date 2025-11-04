@@ -1,5 +1,5 @@
 import fs from 'fs';
-import rimraf from 'rimraf';
+import { rimrafSync } from 'rimraf';
 import undefinedToNull from '../utils/undefined-to-null';
 import NodeWrapper from './node';
 import { TransformNodeInfo, CallbackObject } from 'broccoli-node-api';
@@ -74,7 +74,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
     }
 
     if (!this.nodeInfo.persistentOutput) {
-      rimraf.sync(this.outputPath);
+      rimrafSync(this.outputPath);
       fs.mkdirSync(this.outputPath);
     }
 
