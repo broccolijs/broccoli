@@ -70,7 +70,7 @@
     "broccoli-node-api": "^1.7.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "copyfiles": "^2.2.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-mocha": "^10.5.0",
