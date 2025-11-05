@@ -85,7 +85,7 @@
     "prettier": "^1.19.1",
     "rsvp": "^4.8.5",
     "semver": "^7.7.3",
-    "sinon": "^9.0.0",
+    "sinon": "^21.0.0",
     "sinon-chai": "^4.0.1",
     "symlink-or-copy": "^1.3.1",
     "ts-node": "^10.9.2",

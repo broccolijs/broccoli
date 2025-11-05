@@ -163,11 +163,11 @@ importers:
         specifier: ^7.7.3
         version: 7.7.3
       sinon:
-        specifier: ^9.0.0
-        version: 9.0.0
+        specifier: ^21.0.0
+        version: 21.0.0
       sinon-chai:
         specifier: ^4.0.1
-        version: 4.0.1(chai@6.2.0)(sinon@9.0.0)
+        version: 4.0.1(chai@6.2.0)(sinon@21.0.0)
       symlink-or-copy:
         specifier: ^1.3.1
         version: 1.3.1
@@ -293,20 +293,14 @@ packages:
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
 
-  '@sinonjs/commons@1.7.1':
-    resolution: {integrity: sha512-Debi3Baff1Qu1Unc3mjJ96MgpbwTn43S1+9yJ0llWygPwDNu2aaWBD6yc9y/Z8XDRNhx7U+u2UDg2OGQXkclUQ==}
+  '@sinonjs/commons@3.0.1':
+    resolution: {integrity: sha512-K3mCHKQ9sVh8o1C9cxkwxaOmXoAMlDxC1mYyHrjqOWEcBjYr76t96zL2zlj5dUGZ3HSw240X1qgH3Mjf1yJWpQ==}
 
-  '@sinonjs/fake-timers@6.0.0':
-    resolution: {integrity: sha512-atR1J/jRXvQAb47gfzSK8zavXy7BcpnYq21ALon0U99etu99vsir0trzIO3wpeLtW+LLVY6X7EkfVTbjGSH8Ww==}
+  '@sinonjs/fake-timers@13.0.5':
+    resolution: {integrity: sha512-36/hTbH2uaWuGVERyC6da9YwGWnzUZXuPro/F2LfsdOsLnCojz/iSH8MxUt/FD2S5XBSVPhmArFUXcpCQ2Hkiw==}
 
-  '@sinonjs/formatio@5.0.1':
-    resolution: {integrity: sha512-KaiQ5pBf1MpS09MuA0kp6KBQt2JUOQycqVG1NZXvzeaXe5LGFqAKueIS0bw4w0P9r7KuBSVdUk5QjXsUdu2CxQ==}
-
-  '@sinonjs/samsam@5.0.3':
-    resolution: {integrity: sha512-QucHkc2uMJ0pFGjJUDP3F9dq5dx8QIaqISl9QgwLOh6P9yv877uONPGXh/OH/0zmM3tW1JjuJltAZV2l7zU+uQ==}
-
-  '@sinonjs/text-encoding@0.7.1':
-    resolution: {integrity: sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==}
+  '@sinonjs/samsam@8.0.3':
+    resolution: {integrity: sha512-hw6HbX+GyVZzmaYNh82Ecj1vdGZrqVIn/keDTg63IgAwiQPO+xCz99uG6Woqgb4tM0mUiFENKZ4cqd7IX94AXQ==}
 
   '@szmarczak/http-timer@4.0.6':
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
@@ -1249,9 +1243,6 @@ packages:
   jsonify@0.0.0:
     resolution: {integrity: sha512-trvBk1ki43VZptdBI5rIlG4YOzyeH/WefQt5rj1grasPn4iiZWKet8nkgc4GlsAylaztn0qZfUYOiTsASJFdNA==}
 
-  just-extend@4.0.2:
-    resolution: {integrity: sha512-FrLwOgm+iXrPV+5zDU6Jqu4gCRXbWEQg2O3SKONsWE4w7AXFRkryS53bpWdaL9cNol+AmR3AEYz6kn+o0fCPnw==}
-
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -1262,10 +1253,6 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
-
-  lodash.get@4.4.2:
-    resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
-    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -1398,9 +1385,6 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  nise@4.0.2:
-    resolution: {integrity: sha512-ALDnm0pTTyeGdbg5FCpWGd58Nmp3qO8d8x+dU2Fw8lApeJTEBSjkBZZM4S8t6GpKh+czxkfM/TKxpRMroZzwOg==}
-
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
 
@@ -1502,9 +1486,6 @@ packages:
   path-scurry@2.0.0:
     resolution: {integrity: sha512-ypGJsmGtdXUOeM5u93TyeIEfEhM6s+ljAhrk5vAvSx8uyY/02OvrZnA0YNGUrPXfpJMgI1ODd3nwz8Npx4O4cg==}
     engines: {node: 20 || >=22}
-
-  path-to-regexp@1.7.0:
-    resolution: {integrity: sha512-nifX1uj4S9IrK/w3Xe7kKvNEepXivANs9ng60Iq7PU/BlouV3yL/VUhFqTuTq33ykwUqoNcTeGo5vdOBP4jS/Q==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -1690,9 +1671,8 @@ packages:
       chai: ^5.0.0 || ^6.0.0
       sinon: '>=4.0.0'
 
-  sinon@9.0.0:
-    resolution: {integrity: sha512-c4bREcvuK5VuEGyMW/Oim9I3Rq49Vzb0aMdxouFaA44QCFpilc5LJOugrX+mkrvikbqCimxuK+4cnHVNnLR41g==}
-    deprecated: 16.1.1
+  sinon@21.0.0:
+    resolution: {integrity: sha512-TOgRcwFPbfGtpqvZw+hyqJDvqfapr1qUlOizROIk4bBLjlsjlB00Pg6wMFXNtJRpu+eCZuVOaLatG7M8105kAw==}
 
   source-map-support@0.5.16:
     resolution: {integrity: sha512-efyLRJDr68D9hBBNIPWFjhpFzURh+KJykQwvMyW5UiZzYwoF6l4YMMDIJJEyFWxWCqfyxLzz6tSfUFR+kXXsVQ==}
@@ -1756,10 +1736,6 @@ packages:
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
     engines: {node: '>=4'}
-
-  supports-color@7.1.0:
-    resolution: {integrity: sha512-oRSIpR8pxT1Wr2FquTNnGet79b3BWljqOuoW/h4oBhxJ/HUbX5nX6JSruTkvXDCFMwDPvsaTTbvMLKZWSy0R5g==}
-    engines: {node: '>=8'}
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -2091,26 +2067,18 @@ snapshots:
 
   '@sindresorhus/is@4.6.0': {}
 
-  '@sinonjs/commons@1.7.1':
+  '@sinonjs/commons@3.0.1':
     dependencies:
       type-detect: 4.0.8
 
-  '@sinonjs/fake-timers@6.0.0':
+  '@sinonjs/fake-timers@13.0.5':
     dependencies:
-      '@sinonjs/commons': 1.7.1
+      '@sinonjs/commons': 3.0.1
 
-  '@sinonjs/formatio@5.0.1':
+  '@sinonjs/samsam@8.0.3':
     dependencies:
-      '@sinonjs/commons': 1.7.1
-      '@sinonjs/samsam': 5.0.3
-
-  '@sinonjs/samsam@5.0.3':
-    dependencies:
-      '@sinonjs/commons': 1.7.1
-      lodash.get: 4.4.2
+      '@sinonjs/commons': 3.0.1
       type-detect: 4.1.0
-
-  '@sinonjs/text-encoding@0.7.1': {}
 
   '@szmarczak/http-timer@4.0.6':
     dependencies:
@@ -3124,8 +3092,6 @@ snapshots:
 
   jsonify@0.0.0: {}
 
-  just-extend@4.0.2: {}
-
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
@@ -3138,8 +3104,6 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
-
-  lodash.get@4.4.2: {}
 
   lodash.merge@4.6.2: {}
 
@@ -3262,15 +3226,6 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  nise@4.0.2:
-    dependencies:
-      '@sinonjs/commons': 1.7.1
-      '@sinonjs/fake-timers': 6.0.0
-      '@sinonjs/formatio': 5.0.1
-      '@sinonjs/text-encoding': 0.7.1
-      just-extend: 4.0.2
-      path-to-regexp: 1.7.0
-
   node-int64@0.4.0: {}
 
   noms@0.0.0:
@@ -3363,10 +3318,6 @@ snapshots:
     dependencies:
       lru-cache: 11.2.2
       minipass: 7.1.2
-
-  path-to-regexp@1.7.0:
-    dependencies:
-      isarray: 0.0.1
 
   picocolors@1.1.1: {}
 
@@ -3543,20 +3494,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  sinon-chai@4.0.1(chai@6.2.0)(sinon@9.0.0):
+  sinon-chai@4.0.1(chai@6.2.0)(sinon@21.0.0):
     dependencies:
       chai: 6.2.0
-      sinon: 9.0.0
+      sinon: 21.0.0
 
-  sinon@9.0.0:
+  sinon@21.0.0:
     dependencies:
-      '@sinonjs/commons': 1.7.1
-      '@sinonjs/fake-timers': 6.0.0
-      '@sinonjs/formatio': 5.0.1
-      '@sinonjs/samsam': 5.0.3
-      diff: 4.0.2
-      nise: 4.0.2
-      supports-color: 7.1.0
+      '@sinonjs/commons': 3.0.1
+      '@sinonjs/fake-timers': 13.0.5
+      '@sinonjs/samsam': 8.0.3
+      diff: 7.0.0
+      supports-color: 7.2.0
 
   source-map-support@0.5.16:
     dependencies:
@@ -3619,10 +3568,6 @@ snapshots:
   supports-color@5.5.0:
     dependencies:
       has-flag: 3.0.0
-
-  supports-color@7.1.0:
-    dependencies:
-      has-flag: 4.0.0
 
   supports-color@7.2.0:
     dependencies:
