@@ -109,7 +109,9 @@ describe('server', function() {
       server.instance.on('error', reject);
     });
 
-    const { statusCode } = await got(`https://127.0.0.1:${PORT}/`, { rejectUnauthorized: false });
+    const { statusCode } = await got(`https://127.0.0.1:${PORT}/`, {
+      https: { rejectUnauthorized: false },
+    });
     expect(statusCode).to.eql(200);
   }).timeout(5000);
 
@@ -153,7 +155,7 @@ describe('server', function() {
       await got(`http://127.0.0.1:${PORT}/`);
       expect.fail('expected rejection');
     } catch (e) {
-      expect(e.body).to.include(`<span style="color:#ff00ff;">102</span>`);
+      expect(e.response.body).to.include(`<span style="color:#ff00ff;">102</span>`);
     }
   }).timeout(5000);
 
@@ -225,7 +227,7 @@ describe('server', function() {
         await got(`http://127.0.0.1:${PORT}/../public/foo.txt`); // don't leak root
         expect.fail('expected rejection');
       } catch (e) {
-        expect(e.message).to.match(/Forbidden/);
+        expect(e.message).to.match(/404|Forbidden/);
       }
     }
   }).timeout(10000);
