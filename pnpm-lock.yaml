@@ -41,9 +41,6 @@ importers:
       heimdalljs-logger:
         specifier: ^0.1.9
         version: 0.1.10
-      https:
-        specifier: ^1.0.0
-        version: 1.0.0
       mime-types:
         specifier: ^2.1.26
         version: 2.1.26
@@ -1153,9 +1150,6 @@ packages:
   http-errors@1.6.3:
     resolution: {integrity: sha512-lks+lVC8dgGyh97jxvxeYTWQFvh4uw4yC12gVl63Cg30sjPX4wuGcdkICVXDAESr6OJGjqGA8Iz5mkeN6zlD7A==}
     engines: {node: '>= 0.6'}
-
-  https@1.0.0:
-    resolution: {integrity: sha512-4EC57ddXrkaF0x83Oj8sM6SLQHAWXw90Skqu2M4AEWENZ3F02dFJE/GARA8igO79tcgYqGrD7ae4f5L3um2lgg==}
 
   human-signals@1.1.1:
     resolution: {integrity: sha512-SEQu7vl8KjNL2eoGBLF3+wAjpsNfA9XMlXAYj/3EdaNfAlxKthD1xjEQfGOUhllCGGJVNY34bRr6lPINhNjyZw==}
@@ -3149,8 +3143,6 @@ snapshots:
       inherits: 2.0.3
       setprototypeof: 1.1.0
       statuses: 1.5.0
-
-  https@1.0.0: {}
 
   human-signals@1.1.1: {}
 
