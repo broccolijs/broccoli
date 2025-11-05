@@ -96,17 +96,12 @@ function handleRequest(
         files: fs
           .readdirSync(filename)
           .sort()
-          .map(child => {
+          .map((child) => {
             const stat = fs.statSync(path.join(filename, child)),
               isDir = stat.isDirectory();
             return {
               href: child + (isDir ? '/' : ''),
-              type: isDir
-                ? 'dir'
-                : path
-                    .extname(child)
-                    .replace('.', '')
-                    .toLowerCase(),
+              type: isDir ? 'dir' : path.extname(child).replace('.', '').toLowerCase(),
             };
           }),
         liveReloadPath: options.liveReloadPath,

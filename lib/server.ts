@@ -167,7 +167,7 @@ function serve(
       }
       _process.exit(_process.exitCode);
     })
-    .catch(err => {
+    .catch((err) => {
       ui.writeLine('Broccoli Cleanup error:', 'ERROR');
       ui.writeError(err);
       _process.exit(1);

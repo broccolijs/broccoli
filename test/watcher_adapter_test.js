@@ -39,8 +39,8 @@ function spin(cb, limit) {
   });
 }
 
-describe('WatcherAdapter', function() {
-  afterEach(function() {
+describe('WatcherAdapter', function () {
+  afterEach(function () {
     sinon.restore();
   });
 
@@ -67,7 +67,7 @@ describe('WatcherAdapter', function() {
     watched: true,
   };
 
-  describe('bindFileEvent', function() {
+  describe('bindFileEvent', function () {
     const adapter = {
       emit() {},
     };
@@ -82,7 +82,7 @@ describe('WatcherAdapter', function() {
       revise() {},
     };
 
-    it('works', function() {
+    it('works', function () {
       const emitHandler = sinon.spy();
       adapter.emit = emitHandler;
       const on = sinon.spy(watcher, 'on');
@@ -118,13 +118,13 @@ describe('WatcherAdapter', function() {
     });
   });
 
-  describe('constructor', function() {
-    it('does not support call constructor', function() {
+  describe('constructor', function () {
+    it('does not support call constructor', function () {
       expect(() => WatcherAdapter()).to.throw(/\bwithout 'new'/);
     });
 
-    it('throws if you try to watch a non array', function() {
-      [NaN, {}, { length: 0 }, 'string', function() {}, Symbol('OMG')].forEach(arg => {
+    it('throws if you try to watch a non array', function () {
+      [NaN, {}, { length: 0 }, 'string', function () {}, Symbol('OMG')].forEach((arg) => {
         expect(() => new WatcherAdapter(arg)).to.throw(
           TypeError,
           `WatcherAdapter's first argument must be an array of SourceNodeWrapper nodes`
@@ -132,18 +132,18 @@ describe('WatcherAdapter', function() {
       });
     });
 
-    it('throws if you try to watch a non node', function() {
+    it('throws if you try to watch a non node', function () {
       expect(() => new WatcherAdapter([{}])).to.throw(Error, `[object Object] is not a SourceNode`);
     });
 
-    it('throws if you try to watch a non-source node', function() {
+    it('throws if you try to watch a non-source node', function () {
       expect(() => new WatcherAdapter([new TransformNodeWrapper()])).to.throw(
         Error,
         `[NodeWrapper:undefined undefined at undefined] is not a SourceNode`
       );
     });
 
-    it('throws if you try to watch a non-watchable node', function() {
+    it('throws if you try to watch a non-watchable node', function () {
       expect(() => new WatcherAdapter([unwatchedNodeBasic])).to.throw(
         Error,
         /[/\\]broccoli[/\\]test[/\\]fixtures[/\\]basic' is not watched/
@@ -151,7 +151,7 @@ describe('WatcherAdapter', function() {
     });
   });
 
-  describe('watch', function() {
+  describe('watch', function () {
     this.timeout(20000);
 
     const isWin = process.platform === 'win32';
@@ -159,15 +159,15 @@ describe('WatcherAdapter', function() {
     const FIXTURE_PROJECT = __dirname + (isWin ? '\\fixtures\\project' : '/fixtures/project');
     let adapter;
 
-    afterEach(async function() {
+    afterEach(async function () {
       await adapter.quit();
     });
 
-    it('supports symmetric start/shutdown', function() {
+    it('supports symmetric start/shutdown', function () {
       adapter = new WatcherAdapter([]);
     });
 
-    it('actually works !!', function() {
+    it('actually works !!', function () {
       adapter = new WatcherAdapter([watchedNodeBasic]);
       const changeHandler = sinon.spy();
       adapter.on('change', changeHandler);
@@ -180,7 +180,7 @@ describe('WatcherAdapter', function() {
 
       expect(adapter.watchers.length).to.eql(1);
 
-      return watching.then(function() {
+      return watching.then(function () {
         expect(arguments.length).to.eql(1);
 
         expect(changeHandler).to.have.callCount(0);
@@ -197,7 +197,7 @@ describe('WatcherAdapter', function() {
           const watching = adapter.watch([watchedNodeProject]);
           expect(adapter.watchers.length).to.eql(2);
 
-          return watching.then(val => {
+          return watching.then((val) => {
             expect(val).to.eql(undefined);
 
             fs.utimesSync(FIXTURE_BASIC + '/foo.txt', new Date(), new Date());
@@ -216,7 +216,7 @@ describe('WatcherAdapter', function() {
                 expect(adapter.watchers.length).to.eql(2);
                 const quitting = adapter.quit();
                 expect(adapter.watchers.length).to.eql(0);
-                return quitting.then(val => {
+                return quitting.then((val) => {
                   expect(val).to.eql(undefined);
                   return new Promise((resolve, reject) => {
                     setTimeout(() => {
@@ -235,23 +235,23 @@ describe('WatcherAdapter', function() {
       });
     });
   });
-  describe('optionsFor', function() {
+  describe('optionsFor', function () {
     let adapter;
-    beforeEach(function() {
+    beforeEach(function () {
       adapter = new WatcherAdapter([], {}, [join(__dirname, 'my-ignored-subdir')]);
     });
-    afterEach(async function() {
+    afterEach(async function () {
       await adapter.quit();
     });
-    it('generates a relative ignored path inside watchedDir', function() {
+    it('generates a relative ignored path inside watchedDir', function () {
       const options = adapter.optionsFor(__dirname);
       expect(options.ignored).to.deep.eq(['my-ignored-subdir/**']);
     });
-    it('generates no relative ignored paths when they are outside watchedDir', function() {
+    it('generates no relative ignored paths when they are outside watchedDir', function () {
       const options = adapter.optionsFor('/somewhere/else');
       expect(options.ignored).to.eq(undefined);
     });
-    it('is not fooled by name prefix matches', function() {
+    it('is not fooled by name prefix matches', function () {
       const options = adapter.optionsFor(join(__dirname, 'my-ignored-subdir-just-kidding'));
       expect(options.ignored).to.eq(undefined);
     });

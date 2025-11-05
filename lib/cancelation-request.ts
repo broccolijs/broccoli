@@ -28,7 +28,7 @@ export default class CancelationRequest {
       return this._canceling;
     }
 
-    this._canceling = this._pendingWork.catch(e => {
+    this._canceling = this._pendingWork.catch((e) => {
       if (CancelationError.isCancelationError(e)) {
         return;
       } else {

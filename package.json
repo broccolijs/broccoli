@@ -82,7 +82,7 @@
     "longjohn": "^0.2.12",
     "mocha": "^11.7.4",
     "portfinder": "^1.0.38",
-    "prettier": "^1.19.1",
+    "prettier": "^3.6.2",
     "rsvp": "^4.8.5",
     "semver": "^7.7.3",
     "sinon": "^21.0.0",

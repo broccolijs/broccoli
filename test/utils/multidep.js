@@ -7,7 +7,7 @@ if (process.argv.length !== 3) {
 
 require('./multidep/index')
   .install(process.argv[2])
-  .catch(function(err) {
+  .catch(function (err) {
     console.error(err.stack || err);
     process.exit(1);
   });

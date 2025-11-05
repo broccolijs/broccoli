@@ -7,7 +7,7 @@ const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 function stubTime(ms) {
-  process.hrtime = function() {
+  process.hrtime = function () {
     return [0, ms * 1e6];
   };
 }
@@ -18,10 +18,10 @@ function restoreTime() {
   process.hrtime = originalHrtime;
 }
 
-describe('calculateSummary', function() {
+describe('calculateSummary', function () {
   afterEach(restoreTime);
 
-  it('summarizes simple graphs', function() {
+  it('summarizes simple graphs', function () {
     stubTime(100);
     const heimdall = new Heimdall();
 
@@ -41,7 +41,7 @@ describe('calculateSummary', function() {
         return calculateSummary(heimdall);
       });
 
-    return result.then(result => {
+    return result.then((result) => {
       expect(result).to.deep.equal({
         totalTime: 500,
         nodes: [
@@ -76,7 +76,7 @@ describe('calculateSummary', function() {
     });
   });
 
-  it("counts non-broccoli nodes' time as part of their ancestor broccoli node's time", function() {
+  it("counts non-broccoli nodes' time as part of their ancestor broccoli node's time", function () {
     stubTime(100);
     const heimdall = new Heimdall();
 
@@ -105,7 +105,7 @@ describe('calculateSummary', function() {
         return calculateSummary(heimdall);
       });
 
-    return result.then(result => {
+    return result.then((result) => {
       expect(result).to.deep.equal({
         totalTime: 500,
         nodes: [

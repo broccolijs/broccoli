@@ -36,9 +36,9 @@ export default function calculateSummary(tree: HeimdallNode) {
   const nodesGroupedByName: { [key: string]: GroupedNode } = {};
 
   // calculate times
-  tree.visitPostOrder(node => {
+  tree.visitPostOrder((node) => {
     let nonbroccoliChildrenTime = 0;
-    node.forEachChild(childNode => {
+    node.forEachChild((childNode) => {
       // subsume non-broccoli nodes as their ancestor broccoli nodes'
       // broccoliSelfTime
       if (!childNode.id.broccoliNode) {

@@ -6,8 +6,8 @@ import CancelationError from '../lib/errors/cancelation';
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
-describe('cancelation-request', function() {
-  it('.isCancelled / .cancel', async function() {
+describe('cancelation-request', function () {
+  it('.isCancelled / .cancel', async function () {
     const request = new CancelationRequest(Promise.resolve());
 
     expect(request.isCanceled).to.eql(false);
@@ -19,7 +19,7 @@ describe('cancelation-request', function() {
     });
   });
 
-  it('.throwIfRequested (requested)', async function() {
+  it('.throwIfRequested (requested)', async function () {
     const request = new CancelationRequest(Promise.resolve());
 
     request.throwIfRequested();
@@ -35,13 +35,13 @@ describe('cancelation-request', function() {
     }).to.throw('Build Canceled');
   });
 
-  it('.cancel (with CancelationError rejection)', function() {
+  it('.cancel (with CancelationError rejection)', function () {
     const request = new CancelationRequest(Promise.reject(new CancelationError()));
 
     return request.cancel();
   });
 
-  it('.cancel (with non-builder rejection)', function() {
+  it('.cancel (with non-builder rejection)', function () {
     const request = new CancelationRequest(Promise.reject(new Error('OOPS')));
 
     return expect(request.cancel()).to.eventually.be.rejectedWith('OOPS');

@@ -80,7 +80,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
 
     if (this.nodeInfo.trackInputChanges === true) {
       const changed = this.inputNodeWrappers.map(
-        wrapper => this.inputRevisions.get(wrapper)!.changed
+        (wrapper) => this.inputRevisions.get(wrapper)!.changed
       );
 
       await this.callbackObject.build({ changedNodes: changed });
@@ -109,7 +109,7 @@ export default class TransformNodeWrapper extends NodeWrapper {
     let hint = this.label;
     if (this.inputNodeWrappers) {
       // a bit defensive to deal with partially-constructed node wrappers
-      hint += ' inputNodeWrappers:[' + this.inputNodeWrappers.map(nw => nw.id) + ']';
+      hint += ' inputNodeWrappers:[' + this.inputNodeWrappers.map((nw) => nw.id) + ']';
     }
     hint += ' at ' + this.outputPath;
     if (this.buildState.selfTime != null) {

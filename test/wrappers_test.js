@@ -8,7 +8,7 @@ const { expect } = chai;
 
 chai.use(sinonChai);
 
-describe('transform-node', function() {
+describe('transform-node', function () {
   let transform;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('transform-node', function() {
     delete process.env['BROCCOLI_ENABLED_MEMOIZE'];
   });
 
-  it('shouldBuild should return false if there are no inputNodes and this is a rebuild', function() {
+  it('shouldBuild should return false if there are no inputNodes and this is a rebuild', function () {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
     transform._revision = 0;
@@ -39,7 +39,7 @@ describe('transform-node', function() {
     expect(transform.shouldBuild()).to.be.false;
   });
 
-  it('shouldBuild method should return false if none of the inputNodes changed', async function() {
+  it('shouldBuild method should return false if none of the inputNodes changed', async function () {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
     const inputWrapperA = new Node();
@@ -52,7 +52,7 @@ describe('transform-node', function() {
     expect(transform.shouldBuild()).to.be.false;
   });
 
-  it('shouldBuild method should return true if some of the inputs changed', async function() {
+  it('shouldBuild method should return true if some of the inputs changed', async function () {
     process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
     const inputWrapperA = new Node();
@@ -66,7 +66,7 @@ describe('transform-node', function() {
     expect(transform.shouldBuild()).to.be.true;
   });
 
-  it('shouldBuild method should return true if none of the inputNodes changed and volatile is true', function() {
+  it('shouldBuild method should return true if none of the inputNodes changed and volatile is true', function () {
     transform.nodeInfo.volatile = true;
 
     const inputWrapperA = new Node();
@@ -79,7 +79,7 @@ describe('transform-node', function() {
     expect(transform.shouldBuild()).to.be.true;
   });
 
-  it('build should receive object if trackInputChanges is true', async function() {
+  it('build should receive object if trackInputChanges is true', async function () {
     const spy = sinon.spy();
 
     transform.nodeInfo.build = spy;
@@ -117,7 +117,7 @@ describe('transform-node', function() {
     });
   });
 
-  it('build should not receive an object if trackInputChanges is false / undefined', async function() {
+  it('build should not receive an object if trackInputChanges is false / undefined', async function () {
     const spy = sinon.spy();
 
     transform.nodeInfo.build = spy;

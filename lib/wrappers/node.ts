@@ -35,7 +35,7 @@ export default class NodeWrapper {
       nodeInfo: this.nodeInfoToJSON(),
       buildState: this.buildState,
       label: this.label,
-      inputNodeWrappers: this.inputNodeWrappers.map(nw => nw.id),
+      inputNodeWrappers: this.inputNodeWrappers.map((nw) => nw.id),
       cachePath: this.cachePath,
       outputPath: this.outputPath,
       // leave out node, originalNode, inputPaths (redundant), build

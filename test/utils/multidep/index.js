@@ -25,7 +25,7 @@ function PackageCollection() {
   this.versions = [];
 }
 
-PackageCollection.prototype.forEachVersion = function(cb) {
+PackageCollection.prototype.forEachVersion = function (cb) {
   for (let i = 0; i < this.versions.length; i++) {
     const module = this[this.versions[i]](); // require
     cb(this.versions[i], module);
@@ -40,9 +40,9 @@ module.exports = function multidep(specPath) {
   const packages = {};
   Object.keys(spec.versions)
     .sort()
-    .forEach(function(packageName) {
+    .forEach(function (packageName) {
       packages[packageName] = new PackageCollection();
-      spec.versions[packageName].forEach(function(version) {
+      spec.versions[packageName].forEach(function (version) {
         const packagePath = path.join(spec.path, packageName + '-' + version);
         if (!fs.existsSync(packagePath)) {
           throw new Error(packagePath + ': No such file or directory. Run `multidep` to install.');
@@ -58,7 +58,7 @@ module.exports = function multidep(specPath) {
         packages[packageName]['master'] = require.bind(global, absPath);
         packages[packageName].versions.push('master');
       } else {
-        packages[packageName]['master'] = function() {
+        packages[packageName]['master'] = function () {
           return null;
         };
       }
@@ -93,7 +93,7 @@ module.exports = function multidep(specPath) {
   return multidepRequire;
 };
 
-module.exports.install = function(specPath) {
+module.exports.install = function (specPath) {
   const spec = getSpec(specPath);
 
   if (!fs.existsSync(spec.path)) {
@@ -103,12 +103,12 @@ module.exports.install = function(specPath) {
   let promise = RSVP.resolve();
   Object.keys(spec.versions)
     .sort()
-    .forEach(function(packageName) {
-      spec.versions[packageName].forEach(function(version) {
-        promise = promise.then(function() {
+    .forEach(function (packageName) {
+      spec.versions[packageName].forEach(function (version) {
+        promise = promise.then(function () {
           const packagePath = path.join(spec.path, packageName + '-' + version);
           return RSVP.resolve()
-            .then(async function() {
+            .then(async function () {
               if (!fs.existsSync(packagePath)) {
                 console.log(packageName + ' ' + version + ': Installing');
                 fs.mkdirSync(packagePath);
@@ -126,7 +126,7 @@ module.exports.install = function(specPath) {
                 console.log(packageName + ' ' + version + ': Installed');
               }
             })
-            .catch(function(err) {
+            .catch(function (err) {
               // We created a nested promise with `RSVP.resolve()` above so this
               // .catch clause only applies to the previous .then and doesn't
               // catch earlier failures in the chain

@@ -9,10 +9,10 @@ const expect = chai.expect;
 chai.use(sinonChai);
 const sinon = Sinon.createSandbox();
 
-describe('Watcher', function() {
+describe('Watcher', function () {
   let watcher;
 
-  afterEach(function() {
+  afterEach(function () {
     if (watcher) {
       watcher.quit();
       watcher = null;
@@ -41,8 +41,8 @@ describe('Watcher', function() {
     quit() {},
   };
 
-  describe('start', function() {
-    it('sets up event handlers, watchedPaths, and builds', async function() {
+  describe('start', function () {
+    it('sets up event handlers, watchedPaths, and builds', async function () {
       const builderBuild = sinon.spy(builder, 'build');
 
       const watchedNodes = [watchedNodeBasic];
@@ -71,7 +71,7 @@ describe('Watcher', function() {
       expect(builderBuild).to.have.been.called;
     });
 
-    it('throws error if called twice', function() {
+    it('throws error if called twice', function () {
       const watcher = new Watcher(builder, [], { watcherAdapter: adapter });
       watcher.start();
       expect(() => watcher.start()).to.throw(
@@ -79,7 +79,7 @@ describe('Watcher', function() {
       );
     });
 
-    it('calls error if build rejects', async function() {
+    it('calls error if build rejects', async function () {
       const watcher = new Watcher(
         {
           nodeWrappers: [],
@@ -105,8 +105,8 @@ describe('Watcher', function() {
     });
   });
 
-  describe('change', function() {
-    it('on change, rebuild is invoked', async function() {
+  describe('change', function () {
+    it('on change, rebuild is invoked', async function () {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -139,7 +139,7 @@ describe('Watcher', function() {
       expect(builderBuild).to.have.been.called;
     });
 
-    it('does nothing if not ready', function() {
+    it('does nothing if not ready', function () {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -151,7 +151,7 @@ describe('Watcher', function() {
       expect(builderBuild).to.not.have.been.called;
     });
 
-    it('does nothing if rebuilding', function() {
+    it('does nothing if rebuilding', function () {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -164,21 +164,21 @@ describe('Watcher', function() {
       expect(builderBuild).to.not.have.been.called;
     });
 
-    it('filePath is undefined on initial build', async function() {
+    it('filePath is undefined on initial build', async function () {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       const result = await watcher._build();
       expect(result.filePath).to.be.undefined;
     });
 
-    it('filePath is set on rebuild', async function() {
+    it('filePath is set on rebuild', async function () {
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
       const result = await watcher._build(path.join('root', 'file.js'));
       expect(result.filePath).to.equal(path.join('root', 'file.js'));
     });
 
-    it('annotation is properly sent on initial build', async function() {
+    it('annotation is properly sent on initial build', async function () {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -193,7 +193,7 @@ describe('Watcher', function() {
       });
     });
 
-    it('annotation is properly sent on rebuild', async function() {
+    it('annotation is properly sent on rebuild', async function () {
       const builderBuild = sinon.spy(builder, 'build');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -211,8 +211,8 @@ describe('Watcher', function() {
     });
   });
 
-  describe('error', function() {
-    it('emits an error and quits', function() {
+  describe('error', function () {
+    it('emits an error and quits', function () {
       const error = new Error('fail');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -230,7 +230,7 @@ describe('Watcher', function() {
       });
     });
 
-    it('does noting if already quitting', function() {
+    it('does noting if already quitting', function () {
       const error = new Error('fail');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -244,8 +244,8 @@ describe('Watcher', function() {
     });
   });
 
-  describe('quit', function() {
-    it('quits the watcher', async function() {
+  describe('quit', function () {
+    it('quits the watcher', async function () {
       const adapterQuit = sinon.spy(adapter, 'quit');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
 
@@ -272,7 +272,7 @@ describe('Watcher', function() {
       expect(quitEndHandler).to.have.been.called;
     });
 
-    it('does nothing if already quitting', function() {
+    it('does nothing if already quitting', function () {
       const adapterQuit = sinon.spy(adapter, 'quit');
       const watcher = new Watcher(builder, [watchedNodeBasic], { watcherAdapter: adapter });
       watcher._quittingPromise = true;
