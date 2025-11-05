@@ -61,7 +61,7 @@
     "@types/esm": "^3.2.0",
     "@types/findup-sync": "^4.0.5",
     "@types/mime-types": "^2.1.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.10.0",
     "@types/sane": "^2.0.0",
     "@types/tmp": "^0.2.6",
     "@types/underscore.string": "^0.0.38",
