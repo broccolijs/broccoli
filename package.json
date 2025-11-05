@@ -11,14 +11,17 @@
     "pipeline"
   ],
   "homepage": "https://github.com/broccolijs/broccoli",
-  "license": "MIT",
-  "author": "Jo Liss <joliss42@gmail.com>",
-  "main": "dist/index.js",
-  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/broccolijs/broccoli"
   },
+  "license": "MIT",
+  "author": "Jo Liss <joliss42@gmail.com>",
+  "main": "dist/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc && pnpm html",
     "clean": "rm -rf dist",
@@ -83,6 +86,7 @@
     "mocha": "^11.7.4",
     "portfinder": "^1.0.38",
     "prettier": "^3.6.2",
+    "release-plan": "^0.17.0",
     "rsvp": "^4.8.5",
     "semver": "^7.7.3",
     "sinon": "^21.0.0",
@@ -93,8 +97,5 @@
   },
   "engines": {
     "node": ">= 20.*"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }
