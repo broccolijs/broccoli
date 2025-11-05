@@ -157,8 +157,8 @@ importers:
         specifier: ^1.19.1
         version: 1.19.1
       rsvp:
-        specifier: ^3.1.0
-        version: 3.6.2
+        specifier: ^4.8.5
+        version: 4.8.5
       semver:
         specifier: ^7.7.3
         version: 7.7.3
@@ -1708,10 +1708,6 @@ packages:
 
   rsvp@3.2.1:
     resolution: {integrity: sha512-Rf4YVNYpKjZ6ASAmibcwTNciQ5Co5Ztq6iZPEykHpkoflnD/K5ryE/rHehFsTm4NJj8nKDhbi3eKBWGogmNnkg==}
-
-  rsvp@3.6.2:
-    resolution: {integrity: sha512-OfWGQTb9vnwRjwtA2QwpG2ICclHC3pgXZO5xt8H2EfgDquO0qVdSb5T88L4qJVAEugbS56pAuV4XZM58UX8ulw==}
-    engines: {node: 0.12.* || 4.* || 6.* || >= 7.*}
 
   rsvp@4.8.5:
     resolution: {integrity: sha512-nfMOlASu9OnRJo1mbEk2cz0D56a1MBNrJ7orjRZQG10XDyuvwksKbuXNp6qa+kbn839HwjwhBzhFmdsaEAfauA==}
@@ -3667,8 +3663,6 @@ snapshots:
       package-json-from-dist: 1.0.1
 
   rsvp@3.2.1: {}
-
-  rsvp@3.6.2: {}
 
   rsvp@4.8.5: {}
 
