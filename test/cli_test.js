@@ -33,18 +33,18 @@ function createWatcherSpy() {
   return spy;
 }
 
-describe('cli', function() {
+describe('cli', function () {
   let oldCwd = null;
   let exitStub;
   const EXIT_CODE = process.exitCode;
 
-  beforeEach(function() {
+  beforeEach(function () {
     exitStub = sinon.stub(process, 'exit');
     oldCwd = process.cwd();
     process.chdir('test/fixtures/project/subdir');
   });
 
-  afterEach(function() {
+  afterEach(function () {
     process.exitCode = EXIT_CODE;
     sinon.restore();
     process.chdir(oldCwd);
@@ -52,12 +52,12 @@ describe('cli', function() {
     process.removeAllListeners('SIGINT');
   });
 
-  describe('build', function() {
-    afterEach(function() {
+  describe('build', function () {
+    afterEach(function () {
       rimrafSync('dist');
     });
 
-    it('creates watcher with sane options', async function() {
+    it('creates watcher with sane options', async function () {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
         .value(() => ({ watcher: 'polling' }));
@@ -78,29 +78,29 @@ describe('cli', function() {
       );
     });
 
-    context('on successful build', function() {
-      it('cleanups tmp files', async function() {
+    context('on successful build', function () {
+      it('cleanups tmp files', async function () {
         const cleanup = sinon.spy(Builder.prototype, 'cleanup');
         await cli(['node', 'broccoli', 'build', 'dist']);
         chai.expect(cleanup).to.be.calledOnce;
       });
 
-      it('closes process on completion', async function() {
+      it('closes process on completion', async function () {
         await cli(['node', 'broccoli', 'build', 'dist']);
         chai.expect(process.exitCode).to.eql(0);
         chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('creates output folder', async function() {
+      it('creates output folder', async function () {
         await cli(['node', 'broccoli', 'build', 'dist']);
         chai.expect(fs.existsSync('dist')).to.be.true;
       });
     });
 
-    context('on failed build', function() {
-      it('closes process with exit code 1 on build failure', async function() {
+    context('on failed build', function () {
+      it('closes process with exit code 1 on build failure', async function () {
         const mockUI = new MockUI();
-        sinon.stub(DummyWatcher.prototype, 'start').value(function() {
+        sinon.stub(DummyWatcher.prototype, 'start').value(function () {
           this.emit('buildFailure', new Error('Build failed'));
         });
 
@@ -108,9 +108,9 @@ describe('cli', function() {
         chai.expect(process.exitCode).to.eql(1);
       });
 
-      it('closes process with exit code 1 when the watcher fails to start', async function() {
+      it('closes process with exit code 1 when the watcher fails to start', async function () {
         const mockUI = new MockUI();
-        sinon.stub(DummyWatcher.prototype, 'start').value(function() {
+        sinon.stub(DummyWatcher.prototype, 'start').value(function () {
           throw new Error('Build failed');
         });
 
@@ -119,12 +119,12 @@ describe('cli', function() {
       });
     });
 
-    context('overwrites existing [target]', function() {
+    context('overwrites existing [target]', function () {
       afterEach(() => {
         rimrafSync('dist');
       });
 
-      it('removes existing files', async function() {
+      it('removes existing files', async function () {
         fs.mkdirSync('dist');
         fs.writeFileSync('dist/foo.txt', 'foo');
 
@@ -134,7 +134,7 @@ describe('cli', function() {
         chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
       });
 
-      it('errors if [target] is a parent directory', function() {
+      it('errors if [target] is a parent directory', function () {
         const mockUI = new MockUI();
         cli(['node', 'broccoli', 'build', '../'], mockUI);
         chai
@@ -143,7 +143,7 @@ describe('cli', function() {
       });
 
       // just to be safe ;)
-      it('errors if [target] is a the root directory', function() {
+      it('errors if [target] is a the root directory', function () {
         const mockUI = new MockUI();
         cli(['node', 'broccoli', 'build', '/'], mockUI);
         chai
@@ -153,22 +153,22 @@ describe('cli', function() {
       });
     });
 
-    context('with param --watch', function() {
-      it('starts watcher', function(done) {
+    context('with param --watch', function () {
+      it('starts watcher', function (done) {
         sinon.stub(broccoli.Watcher.prototype, 'start').value(() => done());
         cli(['node', 'broccoli', 'build', 'dist', '--watch']);
         chai.expect(process.exitCode).to.eql(0);
       });
     });
 
-    context('with param --watcher', function() {
-      it('closes process on completion', async function() {
+    context('with param --watcher', function () {
+      it('closes process on completion', async function () {
         await cli(['node', 'broccoli', 'build', 'dist', '--watcher', 'polling']);
         chai.expect(process.exitCode).to.eql(0);
         chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('creates watcher with sane options for polling', async function() {
+      it('creates watcher with sane options for polling', async function () {
         const spy = createWatcherSpy();
         await cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'polling']);
         chai.expect(spy).to.have.been.calledWith(
@@ -185,7 +185,7 @@ describe('cli', function() {
         );
       });
 
-      it('creates watcher with sane options for watchman', async function() {
+      it('creates watcher with sane options for watchman', async function () {
         sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
         const spy = createWatcherSpy();
         await cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'watchman']);
@@ -203,7 +203,7 @@ describe('cli', function() {
         );
       });
 
-      it('creates watcher with sane options for node', async function() {
+      it('creates watcher with sane options for node', async function () {
         const spy = createWatcherSpy();
         await cli(['node', 'broccoli', 'build', 'dist', '--watch', '--watcher', 'node']);
         chai.expect(spy).to.have.been.calledWith(
@@ -221,22 +221,22 @@ describe('cli', function() {
       });
     });
 
-    context('with param --brocfile-path', function() {
-      it('closes process on completion', async function() {
+    context('with param --brocfile-path', function () {
+      it('closes process on completion', async function () {
         await cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
         chai.expect(process.exitCode).to.eql(0);
         chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('loads brocfile from a path', async function() {
+      it('loads brocfile from a path', async function () {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
         await cli(['node', 'broccoli', 'build', 'dist', '--brocfile-path', '../Brocfile.js']);
         chai.expect(spy).to.be.calledWith(sinon.match.has('brocfilePath', '../Brocfile.js'));
       });
 
-      context('and with param --cwd', function() {
-        it('closes process on completion', async function() {
+      context('and with param --cwd', function () {
+        it('closes process on completion', async function () {
           await cli([
             'node',
             'broccoli',
@@ -253,16 +253,16 @@ describe('cli', function() {
       });
     });
 
-    context('with param --cwd', function() {
-      it('throws BuilderError on wrong path', function() {
+    context('with param --cwd', function () {
+      it('throws BuilderError on wrong path', function () {
         chai
           .expect(() => cli(['node', 'broccoli', 'build', 'dist', '--cwd', '../../basic']))
           .to.throw(BuilderError, /Directory not found/);
       });
     });
 
-    context('with param --environment', function() {
-      it('defaults to --environment=development: { env: "development" }', async function() {
+    context('with param --environment', function () {
+      it('defaults to --environment=development: { env: "development" }', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
@@ -270,7 +270,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('with --environment=production passes { env: "production" }', async function() {
+      it('with --environment=production passes { env: "production" }', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
@@ -278,7 +278,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('with -e production passes { env: "production" }', async function() {
+      it('with -e production passes { env: "production" }', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
@@ -286,7 +286,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('aliases --dev to --environment=development', async function() {
+      it('aliases --dev to --environment=development', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
@@ -294,7 +294,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('aliases --prod to --environment=production', async function() {
+      it('aliases --prod to --environment=production', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
 
@@ -303,31 +303,31 @@ describe('cli', function() {
       });
     });
 
-    it('supports `b` alias', async function() {
+    it('supports `b` alias', async function () {
       await cli(['node', 'broccoli', 'b']);
       chai.expect(process.exitCode).to.eql(0);
       chai.expect(exitStub).to.be.calledWith(0);
     });
 
-    context('with param --output-path', function() {
-      it('closes process on completion', async function() {
+    context('with param --output-path', function () {
+      it('closes process on completion', async function () {
         await cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
         chai.expect(process.exitCode).to.eql(0);
         chai.expect(exitStub).to.be.calledWith(0);
       });
 
-      it('creates output folder', async function() {
+      it('creates output folder', async function () {
         await cli(['node', 'broccoli', 'build', '--output-path', 'dist']);
         chai.expect(fs.existsSync('dist')).to.be.true;
       });
 
-      context('and with [target]', function() {
-        it('exits with error', function() {
+      context('and with [target]', function () {
+        it('exits with error', function () {
           cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist']);
           chai.expect(exitStub).to.be.calledWith(1);
         });
 
-        it('outputs error reason to console', function() {
+        it('outputs error reason to console', function () {
           const mockUI = new MockUI();
           cli(['node', 'broccoli', 'build', 'dist', '--output-path', 'dist'], mockUI);
           chai
@@ -338,14 +338,14 @@ describe('cli', function() {
     });
   });
 
-  describe('serve', function() {
+  describe('serve', function () {
     let server;
 
-    beforeEach(function() {
+    beforeEach(function () {
       server = sinon.mock(broccoli.server);
     });
 
-    it('creates watcher with sane options', async function() {
+    it('creates watcher with sane options', async function () {
       sinon
         .stub(WatchDetector.prototype, 'findBestWatcherOption')
         .value(() => ({ watcher: 'polling' }));
@@ -366,7 +366,7 @@ describe('cli', function() {
       );
     });
 
-    it('should start a server with default values', function() {
+    it('should start a server with default values', function () {
       server
         .expects('serve')
         .once()
@@ -375,7 +375,7 @@ describe('cli', function() {
       server.verify();
     });
 
-    it('supports `s` alias', function() {
+    it('supports `s` alias', function () {
       server
         .expects('serve')
         .once()
@@ -384,32 +384,26 @@ describe('cli', function() {
       server.verify();
     });
 
-    it('starts server with given ip address', async function() {
+    it('starts server with given ip address', async function () {
       server.expects('serve').withArgs(sinon.match.any, '192.168.2.123', sinon.match.number);
       await cli(['node', 'broccoli', 'serve', '--host', '192.168.2.123']);
       server.verify();
     });
 
-    it('converts port to a number and starts the server at given port', async function() {
-      server
-        .expects('serve')
-        .once()
-        .withArgs(sinon.match.any, sinon.match.string, 1234);
+    it('converts port to a number and starts the server at given port', async function () {
+      server.expects('serve').once().withArgs(sinon.match.any, sinon.match.string, 1234);
       await cli(['node', 'broccoli', 'serve', '--port', '1234']);
       server.verify();
     });
 
-    it('converts port to a number and starts the server at given port and host', async function() {
-      server
-        .expects('serve')
-        .once()
-        .withArgs(sinon.match.any, '192.168.2.123', 1234);
+    it('converts port to a number and starts the server at given port and host', async function () {
+      server.expects('serve').once().withArgs(sinon.match.any, '192.168.2.123', 1234);
       await cli(['node', 'broccoli', 'serve', '--port=1234', '--host=192.168.2.123']);
       server.verify();
     });
 
-    context('with param --brocfile-path', function() {
-      it('starts serve', async function() {
+    context('with param --brocfile-path', function () {
+      it('starts serve', async function () {
         server
           .expects('serve')
           .once()
@@ -418,7 +412,7 @@ describe('cli', function() {
         server.verify();
       });
 
-      it('loads brocfile from a path', async function() {
+      it('loads brocfile from a path', async function () {
         const spy = sinon.spy(loadBrocfile);
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(spy);
@@ -427,20 +421,20 @@ describe('cli', function() {
       });
     });
 
-    context('with param --cwd', function() {
-      it('throws BuilderError on wrong path', function() {
+    context('with param --cwd', function () {
+      it('throws BuilderError on wrong path', function () {
         chai
           .expect(() => cli(['node', 'broccoli', 'serve', '--cwd', '../../basic']))
           .to.throw(BuilderError, /Directory not found/);
       });
     });
 
-    context('with param --output-path', function() {
-      afterEach(function() {
+    context('with param --output-path', function () {
+      afterEach(function () {
         rimrafSync('dist');
       });
 
-      it('creates output folder', function(done) {
+      it('creates output folder', function (done) {
         let watcher;
         sinon.stub(broccoli, 'server').value({
           serve(_watcher) {
@@ -449,20 +443,20 @@ describe('cli', function() {
           },
         });
         cli(['node', 'broccoli', 'serve', '--output-path', 'dist']);
-        watcher.on('buildSuccess', function() {
+        watcher.on('buildSuccess', function () {
           chai.expect(fs.existsSync('dist')).to.be.true;
           watcher.quit();
           done();
         });
       });
 
-      context('and with folder already existing', function() {
-        context('accepts --overwrite option', function() {
+      context('and with folder already existing', function () {
+        context('accepts --overwrite option', function () {
           afterEach(() => {
             rimrafSync('dist');
           });
 
-          it('overwrites existing files', function(done) {
+          it('overwrites existing files', function (done) {
             fs.mkdirSync('../dist');
             fs.writeFileSync('../dist/foo.txt', 'foo');
 
@@ -474,7 +468,7 @@ describe('cli', function() {
               },
             });
             cli(['node', 'broccoli', 'serve', '--output-path', 'dist']);
-            watcher.on('buildSuccess', function() {
+            watcher.on('buildSuccess', function () {
               chai.expect(fs.existsSync('dist')).to.be.true;
               chai.expect(fs.existsSync('dist/foo.txt')).to.be.false;
               watcher.quit();
@@ -483,7 +477,7 @@ describe('cli', function() {
           });
         });
 
-        it('errors if [target] is a parent directory', async function() {
+        it('errors if [target] is a parent directory', async function () {
           const mockUI = new MockUI();
           await cli(['node', 'broccoli', 'build', '../'], mockUI);
           chai
@@ -493,8 +487,8 @@ describe('cli', function() {
       });
     });
 
-    context('with param --no-watch', function() {
-      it('should start a server with default values', async function() {
+    context('with param --no-watch', function () {
+      it('should start a server with default values', async function () {
         server
           .expects('serve')
           .once()
@@ -504,8 +498,8 @@ describe('cli', function() {
       });
     });
 
-    context('with param --environment', function() {
-      it('defaults to --environment=development: { env: "development" }', async function() {
+    context('with param --environment', function () {
+      it('defaults to --environment=development: { env: "development" }', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
@@ -514,7 +508,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('with --environment=production passes { env: "production" }', async function() {
+      it('with --environment=production passes { env: "production" }', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
@@ -523,7 +517,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('with -e production passes { env: "production" }', async function() {
+      it('with -e production passes { env: "production" }', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
@@ -532,7 +526,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'production'));
       });
 
-      it('aliases --dev to --environment=development', async function() {
+      it('aliases --dev to --environment=development', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
@@ -541,7 +535,7 @@ describe('cli', function() {
         chai.expect(spy).to.be.calledWith(sinon.match.has('env', 'development'));
       });
 
-      it('aliases --prod to --environment=production', async function() {
+      it('aliases --prod to --environment=production', async function () {
         const spy = sinon.spy(loadBrocfile());
         sinon.stub(broccoli, 'server').value({ serve() {} });
         sinon.stub(broccoli, 'loadBrocfile').value(() => spy);
@@ -552,8 +546,8 @@ describe('cli', function() {
     });
   });
 
-  context('with param --watcher', function() {
-    it('creates watcher with sane options for watchman', async function() {
+  context('with param --watcher', function () {
+    it('creates watcher with sane options for watchman', async function () {
       sinon.stub(childProcess, 'execSync').returns(JSON.stringify({ version: '4.0.0' }));
       const spy = createWatcherSpy();
       await cli(['node', 'broccoli', 'serve', '--watcher', 'watchman']);
@@ -571,7 +565,7 @@ describe('cli', function() {
       );
     });
 
-    it('creates watcher with sane options for node', async function() {
+    it('creates watcher with sane options for node', async function () {
       const spy = createWatcherSpy();
       await cli(['node', 'broccoli', 'serve', '--watcher', 'node']);
       chai.expect(spy).to.have.been.calledWith(
@@ -588,7 +582,7 @@ describe('cli', function() {
       );
     });
 
-    it('creates watcher with sane options for polling', async function() {
+    it('creates watcher with sane options for polling', async function () {
       const spy = createWatcherSpy();
       await cli(['node', 'broccoli', 'serve', '--watcher', 'polling']);
       chai.expect(spy).to.have.been.calledWith(

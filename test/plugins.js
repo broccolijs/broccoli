@@ -4,7 +4,7 @@ const symlinkOrCopySync = symlinkOrCopy.sync;
 
 // Create various test plugins subclassing from Plugin. Wrapped in a function
 // to allow for testing against different Plugin versions.
-module.exports = function(Plugin) {
+module.exports = function (Plugin) {
   const plugins = {};
 
   class CountingPlugin extends Plugin {
@@ -98,7 +98,7 @@ module.exports = function(Plugin) {
 
     build() {
       super.build();
-      return new Promise(resolve => setTimeout(resolve, this.options.sleep));
+      return new Promise((resolve) => setTimeout(resolve, this.options.sleep));
     }
   };
 

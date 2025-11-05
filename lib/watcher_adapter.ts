@@ -87,7 +87,7 @@ class WatcherAdapter extends EventEmitter {
       // we need to convert any absolute ignored paths to local paths that sit
       // within the watchedPath
       const localIgnored = this.ignored
-        .map(ignoredAbsPath => {
+        .map((ignoredAbsPath) => {
           const ignoredRelativePath = relative(watchedPath, ignoredAbsPath);
           if (!ignoredRelativePath.startsWith('..') && !isAbsolute(ignoredRelativePath)) {
             return ignoredRelativePath + '/**';

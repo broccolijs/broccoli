@@ -21,15 +21,15 @@ import SinonChai from 'sinon-chai';
 
 chai.use(SinonChai);
 
-describe('server', function() {
+describe('server', function () {
   let server;
   let PORT;
 
-  before(async function() {
+  before(async function () {
     PORT = await require('portfinder').getPortPromise({ port: 65529 });
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     try {
       await (server && server.stop());
     } finally {
@@ -37,25 +37,25 @@ describe('server', function() {
     }
   });
 
-  it('throws if first argument is not an instance of Watcher', function() {
+  it('throws if first argument is not an instance of Watcher', function () {
     expect(() => Server.serve({}, 123, 1234)).to.throw(/Watcher/);
   });
 
-  it('throws if host is not a string', function() {
+  it('throws if host is not a string', function () {
     expect(() => Server.serve(new Watcher(null, []), 123, 1234)).to.throw(/host/);
   });
 
-  it('throws if port is not a number', function() {
+  it('throws if port is not a number', function () {
     expect(() => Server.serve(new Watcher(null, []), '127.0.0.1', '1234')).to.throw(/port/);
   });
 
-  it('throws if port is NaN', function() {
+  it('throws if port is NaN', function () {
     expect(() => Server.serve(new Watcher(null, []), '127.0.0.1', parseInt('port'))).to.throw(
       /port/
     );
   });
 
-  it('errors if port already in use', async function() {
+  it('errors if port already in use', async function () {
     const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const serverOne = new Server.Server(
@@ -86,7 +86,7 @@ describe('server', function() {
     }
   }).timeout(10000);
 
-  it('starts with ssl if ssl option is passed', async function() {
+  it('starts with ssl if ssl option is passed', async function () {
     const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/ssl'));
     const watcher = new Watcher(builder, []);
@@ -115,7 +115,7 @@ describe('server', function() {
     expect(statusCode).to.eql(200);
   }).timeout(5000);
 
-  it('buildSuccess is handled', async function() {
+  it('buildSuccess is handled', async function () {
     const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder, []);
@@ -134,7 +134,7 @@ describe('server', function() {
     expect(buildSuccessWasCalled).to.eql(1);
   });
 
-  it('converts ANSI codes to HTML from the error stack', async function() {
+  it('converts ANSI codes to HTML from the error stack', async function () {
     const error = new Error('whoops');
     error.stack = `\u001b[35m102\u001b[39m\u001b[33m\u001b[0m`;
 
@@ -159,7 +159,7 @@ describe('server', function() {
     }
   }).timeout(5000);
 
-  it('supports being provided a custom connect middleware root', function() {
+  it('supports being provided a custom connect middleware root', function () {
     const mockUI = new MockUI();
     const builder = new Builder(new broccoliSource.WatchedDir('test/fixtures/basic'));
     const watcher = new Watcher(builder, []);
@@ -180,7 +180,7 @@ describe('server', function() {
     expect(altConnectWasUsed).to.eql(true);
   });
 
-  it('supports serving a built file', async function() {
+  it('supports serving a built file', async function () {
     fs.utimesSync(
       'test/fixtures/public/foo.txt',
       new Date('2018-07-27T17:25:23.102Z'),

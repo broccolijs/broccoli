@@ -28,14 +28,14 @@ const sinon = Sinon.createSandbox();
 tmp.setGracefulCleanup();
 
 function wait(time) {
-  return new Promise(resolve => setTimeout(resolve, time || 0));
+  return new Promise((resolve) => setTimeout(resolve, time || 0));
 }
 // Make a default set of plugins with the latest Plugin version. In some tests
 // we'll shadow this `plugins` variable with one created with different versions.
 const plugins = makePlugins(Plugin);
 
 function sleep() {
-  return new Promise(resolve => setTimeout(resolve, 10));
+  return new Promise((resolve) => setTimeout(resolve, 10));
 }
 
 class FixtureBuilder extends Builder {
@@ -54,18 +54,18 @@ async function buildToFixture(node) {
   }
 }
 
-describe('Builder', function() {
+describe('Builder', function () {
   if (process.env.CI) {
     this.timeout(120000);
   }
 
   let builder;
 
-  beforeEach(function() {
+  beforeEach(function () {
     heimdall._reset();
   });
 
-  afterEach(function() {
+  afterEach(function () {
     sinon.restore();
 
     if (builder) {
@@ -74,7 +74,7 @@ describe('Builder', function() {
     }
   });
 
-  it('has static members that are part of the public API', function() {
+  it('has static members that are part of the public API', function () {
     expect(Builder.BuilderError).to.be.ok;
     expect(Builder.InvalidNodeError).to.be.ok;
     expect(Builder.NodeSetupError).to.be.ok;
@@ -84,15 +84,15 @@ describe('Builder', function() {
     expect(Builder.SourceNodeWrapper).to.be.ok;
   });
 
-  describe('build result', function() {
-    it('returns a promise', function() {
+  describe('build result', function () {
+    it('returns a promise', function () {
       const stepA = new plugins.Noop();
       const builder = new Builder(stepA);
       const promise = builder.build();
       expect(promise).to.be.an.instanceOf(Promise);
     });
 
-    it('promise resolves to a node', function() {
+    it('promise resolves to a node', function () {
       const stepA = new plugins.Noop();
       const builder = new Builder(stepA);
       const promise = builder.build();
@@ -101,16 +101,16 @@ describe('Builder', function() {
     });
   });
 
-  describe('broccoli-plugin nodes (nodeType: "transform")', function() {
-    multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
+  describe('broccoli-plugin nodes (nodeType: "transform")', function () {
+    multidepRequire.forEachVersion('broccoli-plugin', function (version, Plugin) {
       const plugins = makePlugins(Plugin);
 
-      describe('broccoli-plugin ' + version, function() {
+      describe('broccoli-plugin ' + version, function () {
         afterEach(() => {
           delete process.env['BROCCOLI_ENABLED_MEMOIZE'];
         });
 
-        it('builds a single node, repeatedly', async function() {
+        it('builds a single node, repeatedly', async function () {
           const node = new plugins.Veggies();
           const buildSpy = sinon.spy(node, 'build');
 
@@ -124,7 +124,7 @@ describe('Builder', function() {
           expect(buildSpy).to.have.been.calledTwice;
         });
 
-        it('allows for asynchronous build', async function() {
+        it('allows for asynchronous build', async function () {
           const asyncNode = new plugins.Async();
           const outputNode = new plugins.Merge([asyncNode]);
           const buildSpy = sinon.spy(outputNode, 'build');
@@ -141,19 +141,19 @@ describe('Builder', function() {
           expect(buildSpy).to.have.been.called;
         });
 
-        it('builds nodes reachable through multiple paths only once', async function() {
+        it('builds nodes reachable through multiple paths only once', async function () {
           const src = new plugins.Veggies();
           const buildSpy = sinon.spy(src, 'build');
           const outputNode = new plugins.Merge([src, src], { overwrite: true });
 
           await expect(buildToFixture(outputNode)).to.eventually.deep.equal({
-            '0': { 'veggies.txt': 'tasty' },
-            '1': { 'veggies.txt': 'tasty' },
+            0: { 'veggies.txt': 'tasty' },
+            1: { 'veggies.txt': 'tasty' },
           });
           expect(buildSpy).to.have.been.calledOnce;
         });
 
-        it('builds if revision counter has incremented', async function() {
+        it('builds if revision counter has incremented', async function () {
           process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
           const outputNode = new plugins.Merge([
@@ -173,7 +173,7 @@ describe('Builder', function() {
           expect(buildSpy).to.have.been.calledOnce;
         });
 
-        it('nodes with inputs that have different revisions call their builds', async function() {
+        it('nodes with inputs that have different revisions call their builds', async function () {
           process.env['BROCCOLI_ENABLED_MEMOIZE'] = true;
 
           const basicWatchDir = new broccoliSource.WatchedDir('test/fixtures/basic');
@@ -193,7 +193,7 @@ describe('Builder', function() {
           expect(barBuildSpy).to.have.been.calledOnce;
           expect(buildSpy).to.have.been.calledOnce;
 
-          builder.nodeWrappers.find(wrap => wrap.outputPath === 'test/fixtures/basic').revise();
+          builder.nodeWrappers.find((wrap) => wrap.outputPath === 'test/fixtures/basic').revise();
 
           await builder.build();
           expect(fooBuildSpy).to.have.been.calledTwice;
@@ -201,7 +201,7 @@ describe('Builder', function() {
           expect(buildSpy).to.have.been.calledTwice;
         });
 
-        it('supplies a cachePath by default', async function() {
+        it('supplies a cachePath by default', async function () {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
@@ -219,7 +219,7 @@ describe('Builder', function() {
           await builder.build();
         });
 
-        it('supplies a cachePath when requested', async function() {
+        it('supplies a cachePath when requested', async function () {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
@@ -241,7 +241,7 @@ describe('Builder', function() {
       });
 
       if (version === 'master' || version === 'main' || semver.gt(version, '1.3.0')) {
-        it('does not create a cachePath when opt-ed out', async function() {
+        it('does not create a cachePath when opt-ed out', async function () {
           // inputPath and outputPath are tested implicitly by the other tests,
           // but cachePath isn't, so we have this test case
 
@@ -263,7 +263,7 @@ describe('Builder', function() {
       }
     });
 
-    describe('persistentOutput flag', function() {
+    describe('persistentOutput flag', function () {
       multidepRequire.forEachVersion('broccoli-plugin', (version, Plugin) => {
         class BuildOncePlugin extends Plugin {
           constructor(options) {
@@ -290,13 +290,13 @@ describe('Builder', function() {
           }
         }
 
-        describe('broccoli-plugin ' + version, function() {
-          it('is not persistent by default', async function() {
+        describe('broccoli-plugin ' + version, function () {
+          it('is not persistent by default', async function () {
             await expect(isPersistent({})).to.be.eventually.false;
           });
 
           if (version !== '1.0.0') {
-            it('is persistent with persistentOutput: true', async function() {
+            it('is persistent with persistentOutput: true', async function () {
               await expect(isPersistent({ persistentOutput: true })).to.be.eventually.true;
             });
           }
@@ -305,10 +305,10 @@ describe('Builder', function() {
     });
   });
 
-  describe('broccoli-source nodes (nodeType: "source") and strings', function() {
-    multidepRequire.forEachVersion('broccoli-source', function(version, broccoliSource) {
-      describe('broccoli-source ' + version, function() {
-        it('records unwatched source directories', async function() {
+  describe('broccoli-source nodes (nodeType: "source") and strings', function () {
+    multidepRequire.forEachVersion('broccoli-source', function (version, broccoliSource) {
+      describe('broccoli-source ' + version, function () {
+        it('records unwatched source directories', async function () {
           builder = new FixtureBuilder(
             new broccoliSource.UnwatchedDir(path.resolve('test/fixtures/basic'))
           );
@@ -321,7 +321,7 @@ describe('Builder', function() {
           });
         });
 
-        it('records watched source directories', async function() {
+        it('records watched source directories', async function () {
           builder = new FixtureBuilder(
             new broccoliSource.WatchedDir(path.resolve('test/fixtures/basic'))
           );
@@ -336,7 +336,7 @@ describe('Builder', function() {
       });
     });
 
-    it('records string (watched) source directories', async function() {
+    it('records string (watched) source directories', async function () {
       builder = new FixtureBuilder('test/fixtures/basic');
 
       expect(builder.watchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
@@ -347,7 +347,7 @@ describe('Builder', function() {
       });
     });
 
-    it('records source directories only once', function() {
+    it('records source directories only once', function () {
       const src = 'test/fixtures/basic';
 
       builder = new FixtureBuilder(new plugins.Merge([src, src]));
@@ -355,19 +355,19 @@ describe('Builder', function() {
       expect(builder.watchedPaths).to.deep.equal([path.resolve('test/fixtures/basic')]);
     });
 
-    it("fails construction when a watched source directory doesn't exist", function() {
+    it("fails construction when a watched source directory doesn't exist", function () {
       expect(() => {
         new Builder(new broccoliSource.WatchedDir('test/fixtures/does-not-exist'));
       }).to.throw(Builder.BuilderError, 'Directory not found: test/fixtures/does-not-exist');
     });
 
-    it('fails construction when a watched source directory is a file', function() {
+    it('fails construction when a watched source directory is a file', function () {
       expect(() => {
         new Builder(new broccoliSource.WatchedDir('test/fixtures/basic/foo.txt'));
       }).to.throw(Builder.BuilderError, 'Not a directory: test/fixtures/basic/foo.txt');
     });
 
-    it("fails when an unwatched source directory doesn't exist", async function() {
+    it("fails when an unwatched source directory doesn't exist", async function () {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/does-not-exist'));
 
       // Note: `ENOENT:` or `ENOENT,` depending on Node version
@@ -377,7 +377,7 @@ describe('Builder', function() {
       );
     });
 
-    it('fails when an unwatched source directory is a file', async function() {
+    it('fails when an unwatched source directory is a file', async function () {
       builder = new Builder(new broccoliSource.UnwatchedDir('test/fixtures/basic/foo.txt'));
 
       await expect(builder.build()).to.be.eventually.rejectedWith(
@@ -386,7 +386,7 @@ describe('Builder', function() {
       );
     });
 
-    it('returns only watched SourceNodeWrappers from watchedSourceNodeWrappers', function() {
+    it('returns only watched SourceNodeWrappers from watchedSourceNodeWrappers', function () {
       const source1 = new broccoliSource.WatchedDir('test/fixtures/basic/');
       const source2 = new broccoliSource.UnwatchedDir('test/fixtures/empty/');
       builder = new Builder(new plugins.Merge([source1, source2]));
@@ -398,22 +398,22 @@ describe('Builder', function() {
     });
   });
 
-  describe('error handling in constructor', function() {
-    it('detects cycles', function() {
+  describe('error handling in constructor', function () {
+    it('detects cycles', function () {
       function CyclicalPlugin() {
         Plugin.call(this, [this]); // use `this` as input node
       }
       // Cycles are quite hard to construct, so we make a special plugin
       CyclicalPlugin.prototype = Object.create(Plugin.prototype);
       CyclicalPlugin.prototype.constructor = CyclicalPlugin;
-      CyclicalPlugin.prototype.build = function() {};
+      CyclicalPlugin.prototype.build = function () {};
 
       expect(() => {
         new Builder(new CyclicalPlugin());
       }).to.throw(Builder.BuilderError, 'Cycle in node graph: CyclicalPlugin -> CyclicalPlugin');
     });
 
-    describe('invalid nodes', function() {
+    describe('invalid nodes', function () {
       const invalidNode = { 'not a node': true };
       const readBasedNode = {
         read() {},
@@ -421,7 +421,7 @@ describe('Builder', function() {
         description: 'an old node',
       };
 
-      it('catches invalid root nodes', function() {
+      it('catches invalid root nodes', function () {
         expect(() => {
           new Builder(invalidNode);
         }).to.throw(
@@ -430,7 +430,7 @@ describe('Builder', function() {
         );
       });
 
-      it('catches invalid input nodes', function() {
+      it('catches invalid input nodes', function () {
         expect(() => {
           new Builder(new plugins.Merge([invalidNode], { annotation: 'some annotation' }));
         }).to.throw(
@@ -439,7 +439,7 @@ describe('Builder', function() {
         );
       });
 
-      it('catches undefined input nodes', function() {
+      it('catches undefined input nodes', function () {
         // Very common sub-case of invalid input nodes
         expect(() => {
           new Builder(new plugins.Merge([undefined], { annotation: 'some annotation' }));
@@ -448,7 +448,7 @@ describe('Builder', function() {
         );
       });
 
-      it('catches .read/.rebuild-based root nodes', function() {
+      it('catches .read/.rebuild-based root nodes', function () {
         expect(() => {
           new Builder(readBasedNode);
         }).to.throw(
@@ -457,7 +457,7 @@ describe('Builder', function() {
         );
       });
 
-      it('catches .read/.rebuild-based input nodes', function() {
+      it('catches .read/.rebuild-based input nodes', function () {
         expect(() => {
           new Builder(
             new plugins.Merge([readBasedNode], {
@@ -472,14 +472,14 @@ describe('Builder', function() {
     });
   });
 
-  describe('cleanup', function() {
+  describe('cleanup', function () {
     let builder;
 
     class Sleep extends Plugin {
       constructor() {
         super(...arguments);
         this.buildWasCalled = false;
-        this.wait = new Promise(resolve => {
+        this.wait = new Promise((resolve) => {
           this.resolve = resolve;
         });
       }
@@ -496,7 +496,7 @@ describe('Builder', function() {
       }
     });
 
-    it('mid-build cleanup cancels the build', async function() {
+    it('mid-build cleanup cancels the build', async function () {
       const innerSleep = new Sleep([], { name: 'Sleep 1' });
       const outerSleep = new Sleep([innerSleep], { name: 'Sleep 2' });
 
@@ -516,7 +516,7 @@ describe('Builder', function() {
       expect(outerSleep.buildWasCalled).to.eql(false);
 
       await Promise.all([
-        build.catch(e => {
+        build.catch((e) => {
           expect(e.message).to.eql('Build Canceled');
         }),
         cleanup,
@@ -527,7 +527,7 @@ describe('Builder', function() {
     });
   });
 
-  describe('temporary directories', function() {
+  describe('temporary directories', function () {
     let tmpdir, tmpRemoveCallback;
 
     beforeEach(() => {
@@ -557,26 +557,26 @@ describe('Builder', function() {
       return false;
     }
 
-    it('creates temporary directory in os.tmpdir() by default', function() {
+    it('creates temporary directory in os.tmpdir() by default', function () {
       builder = new Builder(new plugins.Veggies());
       // This can have false positives from other Broccoli instances, but it's
       // better than nothing, and better than trying to be sophisticated
       expect(hasBroccoliTmpDir(os.tmpdir())).to.be.true;
     });
 
-    it('creates temporary directory in directory given by tmpdir options', function() {
+    it('creates temporary directory in directory given by tmpdir options', function () {
       builder = new Builder(new plugins.Veggies(), { tmpdir });
       expect(hasBroccoliTmpDir(tmpdir)).to.be.true;
     });
 
-    it('removes temporary directory when .cleanup() is called', async function() {
+    it('removes temporary directory when .cleanup() is called', async function () {
       builder = new Builder(new plugins.Veggies(), { tmpdir });
       expect(hasBroccoliTmpDir(tmpdir), 'should have tmpdir').to.be.true;
       await builder.cleanup();
       expect(hasBroccoliTmpDir(tmpdir), 'should not longer have tmpdir').to.be.false;
     });
 
-    describe('failing node setup', function() {
+    describe('failing node setup', function () {
       // Failing node setup is rare, but it could happen if a plugin fails to
       // create some compiler instance
 
@@ -591,7 +591,7 @@ describe('Builder', function() {
         }
       }
 
-      it('reports failing node and instantiation stack, and cleans up temporary directory', async function() {
+      it('reports failing node and instantiation stack, and cleans up temporary directory', async function () {
         const node = new FailingSetupPlugin(new Error('foo error'));
 
         expect(() => {
@@ -601,11 +601,11 @@ describe('Builder', function() {
           /foo error\s+at FailingSetupPlugin\n-~- created here: -~-/
         );
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
       });
 
-      it('supports string errors, and cleans up temporary directory', async function() {
+      it('supports string errors, and cleans up temporary directory', async function () {
         const node = new FailingSetupPlugin('bar error');
 
         expect(() => {
@@ -615,18 +615,18 @@ describe('Builder', function() {
           /bar error\s+at FailingSetupPlugin\n-~- created here: -~-/
         );
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         expect(hasBroccoliTmpDir(tmpdir)).to.be.false;
       });
     });
   });
 
-  describe('failing node build', function() {
-    multidepRequire.forEachVersion('broccoli-plugin', function(version, Plugin) {
+  describe('failing node build', function () {
+    multidepRequire.forEachVersion('broccoli-plugin', function (version, Plugin) {
       const plugins = makePlugins(Plugin);
 
-      describe('broccoli-plugin ' + version, function() {
-        it('rethrows as rich BuildError', async function() {
+      describe('broccoli-plugin ' + version, function () {
+        it('rethrows as rich BuildError', async function () {
           const originalError = new Error('whoops');
           originalError.file = 'some-file.js';
           originalError.treeDir = '/some/dir';
@@ -678,7 +678,7 @@ describe('Builder', function() {
           }
         });
 
-        it('reports the instantiationStack when no err.file is given', async function() {
+        it('reports the instantiationStack when no err.file is given', async function () {
           const originalError = new Error('whoops');
 
           builder = new Builder(new plugins.Failing(originalError));
@@ -688,12 +688,12 @@ describe('Builder', function() {
           );
         });
 
-        it('handles string errors', async function() {
+        it('handles string errors', async function () {
           builder = new Builder(new plugins.Failing('string exception'));
           await expect(builder.build()).to.be.rejectedWith(Builder.BuildError, /string exception/);
         });
 
-        it('handles undefined errors', async function() {
+        it('handles undefined errors', async function () {
           // Apparently that's a thing
           builder = new Builder(new plugins.Failing(undefined));
           await expect(builder.build()).to.be.rejectedWith(Builder.BuildError, /undefined/);
@@ -702,13 +702,13 @@ describe('Builder', function() {
     });
   });
 
-  describe('event handling', function() {
+  describe('event handling', function () {
     let events;
 
     function setupEventHandlers() {
       events = [];
-      builder.on('beginNode', nw => events.push('beginNode:' + nw.id));
-      builder.on('endNode', nw => events.push('endNode:' + nw.id));
+      builder.on('beginNode', (nw) => events.push('beginNode:' + nw.id));
+      builder.on('endNode', (nw) => events.push('endNode:' + nw.id));
     }
 
     it('triggers RSVP events', async () => {
@@ -725,7 +725,7 @@ describe('Builder', function() {
       ]);
     });
 
-    it('triggers matching endNode event when a node fails to build', async function() {
+    it('triggers matching endNode event when a node fails to build', async function () {
       builder = new Builder(new plugins.Merge([new plugins.Failing(new Error('whoops'))]));
       setupEventHandlers();
       await expect(builder.build()).to.be.rejected;
@@ -733,7 +733,7 @@ describe('Builder', function() {
     });
   });
 
-  describe('node wrappers', function() {
+  describe('node wrappers', function () {
     // It would be easier to test the node wrappers if we could create them
     // without instantiating a builder, but unfortunately this isn't easily
     // possible right now.
@@ -752,7 +752,7 @@ describe('Builder', function() {
       transformNw = builder.nodeWrappers[2];
     }
 
-    it('has .toString value useful for debugging', async function() {
+    it('has .toString value useful for debugging', async function () {
       setUpWatchedUnwatchedAndTransformNode();
       expect(watchedSourceNw + '').to.equal('[NodeWrapper:0 test/fixtures/basic]');
       expect(unwatchedSourceNw + '').to.equal('[NodeWrapper:1 test/fixtures/basic (unwatched)]');
@@ -766,7 +766,7 @@ describe('Builder', function() {
       expect(transformNw + '').to.match(/\([0-9]+ ms\)/);
     });
 
-    it('has .label property', function() {
+    it('has .label property', function () {
       const node0 = new broccoliSource.WatchedDir('test/fixtures/basic');
       const node1 = new broccoliSource.WatchedDir('test/fixtures/basic', {
         annotation: 'some text',
@@ -780,7 +780,7 @@ describe('Builder', function() {
       expect(builder.nodeWrappers[3].label).to.equal('MergePlugin (some text)');
     });
 
-    it('has .toJSON representation useful for exporting for visualization', async function() {
+    it('has .toJSON representation useful for exporting for visualization', async function () {
       setUpWatchedUnwatchedAndTransformNode();
       expect(watchedSourceNw.toJSON()).to.deep.equal({
         id: 0,
@@ -831,8 +831,8 @@ describe('Builder', function() {
       });
     });
 
-    describe('buildState', function() {
-      it('reports node timings', async function() {
+    describe('buildState', function () {
+      it('reports node timings', async function () {
         const node1 = new plugins.Sleeping(['test/fixtures/basic']);
         const node2 = new plugins.Sleeping();
         const outputNode = new plugins.Sleeping([node1, node2]);
@@ -863,14 +863,14 @@ describe('Builder', function() {
     });
   });
 
-  describe('Builder interface', function() {
-    it('has a features hash', function() {
+  describe('Builder interface', function () {
+    it('has a features hash', function () {
       expect(Builder.prototype).to.have.nested.property('features.persistentOutputFlag', true);
     });
   });
 
-  describe('cancel()', function() {
-    it('handles a cancel without an active build (has no affect)', async function() {
+  describe('cancel()', function () {
+    it('handles a cancel without an active build (has no affect)', async function () {
       const stepA = new plugins.Noop();
       const pipeline = new Builder(stepA);
 
@@ -883,7 +883,7 @@ describe('Builder', function() {
       expect(stepA.buildCount).to.eql(1);
     });
 
-    it('returns a promise which waits until cancellation is complete', async function() {
+    it('returns a promise which waits until cancellation is complete', async function () {
       let resolveCancel;
       let stepAIsComplete = false;
       let cancellingIsComplete = false;
@@ -910,7 +910,7 @@ describe('Builder', function() {
 
       const building = expect(pipeline.build()).to.eventually.be.rejectedWith('Build Canceled');
 
-      const cancelling = new Promise(resolve => (resolveCancel = resolve));
+      const cancelling = new Promise((resolve) => (resolveCancel = resolve));
 
       await Promise.all([
         building,
@@ -924,7 +924,7 @@ describe('Builder', function() {
       ]);
     });
 
-    it('errors if a new build is attempted during a cancellation', async function() {
+    it('errors if a new build is attempted during a cancellation', async function () {
       const stepA = new plugins.Deferred();
       const pipeline = new Builder(stepA);
       const build = pipeline.build();
@@ -950,7 +950,7 @@ describe('Builder', function() {
       return next;
     });
 
-    it('build before cancel completes', async function() {
+    it('build before cancel completes', async function () {
       const stepA = new plugins.Noop();
       const pipeline = new Builder(stepA);
 
@@ -963,7 +963,7 @@ describe('Builder', function() {
       expect(stepA.buildCount).to.eql(1);
     });
 
-    it('it cancels immediately if cancelled immediately after build', async function() {
+    it('it cancels immediately if cancelled immediately after build', async function () {
       const step = new plugins.Deferred();
       const pipeline = new Builder(step);
       step.resolve();
@@ -977,7 +977,7 @@ describe('Builder', function() {
       }
     });
 
-    it('completes the current task before cancelling, and can be resumed', async function() {
+    it('completes the current task before cancelling, and can be resumed', async function () {
       let pipeline;
 
       class SometimesBuildCanceller extends plugins.Noop {
@@ -1028,9 +1028,9 @@ describe('Builder', function() {
     });
   });
 
-  describe('heimdall stats', function() {
-    it('produces stats', async function() {
-      const timeEqualAssert = function(a, b) {
+  describe('heimdall stats', function () {
+    it('produces stats', async function () {
+      const timeEqualAssert = function (a, b) {
         expect(a).to.be.a('number');
 
         // do not run timing assertions in Travis builds
@@ -1041,7 +1041,7 @@ describe('Builder', function() {
         }
       };
 
-      const timeTotalAssert = function(parentNode, childNodes) {
+      const timeTotalAssert = function (parentNode, childNodes) {
         expect(parentNode.stats.time.self).to.be.a('number');
 
         const childTime = childNodes.reduce(

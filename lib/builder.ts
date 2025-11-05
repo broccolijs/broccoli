@@ -463,7 +463,7 @@ class Builder extends EventEmitter {
   }
 
   setupHeimdall() {
-    this.on('beginNode', node => {
+    this.on('beginNode', (node) => {
       let name;
 
       if (node instanceof SourceNodeWrapper) {
@@ -485,7 +485,7 @@ class Builder extends EventEmitter {
       node.__heimdall__ = heimdall.current;
     });
 
-    this.on('endNode', node => {
+    this.on('endNode', (node) => {
       if (node.__heimdall__) {
         node.__heimdall_cookie__.stop();
       }
