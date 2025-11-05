@@ -72,7 +72,7 @@
     "chai-as-promised": "^7.1.1",
     "copyfiles": "^2.2.0",
     "eslint": "^9.39.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-mocha": "^10.5.0",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^5.2.1",
