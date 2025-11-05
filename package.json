@@ -78,7 +78,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "execa": "^5.1.1",
     "fixturify": "^3.0.0",
-    "got": "^9.0.0",
+    "got": "^11.8.6",
     "longjohn": "^0.2.12",
     "mocha": "^11.7.4",
     "portfinder": "^1.0.38",
