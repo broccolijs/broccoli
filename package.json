@@ -41,7 +41,6 @@
     "commander": "^14.0.2",
     "connect": "^3.6.6",
     "console-ui": "^3.1.2",
-    "esm": "^3.2.25",
     "findup-sync": "^5.0.0",
     "handlebars": "^4.7.8",
     "heimdalljs": "^0.2.6",
@@ -96,6 +95,6 @@
     "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">= 20.*"
+    "node": ">= 20.19.*"
   }
 }
