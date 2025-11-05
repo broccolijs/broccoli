@@ -81,7 +81,7 @@
     "got": "^9.0.0",
     "longjohn": "^0.2.12",
     "mocha": "^7.1.0",
-    "portfinder": "^1.0.25",
+    "portfinder": "^1.0.38",
     "prettier": "^1.19.1",
     "rsvp": "^4.8.5",
     "semver": "^7.7.3",
