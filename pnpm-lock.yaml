@@ -65,7 +65,7 @@ importers:
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.0
-        version: 9.39.0
+        version: 9.39.1
       '@types/chai':
         specifier: ^5.2.3
         version: 5.2.3
@@ -213,10 +213,6 @@ packages:
 
   '@eslint/eslintrc@3.3.1':
     resolution: {integrity: sha512-gtF186CXhIl1p4pJNGZw8Yc6RlshoePRvE0X91oPGb3vZ8pM3qOS9W9NGPat9LziaBV7XrJWGylNQXkGcnM3IQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@eslint/js@9.39.0':
-    resolution: {integrity: sha512-BIhe0sW91JGPiaF1mOuPy5v8NflqfjIcDNpC+LbW9f609WVRX1rArrhi6Z2ymvrAry9jw+5POTj4t2t62o8Bmw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/js@9.39.1':
@@ -2508,8 +2504,6 @@ snapshots:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
-
-  '@eslint/js@9.39.0': {}
 
   '@eslint/js@9.39.1': {}
 
