@@ -2,7 +2,8 @@ const eslint = require('@eslint/js');
 const tseslint = require('@typescript-eslint/eslint-plugin');
 const tsparser = require('@typescript-eslint/parser');
 const prettier = require('eslint-plugin-prettier');
-const mocha = require('eslint-plugin-mocha');
+const mochaPlugin = require('eslint-plugin-mocha');
+const mocha = mochaPlugin.default || mochaPlugin;
 const node = require('eslint-plugin-node');
 const prettierConfig = require('./prettier.config');
 
