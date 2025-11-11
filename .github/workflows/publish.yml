@@ -21,7 +21,7 @@ jobs:
     name: "NPM Publish"
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
       attestations: write
 
