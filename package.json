@@ -1,6 +1,6 @@
 {
   "name": "broccoli",
-  "version": "3.5.2",
+  "version": "4.0.0",
   "description": "Fast client-side asset builder",
   "keywords": [
     "asset",
