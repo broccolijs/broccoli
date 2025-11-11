@@ -1,0 +1,30 @@
+{
+  "solution": {
+    "broccoli": {
+      "impact": "major",
+      "oldVersion": "3.5.2",
+      "newVersion": "4.0.0",
+      "tagName": "latest",
+      "constraints": [
+        {
+          "impact": "major",
+          "reason": "Appears in changelog section :boom: Breaking Change"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :bug: Bug Fix"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :memo: Documentation"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :house: Internal"
+        }
+      ],
+      "pkgJSONPath": "./package.json"
+    }
+  },
+  "description": "## Release (2025-11-11)\n\n* broccoli 4.0.0 (major)\n\n#### :boom: Breaking Change\n* `broccoli`\n  * [#510](https://github.com/broccolijs/broccoli/pull/510) Drop Node < 20; widen Node range up to 24, get CI running; revert unreleased change ([@kategengler](https://github.com/kategengler))\n\n#### :bug: Bug Fix\n* `broccoli`\n  * [#531](https://github.com/broccolijs/broccoli/pull/531) remove esm package and bump minimum node version to v20.19 ([@mansona](https://github.com/mansona))\n  * [#513](https://github.com/broccolijs/broccoli/pull/513) Convert to pnpm + upgrades ([@kategengler](https://github.com/kategengler))\n\n#### :memo: Documentation\n* `broccoli`\n  * [#517](https://github.com/broccolijs/broccoli/pull/517) Remove broken website link ([@kategengler](https://github.com/kategengler))\n\n#### :house: Internal\n* `broccoli`\n  * [#530](https://github.com/broccolijs/broccoli/pull/530) Prepare Release v4.0.0 ([@github-actions[bot]](https://github.com/apps/github-actions))\n  * [#529](https://github.com/broccolijs/broccoli/pull/529) Add release-plan ([@kategengler](https://github.com/kategengler))\n  * [#528](https://github.com/broccolijs/broccoli/pull/528) Upgrade prettier ([@kategengler](https://github.com/kategengler))\n  * [#527](https://github.com/broccolijs/broccoli/pull/527) Upgrade dev deps ([@kategengler](https://github.com/kategengler))\n  * [#518](https://github.com/broccolijs/broccoli/pull/518) Update lockfile after removing https package ([@kategengler](https://github.com/kategengler))\n  * [#504](https://github.com/broccolijs/broccoli/pull/504) Remove https npm library as it doesn't and cannot do anything ([@spthiel](https://github.com/spthiel))\n  * [#516](https://github.com/broccolijs/broccoli/pull/516) Fixes after branch rename to main ([@kategengler](https://github.com/kategengler))\n\n#### Committers: 4\n- Chris Manson ([@mansona](https://github.com/mansona))\n- Katie Gengler ([@kategengler](https://github.com/kategengler))\n- [@github-actions[bot]](https://github.com/apps/github-actions)\n- [@spthiel](https://github.com/spthiel)\n"
+}
