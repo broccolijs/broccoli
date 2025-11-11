@@ -204,6 +204,8 @@ describe('server', function () {
       expect(body).to.eql('Hello');
       expect(headers['last-modified']).to.eql('Fri, 27 Jul 2018 17:23:02 GMT');
       expect(headers['cache-control']).to.eql('private, max-age=0, must-revalidate');
+      expect(headers['access-control-allow-origin']).to.eql('*');
+      expect(headers['access-control-allow-methods']).to.eql('GET, OPTIONS');
       expect(headers['content-length']).to.eql('5');
       expect(headers['content-type']).to.eql('text/plain; charset=utf-8');
     }

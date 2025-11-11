@@ -127,6 +127,9 @@ function handleRequest(
     return;
   }
 
+  response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+
   response.setHeader('Cache-Control', 'private, max-age=0, must-revalidate');
   response.setHeader('Content-Length', stat.size);
   response.setHeader('Content-Type', mime.contentType(path.extname(filename)));
