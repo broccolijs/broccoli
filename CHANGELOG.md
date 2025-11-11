@@ -1,7 +1,5 @@
 # Changelog
 
-# master
-
 ## v3.5.2 (2021-05-03)
 
 #### :bug: Bug Fix
