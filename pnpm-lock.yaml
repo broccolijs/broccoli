@@ -133,8 +133,8 @@ importers:
         specifier: ^5.2.1
         version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.39.1))(eslint@9.39.1)(prettier@3.6.2)
       execa:
-        specifier: ^5.1.1
-        version: 5.1.1
+        specifier: ^9.6.0
+        version: 9.6.0
       fixturify:
         specifier: ^3.0.0
         version: 3.0.0
